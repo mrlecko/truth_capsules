@@ -1,0 +1,31 @@
+{
+  "title": "REPORT_SCHEMA",
+  "type": "object",
+  "properties": {
+    "objective": {
+      "type": "string"
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "plan": {
+      "type": "string"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "summary": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "objective",
+    "summary"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "title": "JUDGE_SCHEMA",
+  "type": "object",
+  "properties": {
+    "score": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "fail"
+      ]
+    },
+    "justification": {
+      "type": "string"
+    },
+    "citations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "score",
+    "verdict",
+    "justification"
+  ]
+}

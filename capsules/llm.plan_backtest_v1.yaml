@@ -1,0 +1,41 @@
+id: llm.plan_backtest_v1
+version: 1.0.0
+domain: llm
+title: Plan Backtest
+statement: Backtest the plan on a prior similar case; report differences and whether
+  the plan would have succeeded.
+assumptions:
+- We can reference at least one analogous case (internal or public).
+pedagogy:
+- kind: Socratic
+  text: What happened last time we tried something like this?
+- kind: Aphorism
+  text: Yesterday is a cheap simulator.
+witnesses: []
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules
+  created: '2025-11-07T03:56:05.351404Z'
+  updated: '2025-11-07T03:56:05.351404Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: ca48eef684d2815426664bd7beb2a8a785586c1c169f991a4e64252a99c4155b
+    signature: null
+applies_to:
+- conversation
+- code_assistant
+- ci
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: low
+  notes: ''

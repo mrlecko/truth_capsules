@@ -1,0 +1,38 @@
+{
+  "@context": {
+    "@vocab": "https://w3id.org/tc#",
+    "id": "@id",
+    "type": "@type",
+
+    "Capsule": "Capsule",
+    "Witness": "Witness",
+    "Bundle": "Bundle",
+
+    "identifier": "http://purl.org/dc/terms/identifier",
+    "title": "http://purl.org/dc/terms/title",
+    "statement": "statement",
+    "domain": "domain",
+    "version": "http://schema.org/version",
+    "assumption": "assumption",
+
+    "hasWitness": { "@id": "hasWitness", "@container": "@set" },
+    "inBundle":  { "@id": "inBundle",  "@type": "@id" },
+
+    "language": "language",
+    "entrypoint": "entrypoint",
+    "codeHash": "codeHash",
+    "codeRef":  "codeRef",
+
+    "author": "http://purl.org/dc/terms/creator",
+    "org": "http://schema.org/affiliation",
+    "license": "http://purl.org/dc/terms/license",
+    "created": { "@id": "http://purl.org/dc/terms/created", "@type": "http://www.w3.org/2001/XMLSchema#dateTime" },
+    "updated": { "@id": "http://purl.org/dc/terms/modified", "@type": "http://www.w3.org/2001/XMLSchema#dateTime" },
+
+    "reviewStatus": "reviewStatus",
+    "applies_to":  "applies_to",
+    "dependency":  "dependency",
+    "incompatible_with": "incompatible_with",
+    "sensitivity": "sensitivity"
+  }
+}

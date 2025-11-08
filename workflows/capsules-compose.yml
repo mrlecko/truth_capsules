@@ -1,0 +1,36 @@
+name: capsules-compose
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: 'Profile ID to use'
+        required: true
+        default: 'profile.ci_deterministic_gate_v1'
+      bundles:
+        description: 'Comma-separated bundle names'
+        required: true
+        default: 'pr_review_minibundle_v1'
+jobs:
+  compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: pip install pyyaml
+      - name: Compose prompt + manifest
+        run: |
+          IFS=',' read -ra BARR <<< "${{ github.event.inputs.bundles }}"
+          ARGS=""
+          for b in "${BARR[@]}"; do ARGS="$ARGS --bundle $b"; done
+          python compose_capsules_cli.py --root truth-capsules-v1             --profile "${{ github.event.inputs.profile }}"             $ARGS             --out examples/ci/prompt.txt             --manifest examples/ci/prompt.manifest.json
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: truth-capsules-prompt
+          path: |
+            examples/ci/prompt.txt
+            examples/ci/prompt.manifest.json

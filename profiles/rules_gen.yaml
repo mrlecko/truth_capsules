@@ -1,0 +1,28 @@
+kind: profile
+id: profile.rules_generator_v1
+title: Code Assistant - Rules Generator
+version: 1.0.0
+description: Emit a single YAML document for agent/IDE rules.
+response:
+  format: yaml
+  policy: |
+    Emit one YAML with sections: rules, violations, meta. No prose outside YAML.
+  system_block: |
+    SYSTEM: Profile=Rules Generator
+    POLICY: Emit a single YAML document with 'rules', 'violations', and 'meta' sections.
+    FORMAT: ```yaml``` only.
+  projection:
+    include:
+      - title
+      - statement
+      - assumptions[:3]
+      - pedagogy.socratic[:3]
+      - pedagogy.aphorisms[:2]
+    render:
+      capsule_header: "BEGIN CAPSULE id={id} version={version} domain={domain}"
+      assumption_bullet: "  - {text}"
+      socratic_bullet: "  - {text}"
+      aphorism_bullet: "  - {text}"
+      enforcement_footer: "ENFORCEMENT: Ensure outputs satisfy this capsule; otherwise abstain and request the minimal missing info."
+download:
+  suggested_ext: yaml

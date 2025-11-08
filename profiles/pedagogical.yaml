@@ -1,0 +1,28 @@
+kind: profile
+id: profile.pedagogical_v1
+title: Pedagogical / Socratic
+version: 1.0.0
+description: Teaching/coaching mode; questions first, then takeaways.
+response:
+  format: natural
+  policy: |
+    Use 3–5 Socratic questions, then 3 concise takeaways. Prefer tiny, reversible steps.
+  system_block: |
+    SYSTEM: Profile=Pedagogical
+    POLICY: Use 3–5 Socratic questions, then 3 bullet takeaways.
+    FORMAT: Bulleted text; no JSON.
+  projection:
+    include:
+      - title
+      - statement
+      - assumptions[:5]
+      - pedagogy.socratic[:5]
+      - pedagogy.aphorisms[:5]
+    render:
+      capsule_header: "BEGIN CAPSULE id={id} version={version} domain={domain}"
+      assumption_bullet: "  - {text}"
+      socratic_bullet: "  - {text}"
+      aphorism_bullet: "  - {text}"
+      enforcement_footer: "ENFORCEMENT: Ensure outputs satisfy this capsule; otherwise abstain and request the minimal missing info."
+download:
+  suggested_ext: md

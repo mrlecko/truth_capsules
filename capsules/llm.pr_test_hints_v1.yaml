@@ -1,0 +1,41 @@
+id: llm.pr_test_hints_v1
+version: 1.0.0
+domain: pr_review
+title: "PR Review - Minimal Tests"
+statement: "Propose 2–4 smallest tests that would catch a regression introduced\
+  \ by this diff (include inputs/edges)."
+assumptions:
+- Some testing harness exists (unit/integration).
+pedagogy:
+- kind: Socratic
+  text: "What’s the cheapest test that would fail if you’re wrong?"
+- kind: Aphorism
+  text: One failing test beats ten opinions.
+witnesses: []
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules
+  created: '2025-11-07T03:56:05.351404Z'
+  updated: '2025-11-07T03:56:05.351404Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: 5805f25cf9ab26a69030c1849005c33062c93ec43aadbf92edbeb9e675533bbc
+    signature: null
+applies_to:
+- conversation
+- code_assistant
+- ci
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: low
+  notes: ''

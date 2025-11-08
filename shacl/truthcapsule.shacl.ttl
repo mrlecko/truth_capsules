@@ -1,0 +1,19 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix tc: <https://w3id.org/tc#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+tc:CapsuleShape a sh:NodeShape ;
+  sh:targetClass tc:Capsule ;
+  sh:property [ sh:path dct:identifier ; sh:datatype xsd:string ; sh:minCount 1 ] ;
+  sh:property [ sh:path dct:title ; sh:datatype xsd:string ; sh:minCount 0 ] ;
+  sh:property [ sh:path tc:statement ; sh:datatype xsd:string ; sh:minCount 1 ] ;
+  sh:property [ sh:path tc:hasWitness ; sh:node tc:WitnessShape ; sh:minCount 0 ] .
+
+tc:WitnessShape a sh:NodeShape ;
+  sh:targetClass tc:Witness ;
+  sh:property [ sh:path tc:language ; sh:in ("python" "node" "bash"); sh:minCount 1 ] ;
+  sh:xone (
+    [ sh:property [ sh:path tc:codeHash ; sh:pattern "^[a-f0-9]{64}$" ; sh:minCount 1 ] ]
+    [ sh:property [ sh:path tc:codeRef  ; sh:nodeKind sh:IRI ; sh:minCount 1 ] ]
+  ) .

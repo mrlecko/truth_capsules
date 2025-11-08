@@ -1,0 +1,49 @@
+id: business.decision_log_v1
+version: 1.0.0
+statement: "Decision records must include decision, ≥3 options, ≥2 criteria,\
+  \ and a rationale mentioning a trade-off."
+domain: business
+witnesses:
+- name: decision_log_gate
+  language: python
+  code: |-
+    import json, os
+
+    p = os.getenv("DEC_REPORT", "artifacts/examples/decision_log_ok.json")
+
+    r = json.load(open(p))
+
+    assert r.get("decision")
+
+    assert isinstance(r.get("options"), list) and len(r["options"])>=3
+
+    assert isinstance(r.get("criteria"), list) and len(r["criteria"])>=2
+
+    assert "trade-off" in (r.get("rationale","")+"").lower() or "because" in (r.get("rationale","")+"").lower()
+provenance:
+  author: Truth Capsules
+  license: MIT
+  schema: provenance.v1
+  org: Truth Capsules Demo
+  source_url: https://example.com/truth-capsules
+  created: '2025-11-07T03:53:50.511776Z'
+  updated: '2025-11-07T03:56:05.351404Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: aaaa74594ea1f7a6a9a1bb5393376d7b50cca234bcf94ace66e9a76f0472b8ef
+    signature: null
+applies_to:
+- conversation
+- code_assistant
+- ci
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: low
+  notes: ''

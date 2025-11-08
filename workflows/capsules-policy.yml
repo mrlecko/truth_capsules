@@ -1,0 +1,20 @@
+name: capsules-policy
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+jobs:
+  policy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Install deps
+        run: pip install pyyaml pynacl
+      - name: Lint capsules
+        run: python capsule_linter.py truth-capsules-v1/capsules
+      - name: Policy check (signatures enforced on approved)
+        run: python capsule_policy_check.py truth-capsules-v1/capsules --require-signature-on-approved

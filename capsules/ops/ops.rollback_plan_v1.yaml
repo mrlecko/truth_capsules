@@ -1,0 +1,44 @@
+id: ops.rollback_plan_v1
+version: 1.0.0
+statement: Deploy plans must include a rollback step with trigger conditions and owner.
+domain: ops
+witnesses:
+- name: rollback_present
+  language: python
+  code: |-
+    import json, os
+
+    p = os.getenv("OPS_PLAN", "artifacts/examples/ops_plan_ok.json")
+
+    r = json.load(open(p))
+
+    rb = r.get("rollback", {})
+
+    assert rb.get("steps") and rb.get("trigger") and rb.get("owner"), "Rollback incomplete"
+provenance:
+  author: Truth Capsules
+  license: MIT
+  schema: provenance.v1
+  org: Truth Capsules Demo
+  source_url: https://example.com/truth-capsules
+  created: '2025-11-07T03:53:50.511776Z'
+  updated: '2025-11-07T03:56:05.351404Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: f61cf94b2bab0b65151a110ccbb77b6f2763179f16c826d5ed5c03288493e5c8
+    signature: null
+applies_to:
+- conversation
+- code_assistant
+- ci
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: low
+  notes: ''

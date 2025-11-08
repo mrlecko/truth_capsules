@@ -1,0 +1,5 @@
+* text=auto eol=lf
+*.yaml diff
+*.yml  diff
+*.json linguist-language=JSON
+*.md   diff=markdown

@@ -1,0 +1,29 @@
+kind: profile
+id: profile.ci_llm_judge_v1
+title: CI Gate - LLM Judge
+version: 1.0.0
+description: LLM evaluates artifacts; score + verdict + justification + citations.
+response:
+  format: json
+  policy: |
+    Score 0–1; verdict in {pass,fail}; brief justification; cite or abstain.
+  schema_ref: judge.schema.v1
+  rubric:
+    - Factual
+    - Reproducible evidence
+    - Citations present (or abstain)
+  system_block: |
+    SYSTEM: Profile=CI LLM Judge
+    POLICY: Score 0–1; verdict in {pass,fail}; brief justification; cite or abstain.
+    SCHEMA: See JUDGE_SCHEMA below.
+  projection:
+    include:
+      - title
+      - statement
+      - assumptions[:2]
+    render:
+      capsule_header: "CAPSULE: {id} v{version}"
+      assumption_bullet: "  - {text}"
+      enforcement_footer: "ENFORCEMENT: Obey or abstain."
+download:
+  suggested_ext: json

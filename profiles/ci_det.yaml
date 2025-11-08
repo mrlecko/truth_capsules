@@ -1,0 +1,23 @@
+kind: profile
+id: profile.ci_deterministic_gate_v1
+title: CI Gate - Deterministic
+version: 1.0.0
+description: Non-LLM checks in CI; machine-parsed JSON pass/fail.
+response:
+  format: json
+  policy: |
+    Output JSON only. No extra text.
+  schema_ref: report.schema.v1
+  system_block: |
+    SYSTEM: Profile=CI Deterministic Gate
+    POLICY: Output JSON only. No extra text.
+    SCHEMA: See REPORT_SCHEMA below.
+  projection:
+    include:
+      - title
+      - statement
+    render:
+      capsule_header: "CAPSULE: {id} v{version}"
+      enforcement_footer: "ENFORCEMENT: Obey or abstain."
+download:
+  suggested_ext: json

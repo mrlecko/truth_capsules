@@ -1,0 +1,24 @@
+@prefix tc:   <https://w3id.org/tc#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+tc:Capsule a rdfs:Class ; rdfs:label "Truth Capsule" .
+tc:Witness a rdfs:Class ; rdfs:label "Witness (executable check)" .
+tc:Bundle  a rdfs:Class ; rdfs:label "Bundle" .
+
+tc:hasWitness a rdfs:Property ; rdfs:domain tc:Capsule ; rdfs:range tc:Witness .
+tc:inBundle   a rdfs:Property ; rdfs:domain tc:Capsule ; rdfs:range tc:Bundle .
+tc:statement  a rdfs:Property ; rdfs:domain tc:Capsule ; rdfs:range xsd:string .
+tc:domain     a rdfs:Property ; rdfs:domain tc:Capsule ; rdfs:range xsd:string .
+tc:assumption a rdfs:Property ; rdfs:domain tc:Capsule ; rdfs:range xsd:string .
+tc:reviewStatus a rdfs:Property ; rdfs:domain tc:Capsule ; rdfs:range xsd:string .
+tc:applies_to a rdfs:Property ; rdfs:domain tc:Capsule ; rdfs:range xsd:string .
+tc:dependency a rdfs:Property ; rdfs:domain tc:Capsule ; rdfs:range xsd:string .
+tc:incompatible_with a rdfs:Property ; rdfs:domain tc:Capsule ; rdfs:range xsd:string .
+tc:sensitivity a rdfs:Property ; rdfs:domain tc:Capsule ; rdfs:range xsd:string .
+
+tc:language  a rdfs:Property ; rdfs:domain tc:Witness ; rdfs:range xsd:string .
+tc:entrypoint a rdfs:Property ; rdfs:domain tc:Witness ; rdfs:range xsd:string .
+tc:codeHash  a rdfs:Property ; rdfs:domain tc:Witness ; rdfs:range xsd:string .
+tc:codeRef   a rdfs:Property ; rdfs:domain tc:Witness ; rdfs:range xsd:anyURI .

@@ -1,0 +1,41 @@
+id: llm.evidence_gap_triage_v1
+version: 1.0.0
+domain: llm
+title: Evidence Gap Triage
+statement: Identify missing evidence blocking a sound answer; request the single smallest
+  artifact that would unlock progress.
+assumptions:
+- The model/user can ask for one clarifying item.
+pedagogy:
+- kind: Socratic
+  text: What one artifact would collapse uncertainty the most?
+- kind: Aphorism
+  text: Ask once, ask small.
+witnesses: []
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules
+  created: '2025-11-07T03:56:05.351404Z'
+  updated: '2025-11-07T03:56:05.351404Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: eb49e65eaa19a8197d7f1b38547a7c66c4ba49b81c1bf18718a57135a3d8e1e4
+    signature: null
+applies_to:
+- conversation
+- code_assistant
+- ci
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: low
+  notes: ''

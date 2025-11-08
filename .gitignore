@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.venv*/
+.env
+.env.*
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node (if any)
+node_modules/
+
+# OS/IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Build & wheels
+dist/
+build/
+*.egg-info/
+
+# Artifacts & outputs (keep examples/)
+artifacts
+artifacts/*.log
+
+# Remove /out for release!
+#artifacts/out
+
+# Keys / secrets
+keys/*.pem
+keys/*.key
+keys/*.pub
+keys/.secrets/
+!keys/README.md
+
+# Data Layers
+.neo4j/
+# bundle apoc jar for now to match pinned neo4j 4.4 spec 
+#.neo4j44/

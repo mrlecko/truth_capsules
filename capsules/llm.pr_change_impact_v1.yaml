@@ -1,0 +1,41 @@
+id: llm.pr_change_impact_v1
+version: 1.0.0
+domain: pr_review
+title: "PR Review - Change Impact"
+statement: Describe user-facing impact (if any), docs to update, and a single line
+  release note.
+assumptions:
+- Every externally visible change gets a note or is explicitly internal-only.
+pedagogy:
+- kind: Socratic
+  text: Who will notice this change tomorrow?
+- kind: Aphorism
+  text: If it matters, document it.
+witnesses: []
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules
+  created: '2025-11-07T03:56:05.351404Z'
+  updated: '2025-11-07T03:56:05.351404Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: aab51bbcfc3e082d3d8b63c05234c9fdf4cde425aefdf6ba0f62986c4be0bdaf
+    signature: null
+applies_to:
+- conversation
+- code_assistant
+- ci
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: low
+  notes: ''

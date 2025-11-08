@@ -1,0 +1,6 @@
+pyyaml
+pytest
+jinja2
+rdflib
+pyshacl
+llm

@@ -1,0 +1,8 @@
+PREFIX tc: <https://w3id.org/tc#>
+PREFIX dct: <http://purl.org/dc/terms/>
+
+SELECT DISTINCT ?id WHERE {
+  ?c a tc:Capsule ; dct:identifier ?id ; tc:hasWitness ?w .
+  ?w tc:language "python" .
+}
+ORDER BY ?id

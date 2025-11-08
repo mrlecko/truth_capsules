@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Truth Capsule Bundle v1.1",
+  "description": "Schema for Truth Capsule bundles - collections of capsules for specific contexts",
+  "type": "object",
+  "required": ["name", "capsules"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Unique bundle name (e.g., conversation_red_team_baseline_v1)",
+      "pattern": "^[a-z0-9_]+_v\\d+$"
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version (e.g., 1.0.0)",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "applies_to": {
+      "type": "array",
+      "description": "Contexts where this bundle is applicable",
+      "items": {
+        "type": "string",
+        "enum": ["conversation", "code_assistant", "ci", "assistant", "tool_runner"]
+      },
+      "minItems": 1
+    },
+    "capsules": {
+      "type": "array",
+      "description": "List of capsule IDs to include in this bundle",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9_.-]+_v\\d+(?:_[a-z0-9_]+)?$"
+      },
+      "minItems": 1
+    },
+    "excludes": {
+      "type": "array",
+      "description": "List of capsule IDs to explicitly exclude (useful for derived bundles)",
+      "items": {
+        "type": "string"
+      }
+    },
+    "priority_overrides": {
+      "type": "object",
+      "description": "Override default priorities for specific capsules (for control table generation)",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 100
+      }
+    },
+    "projection": {
+      "type": "string",
+      "description": "Override profile's default projection (e.g., 'ci', 'compact', 'full')"
+    },
+    "order": {
+      "type": "array",
+      "description": "Explicit ordering of capsule IDs. Unlisted capsules append in original order.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tags": {
+      "type": "array",
+      "description": "Metadata tags for categorization and search",
+      "items": {
+        "type": "string"
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional context or usage notes for this bundle"
+    },
+    "modes": {
+      "type": "array",
+      "description": "Operational modes (e.g., baseline, red_team, strict)",
+      "items": {
+        "type": "string"
+      }
+    },
+    "env": {
+      "type": "object",
+      "description": "Environment variable hints or requirements",
+      "additionalProperties": true
+    },
+    "secrets": {
+      "type": "array",
+      "description": "List of secret keys required by this bundle",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+id: llm.assumption_to_test_v1
+version: 1.0.0
+domain: llm
+title: "Assumptions → Tests"
+statement: "Convert each critical assumption into a falsifiable micro-test with owner,\
+  \ required evidence, and a 24–72h timebox."
+assumptions:
+- Assumptions are enumerated or can be elicited with one question.
+pedagogy:
+- kind: Socratic
+  text: Which single assumption, if wrong, invalidates the plan?
+- kind: Aphorism
+  text: Make failure explicit and reversible.
+witnesses: []
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules
+  created: '2025-11-07T03:56:05.351404Z'
+  updated: '2025-11-07T03:56:05.351404Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: f810b90bf12c4f5c7314dcd769720b058cbf3f39b3fb7e0d2722e2f8216c3154
+    signature: null
+applies_to:
+- conversation
+- code_assistant
+- ci
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: low
+  notes: ''

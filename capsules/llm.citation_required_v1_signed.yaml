@@ -1,0 +1,29 @@
+id: llm.citation_required_v1_signed
+version: 1.0.0
+domain: llm
+title: Citations required (signed demo)
+statement: Answers must include at least one citation or abstain.
+assumptions: []
+pedagogy:
+- kind: Socratic
+  text: What source supports your key claim?
+- kind: Aphorism
+  text: Cite or abstain.
+provenance:
+  author: Truth Capsules Demo
+  license: MIT
+  schema: provenance.v1
+  org: Truth Capsules
+  created: '2025-11-07T04:51:20.658919Z'
+  signing:
+    algorithm: ed25519
+    public_key_pem: '-----BEGIN PUBLIC KEY-----
+
+      MCowBQYDK2VwAyEAdkKe+ZblRkk/8oGtvid7tisLS8L3j12LjGHLC05vnDs=
+
+      -----END PUBLIC KEY-----
+
+      '
+    digest: b7862aabe696451c37f4e870ece9ae18b37344ef14cf48561dbadf40a5bd5d42
+    signature_b64: VJ8i2ZLMIER3ITahlPQZ435w/ZxRAwyGRnPqboVQG78+GUe2alcBd5BS/1KzjtzMxi+B32TvaSbu7tYf3rNSBg==
+    status: approved

@@ -1,0 +1,19 @@
+name: ci_llm_baseline_v1
+applies_to: [ci]
+capsules:
+  - llm.citation_required_v1
+  - llm.tool_json_contract_v1
+  - llm.plan_verify_answer_v1
+  - llm.pii_redaction_guard_v1
+  - llm.judge_answer_quality_v1
+modes: [static, smoke, judge]
+env:
+  TC_ARTIFACT: artifacts/out/answers.json
+  TC_SCHEMA: artifacts/examples/tool_schema_book_meeting.json
+  TC_CALL: artifacts/out/tool_calls.json
+  TC_PVA: artifacts/out/pva_logs.json
+  TC_TXT: artifacts/out/pii_scan.json
+  TC_CANDIDATE: artifacts/out/answer_candidate.json
+  TC_JUDGMENT: artifacts/judgments/answers.judgment.json
+secrets:
+  - OPENAI_API_KEY

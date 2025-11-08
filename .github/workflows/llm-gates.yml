@@ -1,0 +1,22 @@
+name: Capsule Gates - ci_llm_baseline_v1
+on: [pull_request]
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install pyyaml
+      - name: Prepare fixtures
+        run: mkdir -p artifacts/out && cp -r artifacts/examples/. artifacts/out/ || true
+      - name: Run truth capsules
+        run: python scripts/run_capsules.py capsules
+        env:
+          TC_ARTIFACT: artifacts/out/answers.json
+          TC_SCHEMA: artifacts/examples/tool_schema_book_meeting.json
+          TC_CALL: artifacts/out/tool_calls.json
+          TC_PVA: artifacts/out/pva_logs.json
+          TC_TXT: artifacts/out/pii_scan.json
+          TC_CANDIDATE: artifacts/out/answer_candidate.json
+          TC_JUDGMENT: artifacts/judgments/answers.judgment.json

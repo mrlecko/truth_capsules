@@ -1,0 +1,16 @@
+name: conversation_red_team_baseline_v1
+applies_to: [conversation, code_assistant]
+capsules:
+  - llm.red_team_assessment_v1
+  - llm.counterfactual_probe_v1
+  - llm.assumption_to_test_v1
+  - llm.steelmanning_v1
+  - llm.five_whys_root_cause_v1
+  - llm.fermi_estimation_v1
+  - llm.safety_refusal_guard_v1
+  - llm.evidence_gap_triage_v1
+  - llm.bias_checklist_v1
+  - llm.plan_backtest_v1
+modes: [baseline, red_team]
+env: {}
+secrets: []

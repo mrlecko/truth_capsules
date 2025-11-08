@@ -1,0 +1,24 @@
+kind: profile
+id: profile.tool_runner_v1
+title: Tool Runner / Function Caller
+version: 1.0.0
+description: Produce ONLY JSON arguments for a tool; ask one clarifier if fields missing.
+response:
+  format: json
+  policy: |
+    Output only the JSON arguments matching the tool schema. If fields are missing, ask ONE clarifying question.
+  system_block: |
+    SYSTEM: Profile=Tool Runner
+    POLICY: Output ONLY the JSON arguments matching the tool schema. If missing fields, ask ONE clarifying question.
+    FORMAT: JSON only.
+  projection:
+    include:
+      - title
+      - statement
+      - assumptions[:3]
+    render:
+      capsule_header: "BEGIN CAPSULE id={id} version={version} domain={domain}"
+      assumption_bullet: "  - {text}"
+      enforcement_footer: "ENFORCEMENT: Ensure outputs satisfy this capsule; otherwise abstain and request the minimal missing info."
+download:
+  suggested_ext: json
