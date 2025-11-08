@@ -31,16 +31,16 @@ jobs:
           python scripts/compose_capsules_cli.py --root truth-capsules-v1             --profile "${{ github.event.inputs.profile }}"             $ARGS             --out examples/ci/judge_prompt.txt             --manifest examples/ci/judge.manifest.json
       - name: (Optional) Run model judge
         if: env.OPENAI_API_KEY != ''
-        run: |
+        run: |-
           python - << 'PY'
-import os, json, requests, time
-prompt = open('examples/ci/judge_prompt.txt','r',encoding='utf-8').read()
-# NOTE: Replace with your preferred API endpoint/SDK.
-print("Stub: would send prompt to model here.")
-print(prompt[:400] + '...')
-# Simulate a pass result for demo
-open('examples/ci/judge_result.json','w').write(json.dumps({"score": 0.9, "verdict":"pass","justification":"demo stub"}, indent=2))
-PY
+          import os, json, requests, time
+          prompt = open('examples/ci/judge_prompt.txt','r',encoding='utf-8').read()
+          # NOTE: Replace with your preferred API endpoint/SDK.
+          print("Stub: would send prompt to model here.")
+          print(prompt[:400] + '...')
+          # Simulate a pass result for demo
+          open('examples/ci/judge_result.json','w').write(json.dumps({"score": 0.9, "verdict":"pass","justification":"demo stub"}, indent=2))
+          PY
       - name: Enforce judge threshold
         run: |
           if [ -f examples/ci/judge_result.json ]; then
