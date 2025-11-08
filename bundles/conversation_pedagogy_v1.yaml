@@ -1,4 +1,5 @@
 name: conversation_pedagogy_v1
+description: "Pedagogical guidance for problem-solving conversations: Socratic method, explicit reasoning steps."
 applies_to: [conversation]
 capsules:
   - pedagogy.problem_solving_v1

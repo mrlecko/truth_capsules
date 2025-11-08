@@ -1,4 +1,5 @@
 name: pr_review_minibundle_v1
+description: "PR review essentials: diff-first analysis, risk tags, test hints, deploy checklist, and change impact."
 applies_to: [conversation, code_assistant, ci]
 capsules:
   - llm.pr_diff_first_v1

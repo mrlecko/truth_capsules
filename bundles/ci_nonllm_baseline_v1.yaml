@@ -1,4 +1,5 @@
 name: ci_nonllm_baseline_v1
+description: "Non-LLM business rules for CI: decision log validation, rollback plan requirements."
 applies_to: [ci]
 capsules:
   - business.decision_log_v1

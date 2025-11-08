@@ -425,8 +425,13 @@ function renderBundles(){
     });
     row.appendChild(cb);
 
-    const ttl=document.createElement('div'); ttl.textContent=(b.name||k)+'  -  '+(b.domain||''); row.appendChild(ttl);
-    const small=document.createElement('div'); small.className='small'; small.textContent=(b.description||''); item.appendChild(small);
+    const ttl=document.createElement('div'); ttl.textContent=(b.name||k); row.appendChild(ttl);
+
+    // Add description if present
+    if(b.description){
+      const desc=document.createElement('div'); desc.className='small'; desc.textContent=b.description; item.appendChild(desc);
+    }
+
     list.appendChild(item);
   }
   $('bundlesCount').textContent = keys.length;

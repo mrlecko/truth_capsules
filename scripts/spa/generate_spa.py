@@ -134,6 +134,7 @@ def collect_data(root_dir):
             bundles[name] = {
                 "name": name,
                 "version": data.get("version", "1.0.0"),
+                "description": data.get("description", ""),
                 "applies_to": data.get("applies_to", []),
                 "capsules": data.get("capsules", []),
                 "excludes": data.get("excludes", []),

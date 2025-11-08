@@ -1,4 +1,5 @@
 name: conversation_red_team_baseline_v1
+description: "Red-team baseline for conversational AI: probes assumptions, bias, counterfactuals, and safety refusals."
 applies_to: [conversation, code_assistant]
 capsules:
   - llm.red_team_assessment_v1

@@ -1,4 +1,5 @@
 name: ci_llm_baseline_v1
+description: "CI/CD LLM quality gates: citations, JSON contracts, answer quality judging, PII scanning."
 applies_to: [ci]
 capsules:
   - llm.citation_required_v1

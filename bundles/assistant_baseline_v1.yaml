@@ -1,4 +1,5 @@
 name: assistant_baseline_v1
+description: "Core assistant rules: citation required, JSON contract validation, plan-verify-answer, PII redaction."
 applies_to: [assistant]
 capsules:
   - llm.citation_required_v1

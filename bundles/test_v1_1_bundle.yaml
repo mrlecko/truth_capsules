@@ -1,5 +1,6 @@
 name: test_v1_1_bundle
 version: 1.1.0
+description: "Test bundle for v1.1 features: priority overrides, exclusions, safety + quality gates."
 applies_to:
   - conversation
   - code_assistant
