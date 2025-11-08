@@ -28,7 +28,7 @@ jobs:
           IFS=',' read -ra BARR <<< "${{ github.event.inputs.bundles }}"
           ARGS=""
           for b in "${BARR[@]}"; do ARGS="$ARGS --bundle $b"; done
-          python compose_capsules_cli.py --root truth-capsules-v1             --profile "${{ github.event.inputs.profile }}"             $ARGS             --out examples/ci/judge_prompt.txt             --manifest examples/ci/judge.manifest.json
+          python scripts/compose_capsules_cli.py --root truth-capsules-v1             --profile "${{ github.event.inputs.profile }}"             $ARGS             --out examples/ci/judge_prompt.txt             --manifest examples/ci/judge.manifest.json
       - name: (Optional) Run model judge
         if: env.OPENAI_API_KEY != ''
         run: |

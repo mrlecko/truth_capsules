@@ -14,4 +14,4 @@ jobs:
       - name: Install deps
         run: pip install pyyaml
       - name: Lint capsules
-        run: python capsule_linter.py truth-capsules-v1/capsules
+        run: python scripts/capsule_linter.py truth-capsules-v1/capsules

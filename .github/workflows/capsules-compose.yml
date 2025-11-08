@@ -26,7 +26,7 @@ jobs:
           IFS=',' read -ra BARR <<< "${{ github.event.inputs.bundles }}"
           ARGS=""
           for b in "${BARR[@]}"; do ARGS="$ARGS --bundle $b"; done
-          python compose_capsules_cli.py --root truth-capsules-v1             --profile "${{ github.event.inputs.profile }}"             $ARGS             --out examples/ci/prompt.txt             --manifest examples/ci/prompt.manifest.json
+          python scripts/compose_capsules_cli.py --root truth-capsules --profile "${{ github.event.inputs.profile }}"             $ARGS             --out examples/ci/prompt.txt             --manifest examples/ci/prompt.manifest.json
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
