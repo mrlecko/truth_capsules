@@ -386,7 +386,12 @@
       padding-right: 0;
     }
 
-    /* optional */
+    /* accessibility patches */
+    .small{ color: #bac2d6; }               /* was #a9b1c3 */
+    .badge{ color:#d6e1ff; border-color:#253043; }
+    .badge.err{ color:#ffdadd; }
+    :root{ color-scheme: dark; }            /* hints to OS/browser */
+
   </style>
 
   <!-- Prism for YAML/JSON highlighting -->
@@ -403,7 +408,7 @@
 <body>
   <header class="toolbar">
     <h1>Truth Capsule Prompt Composer</h1>
-    <div class="small">Generated 2025-11-08T17:41:33.920367Z</div>
+    <div class="small">Generated 2025-11-08T18:14:59.909070Z</div>
     <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
       <button class="btn" id="composeBtn" title="Compose (Ctrl/Cmd+Enter)">🟢 Compose</button>
       <button class="btn" id="copyBtn" title="Copy prompt">📋 Copy</button>
@@ -535,9 +540,7 @@
     </div>
   </div>
 
-  <script>
-    /* ------------ Data ------------ */
-    const DATA = {
+  <script id="tc-data" type="application/json">{
   "capsules": {
     "llm.citation_required_v1": {
       "id": "llm.citation_required_v1",
@@ -2331,501 +2334,507 @@
       "cmd_template": "{{SYS_HEREDOC}}\nllm -m {{MODEL}} --system \"$TC_SYSTEM\" {{EXTRA_FLAGS}} {{INPUT_FRAGMENT}}\n"
     }
   ]
-};
+}</script>
 
-    /* ------------ State & helpers ------------ */
-    const STATE = { selectedBundles: new Set(), selectedCaps: new Set(), order: [], manualCaps: new Set(), profile: null, filter: "" };
-    const $ = id => document.getElementById(id);
-    const esc = s => (s == null ? "" : String(s).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])));
+    <script>
+      /* ------------ Data ------------ */
+      const DATA = JSON.parse(document.getElementById('tc-data').textContent);
+    </script>
 
-    /* Toast */
-    function toast(msg) {
-      const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t);
-      setTimeout(() => t.remove(), 1800);
-    }
+    <script>
+      /* ------------ State & helpers ------------ */
+      const STATE = { selectedBundles: new Set(), selectedCaps: new Set(), order: [], manualCaps: new Set(), profile: null, filter: "" };
+      const $ = id => document.getElementById(id);
+      const esc = s => (s == null ? "" : String(s).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])));
 
-    /* Hashing for digest */
-    const tenc = s => new TextEncoder().encode(s);
-    async function sha256(s) { const buf = await crypto.subtle.digest('SHA-256', tenc(s)); return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''); }
-    function canonicalJSON(x) {
-      if (Array.isArray(x)) return "[" + x.map(canonicalJSON).join(",") + "]";
-      if (x && typeof x === "object") { const keys = Object.keys(x).sort(); return "{" + keys.map(k => JSON.stringify(k) + ":" + canonicalJSON(x[k])).join(",") + "}"; }
-      return JSON.stringify(x);
-    }
-    function coreForDigest(c) {
-      return {
-        id: c.id, version: c.version, domain: c.domain, title: c.title, statement: c.statement,
-        assumptions: Array.isArray(c.assumptions) ? c.assumptions : [],
-        pedagogy: Array.isArray(c.pedagogy) ? c.pedagogy.map(p => ({ kind: p.kind, text: p.text })) : []
-      };
-    }
-    function digestCore(c) { return canonicalJSON(coreForDigest(c)); }
-    async function validateDigest(c) {
-      const have = await sha256(digestCore(c));
-      const want = (((c.provenance || {}).signing || {}).digest) || '';
-      if (!want) return { ok: true, na: true, have, want };
-      return { ok: (have === want), na: false, have, want };
-    }
-    function badgeDigest(c) {
-      const b = document.createElement('span'); b.className = 'badge'; b.textContent = 'digest…';
-      validateDigest(c).then(r => {
-        if (r.na) { b.textContent = 'digest n/a'; b.title = 'No reference digest in capsule'; return; }
-        b.textContent = r.ok ? 'digest✓' : 'digest✗'; b.className = 'badge ' + (r.ok ? 'ok' : 'err');
-        b.title = r.ok ? 'Digest OK' : 'Have ' + r.have + ' want ' + r.want;
-      });
-      return b;
-    }
-    function badgeAuthor(c) {
-      const p = c.provenance || {}; const b = document.createElement('span'); b.className = 'badge'; b.textContent = (p.author || '?'); return b;
-    }
+      /* Toast */
+      function toast(msg) {
+        const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t);
+        setTimeout(() => t.remove(), 1800);
+      }
 
-    /* ------------ Modal ------------ */
-    let MODAL = null;
-    function openModal(title, c) {
-      MODAL = c;
-      $('m_title').textContent = title;
-      $('m_body_code').textContent = (c._raw || '');
-      Prism.highlightElement($('m_body_code'));
-      $('m_result').textContent = 'idle'; $('m_result').className = 'badge';
-      $('modal').style.display = 'flex';
-    }
-    function closeModal() { $('modal').style.display = 'none'; MODAL = null; }
-    $('m_close').addEventListener('click', closeModal);
-    $('modal').addEventListener('click', e => { if (e.target && e.target.id === 'modal') closeModal(); });
-    $('m_copy_yaml').addEventListener('click', () => { if (!MODAL) return; navigator.clipboard.writeText(MODAL._raw || ''); toast('YAML copied'); });
-    $('m_copy_prov').addEventListener('click', () => { if (!MODAL) return; navigator.clipboard.writeText(JSON.stringify(MODAL.provenance || {}, null, 2)); toast('Provenance copied'); });
-    $('m_validate').addEventListener('click', async () => { if (!MODAL) return; const r = await validateDigest(MODAL); const tag = $('m_result'); tag.textContent = r.ok ? 'digest✓' : 'digest✗'; tag.className = 'badge ' + (r.ok ? 'ok' : 'err'); tag.title = r.ok ? 'OK' : ('have:' + r.have + ' want:' + r.want); });
+      /* Hashing for digest */
+      const tenc = s => new TextEncoder().encode(s);
+      async function sha256(s) { const buf = await crypto.subtle.digest('SHA-256', tenc(s)); return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''); }
+      function canonicalJSON(x) {
+        if (Array.isArray(x)) return "[" + x.map(canonicalJSON).join(",") + "]";
+        if (x && typeof x === "object") { const keys = Object.keys(x).sort(); return "{" + keys.map(k => JSON.stringify(k) + ":" + canonicalJSON(x[k])).join(",") + "}"; }
+        return JSON.stringify(x);
+      }
+      function coreForDigest(c) {
+        return {
+          id: c.id, version: c.version, domain: c.domain, title: c.title, statement: c.statement,
+          assumptions: Array.isArray(c.assumptions) ? c.assumptions : [],
+          pedagogy: Array.isArray(c.pedagogy) ? c.pedagogy.map(p => ({ kind: p.kind, text: p.text })) : []
+        };
+      }
+      function digestCore(c) { return canonicalJSON(coreForDigest(c)); }
+      async function validateDigest(c) {
+        const have = await sha256(digestCore(c));
+        const want = (((c.provenance || {}).signing || {}).digest) || '';
+        if (!want) return { ok: true, na: true, have, want };
+        return { ok: (have === want), na: false, have, want };
+      }
+      function badgeDigest(c) {
+        const b = document.createElement('span'); b.className = 'badge'; b.textContent = 'digest…';
+        validateDigest(c).then(r => {
+          if (r.na) { b.textContent = 'digest n/a'; b.title = 'No reference digest in capsule'; return; }
+          b.textContent = r.ok ? 'digest✓' : 'digest✗'; b.className = 'badge ' + (r.ok ? 'ok' : 'err');
+          b.title = r.ok ? 'Digest OK' : 'Have ' + r.have + ' want ' + r.want;
+        });
+        return b;
+      }
+      function badgeAuthor(c) {
+        const p = c.provenance || {}; const b = document.createElement('span'); b.className = 'badge'; b.textContent = (p.author || '?'); return b;
+      }
 
-    /* ------------ Renderers ------------ */
-    function renderProfiles() {
-      const sel = $('profiles'); sel.innerHTML = '';
-      const keys = Object.keys(DATA.profiles || {}).sort();
-      for (const k of keys) { const p = DATA.profiles[k] || {}; const o = document.createElement('option'); o.value = k; o.textContent = (p.title || k) + ' (' + (p.version || '1.0.0') + ')'; sel.appendChild(o); }
-      if (!STATE.profile) STATE.profile = keys[0] || null;
-      sel.value = STATE.profile || '';
-      $('profileHelp').textContent = (DATA.profiles[STATE.profile || ''] || {}).description || '';
-      sel.onchange = () => { STATE.profile = sel.value; $('profileHelp').textContent = (DATA.profiles[STATE.profile] || {}).description || ''; compose(); };
-    }
+      /* ------------ Modal ------------ */
+      let MODAL = null;
+      function openModal(title, c) {
+        MODAL = c;
+        $('m_title').textContent = title;
+        $('m_body_code').textContent = (c._raw || '');
+        Prism.highlightElement($('m_body_code'));
+        $('m_result').textContent = 'idle'; $('m_result').className = 'badge';
+        $('modal').style.display = 'flex';
+      }
+      function closeModal() { $('modal').style.display = 'none'; MODAL = null; }
+      $('m_close').addEventListener('click', closeModal);
+      $('modal').addEventListener('click', e => { if (e.target && e.target.id === 'modal') closeModal(); });
+      $('m_copy_yaml').addEventListener('click', () => { if (!MODAL) return; navigator.clipboard.writeText(MODAL._raw || ''); toast('YAML copied'); });
+      $('m_copy_prov').addEventListener('click', () => { if (!MODAL) return; navigator.clipboard.writeText(JSON.stringify(MODAL.provenance || {}, null, 2)); toast('Provenance copied'); });
+      $('m_validate').addEventListener('click', async () => { if (!MODAL) return; const r = await validateDigest(MODAL); const tag = $('m_result'); tag.textContent = r.ok ? 'digest✓' : 'digest✗'; tag.className = 'badge ' + (r.ok ? 'ok' : 'err'); tag.title = r.ok ? 'OK' : ('have:' + r.have + ' want:' + r.want); });
 
-    function capsuleRow(c, id) {
-      const item = document.createElement('div'); item.className = 'item'; item.dataset.id = id;
-      const row = document.createElement('div'); row.className = 'row'; item.appendChild(row);
+      /* ------------ Renderers ------------ */
+      function renderProfiles() {
+        const sel = $('profiles'); sel.innerHTML = '';
+        const keys = Object.keys(DATA.profiles || {}).sort();
+        for (const k of keys) { const p = DATA.profiles[k] || {}; const o = document.createElement('option'); o.value = k; o.textContent = (p.title || k) + ' (' + (p.version || '1.0.0') + ')'; sel.appendChild(o); }
+        if (!STATE.profile) STATE.profile = keys[0] || null;
+        sel.value = STATE.profile || '';
+        $('profileHelp').textContent = (DATA.profiles[STATE.profile || ''] || {}).description || '';
+        sel.onchange = () => { STATE.profile = sel.value; $('profileHelp').textContent = (DATA.profiles[STATE.profile] || {}).description || ''; compose(); };
+      }
 
-      const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = STATE.selectedCaps.has(id);
-      cb.addEventListener('change', () => {
-        if (cb.checked) { STATE.selectedCaps.add(id); STATE.manualCaps.add(id); if (!STATE.order.includes(id)) STATE.order.push(id); }
-        else { STATE.selectedCaps.delete(id); STATE.manualCaps.delete(id); STATE.order = STATE.order.filter(x => x !== id); }
-        renderPreview(); compose();
-      });
-      row.appendChild(cb);
-
-      const ttl = document.createElement('div'); ttl.textContent = (c.title || id) + '  -  ' + (c.domain || ''); row.appendChild(ttl);
-      row.appendChild(badgeAuthor(c)); row.appendChild(badgeDigest(c));
-
-      const btn = document.createElement('button'); btn.className = 'btn small'; btn.textContent = 'View'; btn.onclick = () => openModal(c.title || id, c);
-      row.appendChild(btn);
-
-      const small = document.createElement('div'); small.className = 'small'; small.textContent = (c.statement || ''); item.appendChild(small);
-      return item;
-    }
-
-    function renderCapsules() {
-      const list = $('capsules'); list.innerHTML = '';
-      const f = (STATE.filter || '').toLowerCase();
-      const ids = Object.keys(DATA.capsules || {}).filter(id => {
-        const c = DATA.capsules[id] || {}; const hay = (id + ' ' + (c.title || '') + ' ' + (c.domain || '') + ' ' + (c.statement || '')).toLowerCase();
-        return hay.includes(f);
-      }).sort();
-      ids.forEach(id => list.appendChild(capsuleRow(DATA.capsules[id], id)));
-      $('capsulesCount').textContent = ids.length;
-    }
-
-    function renderBundles() {
-      const list = $('bundles'); list.innerHTML = '';
-      const keys = Object.keys(DATA.bundles || {}).sort((a, b) => (DATA.bundles[a].name || a).localeCompare(DATA.bundles[b].name || b));
-      for (const k of keys) {
-        const b = DATA.bundles[k] || {};
-        const item = document.createElement('div'); item.className = 'item';
+      function capsuleRow(c, id) {
+        const item = document.createElement('div'); item.className = 'item'; item.dataset.id = id;
         const row = document.createElement('div'); row.className = 'row'; item.appendChild(row);
 
-        const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = STATE.selectedBundles.has(k);
+        const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = STATE.selectedCaps.has(id);
         cb.addEventListener('change', () => {
-          if (cb.checked) {
-            STATE.selectedBundles.add(k);
-            (b.capsules || []).forEach(cid => { STATE.selectedCaps.add(cid); if (!STATE.order.includes(cid)) STATE.order.push(cid); });
-          } else {
-            STATE.selectedBundles.delete(k);
-            const others = [...STATE.selectedBundles];
-            (b.capsules || []).forEach(cid => {
-              const elsewhere = others.some(name => { const b2 = DATA.bundles[name]; return b2 && Array.isArray(b2.capsules) && b2.capsules.includes(cid); });
-              const manual = STATE.manualCaps.has(cid);
-              if (!elsewhere && !manual) STATE.selectedCaps.delete(cid);
-              STATE.order = STATE.order.filter(x => STATE.selectedCaps.has(x));
-            });
-          }
-          renderCapsules(); renderPreview(); compose();
+          if (cb.checked) { STATE.selectedCaps.add(id); STATE.manualCaps.add(id); if (!STATE.order.includes(id)) STATE.order.push(id); }
+          else { STATE.selectedCaps.delete(id); STATE.manualCaps.delete(id); STATE.order = STATE.order.filter(x => x !== id); }
+          renderPreview(); compose();
         });
         row.appendChild(cb);
 
-        const ttl = document.createElement('div'); ttl.textContent = (b.name || k); row.appendChild(ttl);
-
-        // Add description if present
-        if (b.description) {
-          const desc = document.createElement('div'); desc.className = 'small'; desc.textContent = b.description; item.appendChild(desc);
-        }
-
-        list.appendChild(item);
-      }
-      $('bundlesCount').textContent = keys.length;
-    }
-
-    function renderPreview() {
-      const list = $('preview'); list.innerHTML = '';
-      const ids = STATE.order.filter(id => STATE.selectedCaps.has(id));
-      ids.forEach(id => {
-        const c = DATA.capsules[id]; if (!c) return;
-        const item = document.createElement('div'); item.className = 'item'; item.dataset.id = id;
-
-        const row = document.createElement('div'); row.className = 'row'; item.appendChild(row);
-        const handle = document.createElement('span'); handle.className = 'chip drag'; handle.textContent = '☰'; row.appendChild(handle);
         const ttl = document.createElement('div'); ttl.textContent = (c.title || id) + '  -  ' + (c.domain || ''); row.appendChild(ttl);
-        const btn = document.createElement('button'); btn.className = 'btn small'; btn.textContent = 'View'; btn.onclick = () => openModal(c.title || id, c); row.appendChild(btn);
+        row.appendChild(badgeAuthor(c)); row.appendChild(badgeDigest(c));
 
-        list.appendChild(item);
-      });
+        const btn = document.createElement('button'); btn.className = 'btn small'; btn.textContent = 'View'; btn.onclick = () => openModal(c.title || id, c);
+        row.appendChild(btn);
 
-      // Sortable (drag to reorder)
-      if (window.__sortable) window.__sortable.destroy();
-      window.__sortable = new Sortable(list, {
-        animation: 120,
-        handle: '.drag',
-        ghostClass: 'ghost',
-        onEnd: (evt) => {
-          const old = STATE.order.filter(id => STATE.selectedCaps.has(id));
-          const moved = old.splice(evt.oldIndex, 1)[0];
-          old.splice(evt.newIndex, 0, moved);
-          STATE.order = old.concat(STATE.order.filter(x => !STATE.selectedCaps.has(x)));
-          compose();
+        const small = document.createElement('div'); small.className = 'small'; small.textContent = (c.statement || ''); item.appendChild(small);
+        return item;
+      }
+
+      function renderCapsules() {
+        const list = $('capsules'); list.innerHTML = '';
+        const f = (STATE.filter || '').toLowerCase();
+        const ids = Object.keys(DATA.capsules || {}).filter(id => {
+          const c = DATA.capsules[id] || {}; const hay = (id + ' ' + (c.title || '') + ' ' + (c.domain || '') + ' ' + (c.statement || '')).toLowerCase();
+          return hay.includes(f);
+        }).sort();
+        ids.forEach(id => list.appendChild(capsuleRow(DATA.capsules[id], id)));
+        $('capsulesCount').textContent = ids.length;
+      }
+
+      function renderBundles() {
+        const list = $('bundles'); list.innerHTML = '';
+        const keys = Object.keys(DATA.bundles || {}).sort((a, b) => (DATA.bundles[a].name || a).localeCompare(DATA.bundles[b].name || b));
+        for (const k of keys) {
+          const b = DATA.bundles[k] || {};
+          const item = document.createElement('div'); item.className = 'item';
+          const row = document.createElement('div'); row.className = 'row'; item.appendChild(row);
+
+          const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = STATE.selectedBundles.has(k);
+          cb.addEventListener('change', () => {
+            if (cb.checked) {
+              STATE.selectedBundles.add(k);
+              (b.capsules || []).forEach(cid => { STATE.selectedCaps.add(cid); if (!STATE.order.includes(cid)) STATE.order.push(cid); });
+            } else {
+              STATE.selectedBundles.delete(k);
+              const others = [...STATE.selectedBundles];
+              (b.capsules || []).forEach(cid => {
+                const elsewhere = others.some(name => { const b2 = DATA.bundles[name]; return b2 && Array.isArray(b2.capsules) && b2.capsules.includes(cid); });
+                const manual = STATE.manualCaps.has(cid);
+                if (!elsewhere && !manual) STATE.selectedCaps.delete(cid);
+                STATE.order = STATE.order.filter(x => STATE.selectedCaps.has(x));
+              });
+            }
+            renderCapsules(); renderPreview(); compose();
+          });
+          row.appendChild(cb);
+
+          const ttl = document.createElement('div'); ttl.textContent = (b.name || k); row.appendChild(ttl);
+
+          // Add description if present
+          if (b.description) {
+            const desc = document.createElement('div'); desc.className = 'small'; desc.textContent = b.description; item.appendChild(desc);
+          }
+
+          list.appendChild(item);
         }
-      });
-    }
-
-    /* ------------ Composition ------------ */
-    function parseFieldSpec(spec) { const m = spec.match(/^([a-z_.]+)(?:\[:(\d+)\])?$/); return { path: m ? m[1] : spec, limit: m && m[2] ? parseInt(m[2]) : null }; }
-    function applyProjection(capsule, projection, includePedagogy) {
-      const proj = projection || {}; const include = proj.include || []; const render = proj.render || {};
-      const header = render.capsule_header || "BEGIN CAPSULE id={id} version={version} domain={domain}";
-      const footer = render.enforcement_footer || "ENFORCEMENT: Ensure outputs satisfy this capsule; otherwise abstain and request the minimal missing info.";
-      const aBullet = render.assumption_bullet || "  - {text}";
-      const sBullet = render.socratic_bullet || "  - {text}";
-      const aphBullet = render.aphorism_bullet || "  - {text}";
-      const lines = [];
-
-      lines.push(header.replace('{id}', capsule.id || '').replace('{version}', capsule.version || '1.0.0').replace('{domain}', capsule.domain || ''));
-
-      for (const spec of include) {
-        const { path, limit } = parseFieldSpec(spec);
-        if (path === 'title') { if (capsule.title) lines.push("TITLE: " + capsule.title); }
-        else if (path === 'statement') { if (capsule.statement) lines.push("STATEMENT: " + capsule.statement); }
-        else if (path === 'assumptions') {
-          const items = (capsule.assumptions || []).slice(0, limit || Number.MAX_SAFE_INTEGER);
-          if (items.length) { lines.push("ASSUMPTIONS:"); items.forEach(a => lines.push(aBullet.replace('{text}', a))); }
-        }
-        else if (path === 'pedagogy.socratic' && includePedagogy) {
-          const soc = (capsule.pedagogy || []).filter(p => (p.kind || '').toLowerCase() === 'socratic').slice(0, limit || Number.MAX_SAFE_INTEGER);
-          if (soc.length) { lines.push("PEDAGOGY (Socratic):"); soc.forEach(p => lines.push(sBullet.replace('{text}', p.text || ''))); }
-        }
-        else if (path === 'pedagogy.aphorisms' && includePedagogy) {
-          const aph = (capsule.pedagogy || []).filter(p => (p.kind || '').toLowerCase() === 'aphorism').slice(0, limit || Number.MAX_SAFE_INTEGER);
-          if (aph.length) { lines.push("PEDAGOGY (Aphorisms):"); aph.forEach(p => lines.push(aphBullet.replace('{text}', p.text || ''))); }
-        }
+        $('bundlesCount').textContent = keys.length;
       }
 
-      lines.push(footer);
-      return lines.join("\n");
-    }
-    function composeLegacy(c, includePedagogy) {
-      const lines = [];
-      lines.push("BEGIN CAPSULE id=" + (c.id || '') + " version=" + (c.version || '1.0.0') + " domain=" + (c.domain || ''));
-      if (c.statement) lines.push("STATEMENT: " + c.statement);
-      if (includePedagogy && c.pedagogy) {
-        const ped = c.pedagogy.map(p => (p.kind + ': ' + p.text)).join('\n');
-        if (ped) lines.push('PEDAGOGY:\n' + ped);
-      }
-      lines.push('END CAPSULE');
-      return lines.join("\n");
-    }
-    function compose() {
-      const prof = DATA.profiles[STATE.profile || ''] || {};
-      const response = prof.response || {};
-      const ids = STATE.order.filter(id => STATE.selectedCaps.has(id));
-      const blocks = [];
+      function renderPreview() {
+        const list = $('preview'); list.innerHTML = '';
+        const ids = STATE.order.filter(id => STATE.selectedCaps.has(id));
+        ids.forEach(id => {
+          const c = DATA.capsules[id]; if (!c) return;
+          const item = document.createElement('div'); item.className = 'item'; item.dataset.id = id;
 
-      const policy = response.policy || 'Cite or abstain; follow Plan-Verify-Answer; ask ONE crisp follow-up if required.';
-      const format = response.format || 'natural';
-      const system_block = response.system_block || ("SYSTEM: Profile=" + (prof.title || 'unknown') + "\nPOLICY: " + policy + "\nFORMAT: " + format);
-      blocks.push(system_block);
+          const row = document.createElement('div'); row.className = 'row'; item.appendChild(row);
+          const handle = document.createElement('span'); handle.className = 'chip drag'; handle.textContent = '☰'; row.appendChild(handle);
+          const ttl = document.createElement('div'); ttl.textContent = (c.title || id) + '  -  ' + (c.domain || ''); row.appendChild(ttl);
+          const btn = document.createElement('button'); btn.className = 'btn small'; btn.textContent = 'View'; btn.onclick = () => openModal(c.title || id, c); row.appendChild(btn);
 
-      blocks.push("SYSTEM: Truth Capsules Loader v1\nPURPOSE: Use curated capsules to scaffold reasoning and enforce acceptance rules.\nMETHOD:\n  1) Load capsule rules (below).\n  2) For each task, follow Plan → Verify → Answer.\n  3) If required fields are missing, ask ONE concise follow-up.\n  4) Cite sources or abstain. Redact PII. Validate tool JSON before calling.\n  5) Emit a JSON report when asked (see REPORT SCHEMA).\nFAILURE POLICY: If a capsule cannot be satisfied, abstain + explain what is missing.");
-      blocks.push("SYSTEM: Bootstrap Discipline\n• Curation is king - prefer curated fixtures/evidence; abstain when unsure.\n• Show your work - reference evidence in answers.\n• Make failures explicit and reversible - choose tiny experiments.");
+          list.appendChild(item);
+        });
 
-      if (ids.length === 0) {
-        blocks.push('SYSTEM: Capsule Rules (Selected)\n- (No capsules selected)');
-      } else {
-        blocks.push('SYSTEM: Capsule Rules (Selected)');
-        const projection = response.projection || null;
-        const withPed = $('includePed').checked;
-        for (const id of ids) {
-          const c = DATA.capsules[id]; if (!c) continue;
-          blocks.push((projection && projection.include) ? applyProjection(c, projection, withPed) : composeLegacy(c, withPed));
-        }
+        // Sortable (drag to reorder)
+        if (window.__sortable) window.__sortable.destroy();
+        window.__sortable = new Sortable(list, {
+          animation: 120,
+          handle: '.drag',
+          ghostClass: 'ghost',
+          onEnd: (evt) => {
+            const old = STATE.order.filter(id => STATE.selectedCaps.has(id));
+            const moved = old.splice(evt.oldIndex, 1)[0];
+            old.splice(evt.newIndex, 0, moved);
+            STATE.order = old.concat(STATE.order.filter(x => !STATE.selectedCaps.has(x)));
+            compose();
+          }
+        });
       }
 
-      let out = blocks.join("\n\n");
-      if ($('markdown').checked) out = "```\n" + out + "\n```";
-      $('out').value = out;
-    }
+      /* ------------ Composition ------------ */
+      function parseFieldSpec(spec) { const m = spec.match(/^([a-z_.]+)(?:\[:(\d+)\])?$/); return { path: m ? m[1] : spec, limit: m && m[2] ? parseInt(m[2]) : null }; }
+      function applyProjection(capsule, projection, includePedagogy) {
+        const proj = projection || {}; const include = proj.include || []; const render = proj.render || {};
+        const header = render.capsule_header || "BEGIN CAPSULE id={id} version={version} domain={domain}";
+        const footer = render.enforcement_footer || "ENFORCEMENT: Ensure outputs satisfy this capsule; otherwise abstain and request the minimal missing info.";
+        const aBullet = render.assumption_bullet || "  - {text}";
+        const sBullet = render.socratic_bullet || "  - {text}";
+        const aphBullet = render.aphorism_bullet || "  - {text}";
+        const lines = [];
 
-    /* ------------ Manifest + share ------------ */
-    function buildManifest() { return { profile: STATE.profile, order: STATE.order.filter(id => STATE.selectedCaps.has(id)), bundles: [...STATE.selectedBundles], ts: new Date().toISOString() }; }
-    function exportState() { return { profile: STATE.profile, bundles: [...STATE.selectedBundles], order: STATE.order.filter(id => STATE.selectedCaps.has(id)) }; }
-    function encodeStateToUrl() {
-      const s = btoa(unescape(encodeURIComponent(JSON.stringify(exportState()))));
-      const url = new URL(window.location.href); url.searchParams.set('s', s); return url.toString();
-    }
-    function importState(obj) {
-      if (!obj) return;
-      const prof = obj.profile && DATA.profiles[obj.profile] ? obj.profile : (Object.keys(DATA.profiles || {})[0] || null);
-      STATE.profile = prof; STATE.selectedBundles = new Set(); STATE.selectedCaps = new Set(); STATE.manualCaps = new Set(); STATE.order = [];
-      (obj.bundles || []).forEach(b => { if (DATA.bundles[b]) STATE.selectedBundles.add(b); });
-      STATE.selectedBundles.forEach(b => {
-        const caps = (DATA.bundles[b] && DATA.bundles[b].capsules) || [];
-        caps.forEach(cid => { if (DATA.capsules[cid]) { STATE.selectedCaps.add(cid); if (!STATE.order.includes(cid)) STATE.order.push(cid); } });
-      });
-      (obj.order || []).forEach(cid => { if (DATA.capsules[cid]) { if (!STATE.order.includes(cid)) STATE.order.push(cid); STATE.selectedCaps.add(cid); } });
-      render();
-    }
-    function tryHydrateFromUrl() {
-      const url = new URL(window.location.href); const s = url.searchParams.get('s'); if (!s) return;
-      try { const json = decodeURIComponent(escape(atob(s))); importState(JSON.parse(json)); } catch (e) { console.error('bad s param', e); }
-    }
+        lines.push(header.replace('{id}', capsule.id || '').replace('{version}', capsule.version || '1.0.0').replace('{domain}', capsule.domain || ''));
 
-    /* ------------ LLM Command Composition ------------ */
-    function shQuoteLiteral(s) {
-      // POSIX-safe single-quote wrapper: ' becomes '\''
-      return "'" + String(s).replace(/'/g, "'\\''") + "'";
-    }
-
-    function buildSysHeredoc(promptText) {
-      // Use single-quoted heredoc label to disable interpolation/globbing
-      // Use TC_SYSTEM to avoid conflicts with user's shell variables
-      const label = "__TC_SYSTEM__";
-      return [
-        `read -r -d '' TC_SYSTEM <<'${label}'`,
-        promptText,
-        label
-      ].join("\n");
-    }
-
-    function buildInputFragment(tpl, userText, filePath) {
-      const flags = (tpl.extra_flags || []).join(' ');
-
-      if (tpl.input_mode === 'arg') {
-        return {
-          EXTRA_FLAGS: flags,
-          INPUT_FRAGMENT: `<<< ${shQuoteLiteral(userText || "")}`
-        };
-      }
-
-      if (tpl.input_mode === 'stdin') {
-        return {
-          EXTRA_FLAGS: flags,
-          STDIN_PIPE: `printf %s ${shQuoteLiteral(userText || "")} |`,
-          INPUT_FRAGMENT: ""
-        };
-      }
-
-      if (tpl.input_mode === 'file') {
-        return {
-          EXTRA_FLAGS: flags,
-          FILE_PATH: shQuoteLiteral(filePath || "input.txt"),
-          INPUT_FRAGMENT: ""
-        };
-      }
-
-      return { EXTRA_FLAGS: flags, INPUT_FRAGMENT: "" };
-    }
-
-    function composeLlmCommand(tpl, systemPrompt, userText, filePath, minify) {
-      const sysText = minify ? systemPrompt.replace(/\s+/g, ' ').trim() : systemPrompt;
-      const sysHeredoc = buildSysHeredoc(sysText);
-      const frags = buildInputFragment(tpl, userText, filePath);
-
-      // Build the command by replacing all placeholders
-      let cmd = String(tpl.cmd_template || '');
-
-      // Replace required placeholders
-      cmd = cmd.replace(/\{\{SYS_HEREDOC\}\}/g, sysHeredoc);
-      cmd = cmd.replace(/\{\{MODEL\}\}/g, tpl.model || '');
-      cmd = cmd.replace(/\{\{INPUT_FRAGMENT\}\}/g, frags.INPUT_FRAGMENT || '');
-
-      // Replace optional placeholders
-      cmd = cmd.replace(/\{\{EXTRA_FLAGS\}\}/g, frags.EXTRA_FLAGS || '');
-      cmd = cmd.replace(/\{\{STDIN_PIPE\}\}/g, frags.STDIN_PIPE || '');
-      cmd = cmd.replace(/\{\{FILE_PATH\}\}/g, frags.FILE_PATH || '');
-
-      // Clean up:
-      // 1. Collapse multiple spaces into single space
-      cmd = cmd.replace(/ {2,}/g, ' ');
-      // 2. Remove trailing spaces on lines
-      cmd = cmd.replace(/[ \t]+$/gm, '');
-      // 3. Ensure final newline
-      cmd = cmd.trim() + "\n";
-
-      return cmd;
-    }
-
-    function getCurrentSystemPrompt() {
-      // Get the current composed prompt, stripping markdown fences if present
-      let prompt = $('out').value;
-      if ($('markdown').checked) {
-        // Remove leading ``` and trailing ```
-        prompt = prompt.replace(/^```\n/, '').replace(/\n```$/, '');
-      }
-      return prompt;
-    }
-
-    function updateLlmPreview() {
-      const templates = DATA.llm_templates || [];
-      const selectedId = $('llm_template').value;
-      const tpl = templates.find(t => t.id === selectedId);
-
-      if (!tpl) {
-        $('llm_preview').value = '';
-        return;
-      }
-
-      const systemPrompt = getCurrentSystemPrompt();
-      const userText = $('llm_user_input').value;
-      const filePath = $('llm_file_path').value;
-      const minify = $('llm_minify').checked;
-
-      const command = composeLlmCommand(tpl, systemPrompt, userText, filePath, minify);
-      $('llm_preview').value = command;
-    }
-
-    function openLlmModal() {
-      const templates = DATA.llm_templates || [];
-
-      if (templates.length === 0) {
-        toast('No LLM templates found');
-        return;
-      }
-
-      // Populate template selector
-      const sel = $('llm_template');
-      sel.innerHTML = '';
-      templates.forEach(tpl => {
-        const opt = document.createElement('option');
-        opt.value = tpl.id;
-        opt.textContent = tpl.label;
-        sel.appendChild(opt);
-      });
-
-      // Restore last used template from localStorage
-      const lastTemplate = localStorage.getItem('llm_last_template');
-      if (lastTemplate && templates.find(t => t.id === lastTemplate)) {
-        sel.value = lastTemplate;
-      }
-
-      // Update description and input mode on template change
-      const updateTemplateUI = () => {
-        const selectedId = sel.value;
-        const tpl = templates.find(t => t.id === selectedId);
-        if (!tpl) return;
-
-        $('llm_template_desc').textContent = tpl.description || '';
-
-        // Show/hide input fields based on input_mode
-        if (tpl.input_mode === 'file') {
-          $('llm_input_row').style.display = 'none';
-          $('llm_file_row').style.display = 'flex';
-        } else {
-          $('llm_input_row').style.display = 'flex';
-          $('llm_file_row').style.display = 'none';
-
-          if (tpl.input_mode === 'stdin') {
-            $('llm_input_hint').textContent = 'Will be piped to stdin';
-          } else {
-            $('llm_input_hint').textContent = 'Will be passed as bash here-string (<<<)';
+        for (const spec of include) {
+          const { path, limit } = parseFieldSpec(spec);
+          if (path === 'title') { if (capsule.title) lines.push("TITLE: " + capsule.title); }
+          else if (path === 'statement') { if (capsule.statement) lines.push("STATEMENT: " + capsule.statement); }
+          else if (path === 'assumptions') {
+            const items = (capsule.assumptions || []).slice(0, limit || Number.MAX_SAFE_INTEGER);
+            if (items.length) { lines.push("ASSUMPTIONS:"); items.forEach(a => lines.push(aBullet.replace('{text}', a))); }
+          }
+          else if (path === 'pedagogy.socratic' && includePedagogy) {
+            const soc = (capsule.pedagogy || []).filter(p => (p.kind || '').toLowerCase() === 'socratic').slice(0, limit || Number.MAX_SAFE_INTEGER);
+            if (soc.length) { lines.push("PEDAGOGY (Socratic):"); soc.forEach(p => lines.push(sBullet.replace('{text}', p.text || ''))); }
+          }
+          else if (path === 'pedagogy.aphorisms' && includePedagogy) {
+            const aph = (capsule.pedagogy || []).filter(p => (p.kind || '').toLowerCase() === 'aphorism').slice(0, limit || Number.MAX_SAFE_INTEGER);
+            if (aph.length) { lines.push("PEDAGOGY (Aphorisms):"); aph.forEach(p => lines.push(aphBullet.replace('{text}', p.text || ''))); }
           }
         }
 
-        // Update preview whenever template changes
+        lines.push(footer);
+        return lines.join("\n");
+      }
+      function composeLegacy(c, includePedagogy) {
+        const lines = [];
+        lines.push("BEGIN CAPSULE id=" + (c.id || '') + " version=" + (c.version || '1.0.0') + " domain=" + (c.domain || ''));
+        if (c.statement) lines.push("STATEMENT: " + c.statement);
+        if (includePedagogy && c.pedagogy) {
+          const ped = c.pedagogy.map(p => (p.kind + ': ' + p.text)).join('\n');
+          if (ped) lines.push('PEDAGOGY:\n' + ped);
+        }
+        lines.push('END CAPSULE');
+        return lines.join("\n");
+      }
+      function compose() {
+        const prof = DATA.profiles[STATE.profile || ''] || {};
+        const response = prof.response || {};
+        const ids = STATE.order.filter(id => STATE.selectedCaps.has(id));
+        const blocks = [];
+
+        const policy = response.policy || 'Cite or abstain; follow Plan-Verify-Answer; ask ONE crisp follow-up if required.';
+        const format = response.format || 'natural';
+        const system_block = response.system_block || ("SYSTEM: Profile=" + (prof.title || 'unknown') + "\nPOLICY: " + policy + "\nFORMAT: " + format);
+        blocks.push(system_block);
+
+        blocks.push("SYSTEM: Truth Capsules Loader v1\nPURPOSE: Use curated capsules to scaffold reasoning and enforce acceptance rules.\nMETHOD:\n  1) Load capsule rules (below).\n  2) For each task, follow Plan → Verify → Answer.\n  3) If required fields are missing, ask ONE concise follow-up.\n  4) Cite sources or abstain. Redact PII. Validate tool JSON before calling.\n  5) Emit a JSON report when asked (see REPORT SCHEMA).\nFAILURE POLICY: If a capsule cannot be satisfied, abstain + explain what is missing.");
+        blocks.push("SYSTEM: Bootstrap Discipline\n• Curation is king - prefer curated fixtures/evidence; abstain when unsure.\n• Show your work - reference evidence in answers.\n• Make failures explicit and reversible - choose tiny experiments.");
+
+        if (ids.length === 0) {
+          blocks.push('SYSTEM: Capsule Rules (Selected)\n- (No capsules selected)');
+        } else {
+          blocks.push('SYSTEM: Capsule Rules (Selected)');
+          const projection = response.projection || null;
+          const withPed = $('includePed').checked;
+          for (const id of ids) {
+            const c = DATA.capsules[id]; if (!c) continue;
+            blocks.push((projection && projection.include) ? applyProjection(c, projection, withPed) : composeLegacy(c, withPed));
+          }
+        }
+
+        let out = blocks.join("\n\n");
+        if ($('markdown').checked) out = "```\n" + out + "\n```";
+        $('out').value = out;
+      }
+
+      /* ------------ Manifest + share ------------ */
+      function buildManifest() { return { profile: STATE.profile, order: STATE.order.filter(id => STATE.selectedCaps.has(id)), bundles: [...STATE.selectedBundles], ts: new Date().toISOString() }; }
+      function exportState() { return { profile: STATE.profile, bundles: [...STATE.selectedBundles], order: STATE.order.filter(id => STATE.selectedCaps.has(id)) }; }
+      function encodeStateToUrl() {
+        const s = btoa(unescape(encodeURIComponent(JSON.stringify(exportState()))));
+        const url = new URL(window.location.href); url.searchParams.set('s', s); return url.toString();
+      }
+      function importState(obj) {
+        if (!obj) return;
+        const prof = obj.profile && DATA.profiles[obj.profile] ? obj.profile : (Object.keys(DATA.profiles || {})[0] || null);
+        STATE.profile = prof; STATE.selectedBundles = new Set(); STATE.selectedCaps = new Set(); STATE.manualCaps = new Set(); STATE.order = [];
+        (obj.bundles || []).forEach(b => { if (DATA.bundles[b]) STATE.selectedBundles.add(b); });
+        STATE.selectedBundles.forEach(b => {
+          const caps = (DATA.bundles[b] && DATA.bundles[b].capsules) || [];
+          caps.forEach(cid => { if (DATA.capsules[cid]) { STATE.selectedCaps.add(cid); if (!STATE.order.includes(cid)) STATE.order.push(cid); } });
+        });
+        (obj.order || []).forEach(cid => { if (DATA.capsules[cid]) { if (!STATE.order.includes(cid)) STATE.order.push(cid); STATE.selectedCaps.add(cid); } });
+        render();
+      }
+      function tryHydrateFromUrl() {
+        const url = new URL(window.location.href); const s = url.searchParams.get('s'); if (!s) return;
+        try { const json = decodeURIComponent(escape(atob(s))); importState(JSON.parse(json)); } catch (e) { console.error('bad s param', e); }
+      }
+
+      /* ------------ LLM Command Composition ------------ */
+      function shQuoteLiteral(s) {
+        // POSIX-safe single-quote wrapper: ' becomes '\''
+        return "'" + String(s).replace(/'/g, "'\\''") + "'";
+      }
+
+      function buildSysHeredoc(promptText) {
+        // Use single-quoted heredoc label to disable interpolation/globbing
+        // Use TC_SYSTEM to avoid conflicts with user's shell variables
+        const label = "__TC_SYSTEM__";
+        return [
+          `read -r -d '' TC_SYSTEM <<'${label}'`,
+          promptText,
+          label
+        ].join("\n");
+      }
+
+      function buildInputFragment(tpl, userText, filePath) {
+        const flags = (tpl.extra_flags || []).join(' ');
+
+        if (tpl.input_mode === 'arg') {
+          return {
+            EXTRA_FLAGS: flags,
+            INPUT_FRAGMENT: `<<< ${shQuoteLiteral(userText || "")}`
+          };
+        }
+
+        if (tpl.input_mode === 'stdin') {
+          return {
+            EXTRA_FLAGS: flags,
+            STDIN_PIPE: `printf %s ${shQuoteLiteral(userText || "")} |`,
+            INPUT_FRAGMENT: ""
+          };
+        }
+
+        if (tpl.input_mode === 'file') {
+          return {
+            EXTRA_FLAGS: flags,
+            FILE_PATH: shQuoteLiteral(filePath || "input.txt"),
+            INPUT_FRAGMENT: ""
+          };
+        }
+
+        return { EXTRA_FLAGS: flags, INPUT_FRAGMENT: "" };
+      }
+
+      function composeLlmCommand(tpl, systemPrompt, userText, filePath, minify) {
+        const sysText = minify ? systemPrompt.replace(/\s+/g, ' ').trim() : systemPrompt;
+        const sysHeredoc = buildSysHeredoc(sysText);
+        const frags = buildInputFragment(tpl, userText, filePath);
+
+        // Build the command by replacing all placeholders
+        let cmd = String(tpl.cmd_template || '');
+
+        // Replace required placeholders
+        cmd = cmd.replace(/\{\{SYS_HEREDOC\}\}/g, sysHeredoc);
+        cmd = cmd.replace(/\{\{MODEL\}\}/g, tpl.model || '');
+        cmd = cmd.replace(/\{\{INPUT_FRAGMENT\}\}/g, frags.INPUT_FRAGMENT || '');
+
+        // Replace optional placeholders
+        cmd = cmd.replace(/\{\{EXTRA_FLAGS\}\}/g, frags.EXTRA_FLAGS || '');
+        cmd = cmd.replace(/\{\{STDIN_PIPE\}\}/g, frags.STDIN_PIPE || '');
+        cmd = cmd.replace(/\{\{FILE_PATH\}\}/g, frags.FILE_PATH || '');
+
+        // Clean up:
+        // 1. Collapse multiple spaces into single space
+        cmd = cmd.replace(/ {2,}/g, ' ');
+        // 2. Remove trailing spaces on lines
+        cmd = cmd.replace(/[ \t]+$/gm, '');
+        // 3. Ensure final newline
+        cmd = cmd.trim() + "\n";
+
+        return cmd;
+      }
+
+      function getCurrentSystemPrompt() {
+        // Get the current composed prompt, stripping markdown fences if present
+        let prompt = $('out').value;
+        if ($('markdown').checked) {
+          // Remove leading ``` and trailing ```
+          prompt = prompt.replace(/^```\n/, '').replace(/\n```$/, '');
+        }
+        return prompt;
+      }
+
+      function updateLlmPreview() {
+        const templates = DATA.llm_templates || [];
+        const selectedId = $('llm_template').value;
+        const tpl = templates.find(t => t.id === selectedId);
+
+        if (!tpl) {
+          $('llm_preview').value = '';
+          return;
+        }
+
+        const systemPrompt = getCurrentSystemPrompt();
+        const userText = $('llm_user_input').value;
+        const filePath = $('llm_file_path').value;
+        const minify = $('llm_minify').checked;
+
+        const command = composeLlmCommand(tpl, systemPrompt, userText, filePath, minify);
+        $('llm_preview').value = command;
+      }
+
+      function openLlmModal() {
+        const templates = DATA.llm_templates || [];
+
+        if (templates.length === 0) {
+          toast('No LLM templates found');
+          return;
+        }
+
+        // Populate template selector
+        const sel = $('llm_template');
+        sel.innerHTML = '';
+        templates.forEach(tpl => {
+          const opt = document.createElement('option');
+          opt.value = tpl.id;
+          opt.textContent = tpl.label;
+          sel.appendChild(opt);
+        });
+
+        // Restore last used template from localStorage
+        const lastTemplate = localStorage.getItem('llm_last_template');
+        if (lastTemplate && templates.find(t => t.id === lastTemplate)) {
+          sel.value = lastTemplate;
+        }
+
+        // Update description and input mode on template change
+        const updateTemplateUI = () => {
+          const selectedId = sel.value;
+          const tpl = templates.find(t => t.id === selectedId);
+          if (!tpl) return;
+
+          $('llm_template_desc').textContent = tpl.description || '';
+
+          // Show/hide input fields based on input_mode
+          if (tpl.input_mode === 'file') {
+            $('llm_input_row').style.display = 'none';
+            $('llm_file_row').style.display = 'flex';
+          } else {
+            $('llm_input_row').style.display = 'flex';
+            $('llm_file_row').style.display = 'none';
+
+            if (tpl.input_mode === 'stdin') {
+              $('llm_input_hint').textContent = 'Will be piped to stdin';
+            } else {
+              $('llm_input_hint').textContent = 'Will be passed as bash here-string (<<<)';
+            }
+          }
+
+          // Update preview whenever template changes
+          updateLlmPreview();
+        };
+
+        sel.onchange = updateTemplateUI;
+
+        // Update preview on input changes
+        $('llm_user_input').oninput = updateLlmPreview;
+        $('llm_file_path').oninput = updateLlmPreview;
+        $('llm_minify').onchange = updateLlmPreview;
+
+        updateTemplateUI();
+
+        // Clear inputs (but preserve file path default)
+        $('llm_user_input').value = '';
+        $('llm_file_path').value = 'input.txt';
+        $('llm_minify').checked = false;
+
+        // Initial preview
         updateLlmPreview();
-      };
 
-      sel.onchange = updateTemplateUI;
-
-      // Update preview on input changes
-      $('llm_user_input').oninput = updateLlmPreview;
-      $('llm_file_path').oninput = updateLlmPreview;
-      $('llm_minify').onchange = updateLlmPreview;
-
-      updateTemplateUI();
-
-      // Clear inputs (but preserve file path default)
-      $('llm_user_input').value = '';
-      $('llm_file_path').value = 'input.txt';
-      $('llm_minify').checked = false;
-
-      // Initial preview
-      updateLlmPreview();
-
-      $('llmModal').style.display = 'flex';
-    }
-
-    function closeLlmModal() {
-      $('llmModal').style.display = 'none';
-    }
-
-    function copyLlmCommand() {
-      const command = $('llm_preview').value;
-
-      if (!command) {
-        toast('No command to copy');
-        return;
+        $('llmModal').style.display = 'flex';
       }
 
-      // Save the selected template to localStorage
-      const selectedId = $('llm_template').value;
-      if (selectedId) {
-        localStorage.setItem('llm_last_template', selectedId);
+      function closeLlmModal() {
+        $('llmModal').style.display = 'none';
       }
 
-      navigator.clipboard.writeText(command).then(() => {
-        toast('Command copied to clipboard!');
-        // Don't close the modal - let user copy again or review
-      }).catch(err => {
-        console.error('Copy failed:', err);
-        toast('Copy failed - see console');
-      });
-    }
+      function copyLlmCommand() {
+        const command = $('llm_preview').value;
 
-    // Save the generated command as a runnable bash script
-    function saveLlmScript() {
-      const command = $('llm_preview').value;
-      if (!command) {
-        toast('No command to save');
-        return;
+        if (!command) {
+          toast('No command to copy');
+          return;
+        }
+
+        // Save the selected template to localStorage
+        const selectedId = $('llm_template').value;
+        if (selectedId) {
+          localStorage.setItem('llm_last_template', selectedId);
+        }
+
+        navigator.clipboard.writeText(command).then(() => {
+          toast('Command copied to clipboard!');
+          // Don't close the modal - let user copy again or review
+        }).catch(err => {
+          console.error('Copy failed:', err);
+          toast('Copy failed - see console');
+        });
       }
 
-      const tplId = $('llm_template').value || 'cmd';
-      const nowIso = new Date().toISOString();
-      const filename = `llm_${tplId}_${nowIso.replace(/[:.]/g, '-')}.sh`;
+      // Save the generated command as a runnable bash script
+      function saveLlmScript() {
+        const command = $('llm_preview').value;
+        if (!command) {
+          toast('No command to save');
+          return;
+        }
 
-      const header =
-        `#!/usr/bin/env bash
+        const tplId = $('llm_template').value || 'cmd';
+        const nowIso = new Date().toISOString();
+        const filename = `llm_${tplId}_${nowIso.replace(/[:.]/g, '-')}.sh`;
+
+        const header =
+          `#!/usr/bin/env bash
 # Generated by Truth Capsule Composer
 # Template: ${tplId}
 # Date: ${nowIso}
@@ -2834,88 +2843,108 @@ IFS=$'\\n\\t'
 
 `;
 
-      const blob = new Blob([header, command], { type: 'text/x-shellscript' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-      a.remove();
-      toast(`Saved ${filename} (remember: chmod +x ${filename})`);
-    }
-    function copyLlmCommand() {
-      const command = $('llm_preview').value;
+        const blob = new Blob([header, command], { type: 'text/x-shellscript' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        a.remove();
+        toast(`Saved ${filename} (remember: chmod +x ${filename})`);
+      }
+      function copyLlmCommand() {
+        const command = $('llm_preview').value;
 
-      if (!command) {
-        toast('No command to copy');
-        return;
+        if (!command) {
+          toast('No command to copy');
+          return;
+        }
+
+        // Save the selected template to localStorage
+        const selectedId = $('llm_template').value;
+        if (selectedId) {
+          localStorage.setItem('llm_last_template', selectedId);
+        }
+
+        navigator.clipboard.writeText(command).then(() => {
+          toast('Command copied to clipboard!');
+          // Don't close the modal - let user copy again or review
+        }).catch(err => {
+          console.error('Copy failed:', err);
+          toast('Copy failed - see console');
+        });
       }
 
-      // Save the selected template to localStorage
-      const selectedId = $('llm_template').value;
-      if (selectedId) {
-        localStorage.setItem('llm_last_template', selectedId);
-      }
-
-      navigator.clipboard.writeText(command).then(() => {
-        toast('Command copied to clipboard!');
-        // Don't close the modal - let user copy again or review
-      }).catch(err => {
-        console.error('Copy failed:', err);
-        toast('Copy failed - see console');
+      // Wire up LLM modal events
+      $('copyLlmBtn').addEventListener('click', openLlmModal);
+      $('llm_close').addEventListener('click', closeLlmModal);
+      $('llm_cancel').addEventListener('click', closeLlmModal);
+      $('llm_copy').addEventListener('click', copyLlmCommand);
+      $('llm_save').addEventListener('click', saveLlmScript)
+      $('llmModal').addEventListener('click', e => {
+        if (e.target && e.target.id === 'llmModal') closeLlmModal();
       });
-    }
 
-    // Wire up LLM modal events
-    $('copyLlmBtn').addEventListener('click', openLlmModal);
-    $('llm_close').addEventListener('click', closeLlmModal);
-    $('llm_cancel').addEventListener('click', closeLlmModal);
-    $('llm_copy').addEventListener('click', copyLlmCommand);
-    $('llm_save').addEventListener('click', saveLlmScript)
-    $('llmModal').addEventListener('click', e => {
-      if (e.target && e.target.id === 'llmModal') closeLlmModal();
-    });
+      /* ------------ Wire up UI ------------ */
+      $('search').addEventListener('input', () => { STATE.filter = $('search').value; renderCapsules(); });
+      $('clearBtn').addEventListener('click', () => { STATE.selectedBundles = new Set(); STATE.selectedCaps = new Set(); STATE.manualCaps = new Set(); STATE.order = []; render(); toast('Cleared'); });
+      $('composeBtn').addEventListener('click', compose);
+      $('copyBtn').addEventListener('click', () => { navigator.clipboard.writeText($('out').value); toast('Prompt copied'); });
+      $('dlBtn').addEventListener('click', () => { const blob = new Blob([$('out').value], { type: 'text/plain' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'system_prompt.txt'; a.click(); });
+      $('dlJsonBtn').addEventListener('click', () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(buildManifest(), null, 2)], { type: 'application/json' })); a.download = 'system_prompt.manifest.json'; a.click(); });
+      $('shareLinkBtn').addEventListener('click', () => { const url = encodeStateToUrl(); navigator.clipboard.writeText(url).then(() => toast('Share link copied')).catch(() => { prompt('Copy link:', url); }); });
+      $('loadJsonBtn').addEventListener('click', () => { const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'application/json'; inp.onchange = async () => { const f = inp.files[0]; if (!f) return; const txt = await f.text(); importState(JSON.parse(txt)); toast('State loaded'); }; inp.click(); });
+      $('validateAllBtn').addEventListener('click', async () => {
+        const ids = STATE.order.filter(id => STATE.selectedCaps.has(id)); const results = [];
+        for (const id of ids) { const c = DATA.capsules[id]; if (!c) continue; const v = await validateDigest(c); results.push({ id, ok: v.ok }); }
+        const ok = results.filter(r => r.ok).length; const fail = results.length - ok;
+        toast(`Digests: ${ok} ok, ${fail} fail`); try { await navigator.clipboard.writeText(results.map(r => (r.ok ? '✓ ' : '✗ ') + r.id).join('\n')); } catch { }
+      });
+      $('includePed').addEventListener('change', compose);
+      $('markdown').addEventListener('change', compose);
 
-    /* ------------ Wire up UI ------------ */
-    $('search').addEventListener('input', () => { STATE.filter = $('search').value; renderCapsules(); });
-    $('clearBtn').addEventListener('click', () => { STATE.selectedBundles = new Set(); STATE.selectedCaps = new Set(); STATE.manualCaps = new Set(); STATE.order = []; render(); toast('Cleared'); });
-    $('composeBtn').addEventListener('click', compose);
-    $('copyBtn').addEventListener('click', () => { navigator.clipboard.writeText($('out').value); toast('Prompt copied'); });
-    $('dlBtn').addEventListener('click', () => { const blob = new Blob([$('out').value], { type: 'text/plain' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'system_prompt.txt'; a.click(); });
-    $('dlJsonBtn').addEventListener('click', () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(buildManifest(), null, 2)], { type: 'application/json' })); a.download = 'system_prompt.manifest.json'; a.click(); });
-    $('shareLinkBtn').addEventListener('click', () => { const url = encodeStateToUrl(); navigator.clipboard.writeText(url).then(() => toast('Share link copied')).catch(() => { prompt('Copy link:', url); }); });
-    $('loadJsonBtn').addEventListener('click', () => { const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'application/json'; inp.onchange = async () => { const f = inp.files[0]; if (!f) return; const txt = await f.text(); importState(JSON.parse(txt)); toast('State loaded'); }; inp.click(); });
-    $('validateAllBtn').addEventListener('click', async () => {
-      const ids = STATE.order.filter(id => STATE.selectedCaps.has(id)); const results = [];
-      for (const id of ids) { const c = DATA.capsules[id]; if (!c) continue; const v = await validateDigest(c); results.push({ id, ok: v.ok }); }
-      const ok = results.filter(r => r.ok).length; const fail = results.length - ok;
-      toast(`Digests: ${ok} ok, ${fail} fail`); try { await navigator.clipboard.writeText(results.map(r => (r.ok ? '✓ ' : '✗ ') + r.id).join('\n')); } catch { }
-    });
-    $('includePed').addEventListener('change', compose);
-    $('markdown').addEventListener('change', compose);
+      /* Keyboard shortcuts */
+      document.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { compose(); }
+        if (e.key === '/') { e.preventDefault(); $('search').focus(); }
+        if (e.key === 'm') { $('markdown').checked = !$('markdown').checked; compose(); }
+        if (e.key === 'p') { $('includePed').checked = !$('includePed').checked; compose(); }
+      });
 
-    /* Keyboard shortcuts */
-    document.addEventListener('keydown', (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { compose(); }
-      if (e.key === '/') { e.preventDefault(); $('search').focus(); }
-      if (e.key === 'm') { $('markdown').checked = !$('markdown').checked; compose(); }
-      if (e.key === 'p') { $('includePed').checked = !$('includePed').checked; compose(); }
-    });
+      /* Split init: left/right + inner vertical (bundles/capsules) */
+      /*Split(['#left', '#right'], { minSize: 240, gutterSize: 8, snapOffset: 0 });
+       Split(['#bundlesWrap', '#capsulesWrap'], {
+        direction: 'vertical',
+        sizes: [45, 55],
+        minSize: [80, 120],
+        gutterSize: 8,
+      }); */
 
-    /* Split init: left/right + inner vertical (bundles/capsules) */
-    Split(['#left', '#right'], { minSize: 240, gutterSize: 8, snapOffset: 0 });
-    Split(['#bundlesWrap', '#capsulesWrap'], {
-      direction: 'vertical',
-      sizes: [45, 55],
-      minSize: [80, 120],
-      gutterSize: 8,
-    });
+      function render() { renderProfiles(); renderBundles(); renderCapsules(); renderPreview(); compose(); }
+      render();
+      tryHydrateFromUrl();
 
-    function render() { renderProfiles(); renderBundles(); renderCapsules(); renderPreview(); compose(); }
-    render();
-    tryHydrateFromUrl();
-  </script>
+      // Remember splits
+      const mainSizes = JSON.parse(localStorage.getItem('tc_split_main') || '[30,70]');
+      Split(['#left', '#right'], { sizes: mainSizes, minSize: 240, gutterSize: 8, onDragEnd: s => localStorage.setItem('tc_split_main', JSON.stringify(s)) });
+
+      const subSizes = JSON.parse(localStorage.getItem('tc_split_sub') || '[45,55]');
+      Split(['#bundlesWrap', '#capsulesWrap'], { direction: 'vertical', sizes: subSizes, minSize: [80, 120], gutterSize: 8, onDragEnd: s => localStorage.setItem('tc_split_sub', JSON.stringify(s)) });
+
+      // Remember profile + checkboxes
+      $('profiles').addEventListener('change', () => localStorage.setItem('tc_profile', $('profiles').value));
+      $('includePed').addEventListener('change', () => localStorage.setItem('tc_inc_ped', $('includePed').checked ? '1' : '0'));
+      $('markdown').addEventListener('change', () => localStorage.setItem('tc_md', $('markdown').checked ? '1' : '0'));
+
+      window.addEventListener('load', () => {
+        const p = localStorage.getItem('tc_profile'); if (p && DATA.profiles[p]) $('profiles').value = p;
+        $('includePed').checked = localStorage.getItem('tc_inc_ped') !== '0';
+        $('markdown').checked = localStorage.getItem('tc_md') === '1';
+      });
+
+
+    </script>
 </body>
 
 </html>
