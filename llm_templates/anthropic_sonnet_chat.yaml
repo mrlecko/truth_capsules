@@ -1,0 +1,10 @@
+id: anthropic_sonnet_chat
+label: "Anthropic: Claude 3.5 Sonnet (chat)"
+model: "anthropic:claude-3-5-sonnet"
+description: "Chat completion; user input via stdin pipe."
+engine: "llm"
+input_mode: "stdin"
+extra_flags: ["--no-stream"]
+cmd_template: |
+  {{SYS_HEREDOC}}
+  {{STDIN_PIPE}} llm -m {{MODEL}} --system "$TC_SYSTEM" {{EXTRA_FLAGS}}

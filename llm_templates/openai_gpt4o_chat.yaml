@@ -1,0 +1,10 @@
+id: openai_gpt4o_chat
+label: "OpenAI: GPT-4o mini (chat)"
+model: "gpt-4o-mini"
+description: "Chat completion; user input as arg."
+engine: "llm"
+input_mode: "arg"
+extra_flags: []
+cmd_template: |
+  {{SYS_HEREDOC}}
+  llm -m {{MODEL}} --system "$TC_SYSTEM" {{EXTRA_FLAGS}} {{INPUT_FRAGMENT}}

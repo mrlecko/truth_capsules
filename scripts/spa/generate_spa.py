@@ -35,6 +35,53 @@ def read_yaml(filepath):
         return {"__error__": str(e), "_file": filepath}
 
 
+def index_llm_templates(root_dir):
+    """
+    Load LLM command templates from llm_templates/ directory.
+
+    Args:
+        root_dir: Path to project root directory
+
+    Returns:
+        list of template dicts with id, label, model, etc.
+    """
+    templates = []
+    templates_dir = os.path.join(root_dir, "llm_templates")
+
+    if not os.path.isdir(templates_dir):
+        return templates
+
+    yaml_files = sorted(glob.glob(os.path.join(templates_dir, "*.yaml")))
+
+    for filepath in yaml_files:
+        try:
+            data = read_yaml(filepath)
+            if not isinstance(data, dict):
+                continue
+
+            # Validate required fields
+            required = ["id", "label", "model", "input_mode", "cmd_template"]
+            if not all(field in data for field in required):
+                print(f"  ⚠ Skipping {os.path.basename(filepath)}: missing required fields")
+                continue
+
+            templates.append({
+                "id": data["id"],
+                "label": data.get("label", data["id"]),
+                "model": data["model"],
+                "description": data.get("description", ""),
+                "engine": data.get("engine", "llm"),
+                "input_mode": data.get("input_mode", "arg"),
+                "extra_flags": data.get("extra_flags", []),
+                "cmd_template": data["cmd_template"],
+            })
+        except Exception as e:
+            print(f"  ⚠ Error loading {os.path.basename(filepath)}: {e}")
+            continue
+
+    return templates
+
+
 def collect_data(root_dir):
     """
     Collect all capsules, bundles, and profiles from the root directory.
@@ -43,7 +90,7 @@ def collect_data(root_dir):
         root_dir: Path to truth-capsules-v1 directory
 
     Returns:
-        dict with keys: capsules, bundles, profiles, schemas
+        dict with keys: capsules, bundles, profiles, schemas, llm_templates
     """
     capsules = {}
     bundles = {}
@@ -113,11 +160,15 @@ def collect_data(root_dir):
             schemas[schema_id] = data
             continue
 
+    # Load LLM templates
+    llm_templates = index_llm_templates(root_dir)
+
     return {
         "capsules": capsules,
         "bundles": bundles,
         "profiles": profiles,
-        "schemas": schemas
+        "schemas": schemas,
+        "llm_templates": llm_templates
     }
 
 
@@ -136,6 +187,7 @@ def generate_spa(root_dir, template_path, output_path):
     print(f"  ✓ {len(data['capsules'])} capsules")
     print(f"  ✓ {len(data['bundles'])} bundles")
     print(f"  ✓ {len(data['profiles'])} profiles")
+    print(f"  ✓ {len(data['llm_templates'])} LLM templates")
 
     # Load template
     print(f"\n📄 Loading template from {template_path}...")
@@ -164,7 +216,7 @@ def generate_spa(root_dir, template_path, output_path):
     file_size_kb = len(html.encode('utf-8')) / 1024
     print(f"\n✅ Generated {output_path} ({file_size_kb:.1f} KB)")
     print(f"   Generated at: {generated_at}")
-    print(f"   Data snapshot: {len(data['capsules'])} capsules, {len(data['bundles'])} bundles, {len(data['profiles'])} profiles")
+    print(f"   Data snapshot: {len(data['capsules'])} capsules, {len(data['bundles'])} bundles, {len(data['profiles'])} profiles, {len(data['llm_templates'])} LLM templates")
 
 
 def main():

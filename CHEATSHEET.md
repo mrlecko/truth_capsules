@@ -507,7 +507,100 @@ llm -m openai:gpt-4o-mini --system "$SYS" \
 
 ---
 
-## 15) Minimal Python wrapper (if you need it)
+## 15) Copy a ready-to-run `llm` command from the SPA
+
+The Truth Capsule Composer SPA includes a **"Copy LLM Cmd"** feature that generates fully runnable bash commands with your composed system prompt auto-injected.
+
+### How it works
+
+1. **Compose a prompt** in the SPA (select profile, bundles, and/or capsules)
+2. Click **💻 Copy LLM Cmd** in the header
+3. **Pick a template** (OpenAI, Anthropic, Ollama, etc.)
+4. **(Optional)** Type your user input or specify a file path
+5. Click **📋 Copy Command**, then paste in your terminal
+
+### What you get
+
+The SPA generates a bash command with:
+- **System prompt** via literal heredoc (`read -r -d '' TC_SYSTEM <<'__TC_SYSTEM__'`)
+- **User input** safely quoted (POSIX single-quote escaping)
+- **Model flags** from the template (e.g., `--no-stream` for Anthropic)
+- **Live preview** updates as you type, so you see exactly what will be copied
+
+### Example output (OpenAI / arg mode)
+
+```bash
+read -r -d '' TC_SYSTEM <<'__TC_SYSTEM__'
+SYSTEM: Profile=Conversational Guidance
+POLICY: Cite or abstain; follow Plan→Verify→Answer; ask ONE crisp follow-up if required.
+...
+__TC_SYSTEM__
+llm -m gpt-4o-mini --system "$TC_SYSTEM" <<< 'Perform capsule-compliant PR review. Highlight risky changes and propose tests.'
+```
+
+### Example output (Anthropic / stdin mode)
+
+```bash
+read -r -d '' TC_SYSTEM <<'__TC_SYSTEM__'
+SYSTEM: Profile=Conversational Guidance
+POLICY: Cite or abstain; follow Plan→Verify→Answer; ask ONE crisp follow-up if required.
+...
+__TC_SYSTEM__
+printf %s 'Summarize the attached doc and list 3 risks.' | llm -m anthropic:claude-3-5-sonnet --system "$TC_SYSTEM" --no-stream
+```
+
+### Template types (input modes)
+
+- **`arg`** (OpenAI): User input passed via bash here-string (`<<<`)
+- **`stdin`** (Anthropic): User input piped via `printf`
+- **`file`** (Ollama): File path passed as argument
+
+### Requirements
+
+- **Linux + bash** (relies on here-strings and heredocs)
+- **`llm` CLI** installed (`pipx install llm`)
+- **API keys** configured:
+  - `OPENAI_API_KEY` for OpenAI models
+  - `ANTHROPIC_API_KEY` for Anthropic models
+  - Ollama requires local installation (`ollama pull llama3`)
+
+### Why heredoc?
+
+The heredoc approach (`<<'__TC_SYSTEM__'`) is:
+- **Robust**: Handles newlines, quotes, `$`, backticks, and emoji without escaping
+- **Safe**: No shell injection possible (literal mode)
+- **Standard**: Works on any Linux/bash system
+- **No limits**: Avoids command-line length restrictions
+- **No conflicts**: Uses `TC_SYSTEM` variable to avoid conflicts with your existing shell variables
+
+### Adding custom templates
+
+1. Create a YAML file in `llm_templates/`:
+
+```yaml
+id: custom_model_chat
+label: "Custom: My Model (chat)"
+model: "custom:my-model"
+description: "Chat completion via custom provider"
+engine: "llm"
+input_mode: "arg"
+extra_flags: []
+cmd_template: |
+  {{SYS_HEREDOC}}
+  llm -m {{MODEL}} --system "$SYS" {{INPUT_FRAGMENT}}
+```
+
+2. Regenerate the SPA:
+
+```bash
+python scripts/spa/generate_spa.py --root . --output capsule_composer.html
+```
+
+3. Refresh the SPA in your browser — your template will appear in the dropdown
+
+---
+
+## 16) Minimal Python wrapper (if you need it)
 
 If you prefer to call `llm` from Python without learning any client SDKs right now:
 

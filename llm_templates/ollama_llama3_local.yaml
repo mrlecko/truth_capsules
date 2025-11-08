@@ -1,0 +1,10 @@
+id: ollama_llama3_local
+label: "Ollama: llama3 (local)"
+model: "ollama:llama3"
+description: "Local model; file input."
+engine: "llm"
+input_mode: "file"
+extra_flags: []
+cmd_template: |
+  {{SYS_HEREDOC}}
+  llm -m {{MODEL}} --system "$TC_SYSTEM" {{EXTRA_FLAGS}} {{FILE_PATH}}

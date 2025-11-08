@@ -106,11 +106,15 @@ pre,textarea{
 .gutter:hover{background:rgba(122,162,255,.08)}
 
 /* modal */
-#modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center}
-#modal .modal-inner{
+#modal,#llmModal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:100}
+#modal .modal-inner,#llmModal .modal-inner{
   background:var(--panel-alt);border:1px solid var(--border);border-radius:12px;max-width:900px;width:92%;
   max-height:80vh;overflow:auto;padding:12px
 }
+#llmModal .form-row{display:flex;flex-direction:column;gap:6px;margin:12px 0}
+#llmModal label{font-weight:500;font-size:13px}
+#llmModal textarea{min-height:100px}
+#llmModal .hint{font-size:12px;color:var(--muted);margin-top:4px}
 
 /* toast */
 .toast{
@@ -154,10 +158,11 @@ section#right{ padding-right:0; }   /* optional */
 <body>
 <header class="toolbar">
   <h1>Truth Capsule Composer</h1>
-  <div class="small">Generated 2025-11-08T15:01:56.607924Z</div>
+  <div class="small">Generated 2025-11-08T16:15:50.427771Z</div>
   <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
     <button class="btn" id="composeBtn" title="Compose (Ctrl/Cmd+Enter)">🟢 Compose</button>
     <button class="btn" id="copyBtn" title="Copy prompt">📋 Copy</button>
+    <button class="btn" id="copyLlmBtn" title="Copy LLM command">💻 Copy LLM Cmd</button>
     <button class="btn" id="dlBtn" title="Download prompt">⬇️ Download</button>
     <button class="btn" id="dlJsonBtn" title="Download manifest JSON">⬇️ Download JSON</button>
     <button class="btn" id="loadJsonBtn" title="Load manifest JSON">⬆️ Load JSON</button>
@@ -232,6 +237,52 @@ section#right{ padding-right:0; }   /* optional */
       <span id="m_result" class="badge">idle</span>
     </div>
     <pre><code id="m_body_code" class="language-yaml"></code></pre>
+  </div>
+</div>
+
+<!-- LLM Command modal -->
+<div id="llmModal">
+  <div class="modal-inner">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <strong>Copy LLM Command</strong>
+      <button class="btn small" id="llm_close">Close</button>
+    </div>
+
+    <div class="form-row">
+      <label for="llm_template">Template:</label>
+      <select id="llm_template"></select>
+      <div class="hint" id="llm_template_desc"></div>
+    </div>
+
+    <div class="form-row" id="llm_input_row">
+      <label for="llm_user_input">User input:</label>
+      <textarea id="llm_user_input" placeholder="Enter your prompt/question here..."></textarea>
+      <div class="hint" id="llm_input_hint"></div>
+    </div>
+
+    <div class="form-row" id="llm_file_row" style="display:none">
+      <label for="llm_file_path">File path:</label>
+      <input type="text" id="llm_file_path" placeholder="/path/to/input.txt" value="input.txt">
+    </div>
+
+    <div class="form-row">
+      <label>
+        <input type="checkbox" id="llm_minify">
+        Minify system prompt (collapse whitespace to single line)
+      </label>
+      <div class="hint">Minification removes newlines and extra spaces. May affect formatting.</div>
+    </div>
+
+    <div class="form-row">
+      <label for="llm_preview">Generated command:</label>
+      <textarea id="llm_preview" readonly style="min-height:200px;font-family:monospace;font-size:12px;background:var(--bg);color:var(--text)"></textarea>
+      <div class="hint">This is what will be copied to your clipboard</div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn" id="llm_copy">📋 Copy Command</button>
+      <button class="btn" id="llm_cancel">Cancel</button>
+    </div>
   </div>
 </div>
 
@@ -1959,7 +2010,41 @@ const DATA = {
       "_raw": "kind: profile\nid: profile.rules_generator_v1\ntitle: Code Assistant - Rules Generator\nversion: 1.0.0\ndescription: Emit a single YAML document for agent/IDE rules.\nresponse:\n  format: yaml\n  policy: |\n    Emit one YAML with sections: rules, violations, meta. No prose outside YAML.\n  system_block: |\n    SYSTEM: Profile=Rules Generator\n    POLICY: Emit a single YAML document with 'rules', 'violations', and 'meta' sections.\n    FORMAT: ```yaml``` only.\n  projection:\n    include:\n      - title\n      - statement\n      - assumptions[:3]\n      - pedagogy.socratic[:3]\n      - pedagogy.aphorisms[:2]\n    render:\n      capsule_header: \"BEGIN CAPSULE id={id} version={version} domain={domain}\"\n      assumption_bullet: \"  - {text}\"\n      socratic_bullet: \"  - {text}\"\n      aphorism_bullet: \"  - {text}\"\n      enforcement_footer: \"ENFORCEMENT: Ensure outputs satisfy this capsule; otherwise abstain and request the minimal missing info.\"\ndownload:\n  suggested_ext: yaml\n"
     }
   },
-  "schemas": {}
+  "schemas": {},
+  "llm_templates": [
+    {
+      "id": "anthropic_sonnet_chat",
+      "label": "Anthropic: Claude 3.5 Sonnet (chat)",
+      "model": "anthropic:claude-3-5-sonnet",
+      "description": "Chat completion; user input via stdin pipe.",
+      "engine": "llm",
+      "input_mode": "stdin",
+      "extra_flags": [
+        "--no-stream"
+      ],
+      "cmd_template": "{{SYS_HEREDOC}}\n{{STDIN_PIPE}} llm -m {{MODEL}} --system \"$TC_SYSTEM\" {{EXTRA_FLAGS}}\n"
+    },
+    {
+      "id": "ollama_llama3_local",
+      "label": "Ollama: llama3 (local)",
+      "model": "ollama:llama3",
+      "description": "Local model; file input.",
+      "engine": "llm",
+      "input_mode": "file",
+      "extra_flags": [],
+      "cmd_template": "{{SYS_HEREDOC}}\nllm -m {{MODEL}} --system \"$TC_SYSTEM\" {{EXTRA_FLAGS}} {{FILE_PATH}}\n"
+    },
+    {
+      "id": "openai_gpt4o_chat",
+      "label": "OpenAI: GPT-4o mini (chat)",
+      "model": "gpt-4o-mini",
+      "description": "Chat completion; user input as arg.",
+      "engine": "llm",
+      "input_mode": "arg",
+      "extra_flags": [],
+      "cmd_template": "{{SYS_HEREDOC}}\nllm -m {{MODEL}} --system \"$TC_SYSTEM\" {{EXTRA_FLAGS}} {{INPUT_FRAGMENT}}\n"
+    }
+  ]
 };
 
 /* ------------ State & helpers ------------ */
@@ -2233,6 +2318,217 @@ function tryHydrateFromUrl(){
   const url=new URL(window.location.href); const s=url.searchParams.get('s'); if(!s) return;
   try{ const json=decodeURIComponent(escape(atob(s))); importState(JSON.parse(json)); }catch(e){ console.error('bad s param',e); }
 }
+
+/* ------------ LLM Command Composition ------------ */
+function shQuoteLiteral(s) {
+  // POSIX-safe single-quote wrapper: ' becomes '\''
+  return "'" + String(s).replace(/'/g, "'\\''") + "'";
+}
+
+function buildSysHeredoc(promptText) {
+  // Use single-quoted heredoc label to disable interpolation/globbing
+  // Use TC_SYSTEM to avoid conflicts with user's shell variables
+  const label = "__TC_SYSTEM__";
+  return [
+    `read -r -d '' TC_SYSTEM <<'${label}'`,
+    promptText,
+    label
+  ].join("\n");
+}
+
+function buildInputFragment(tpl, userText, filePath) {
+  const flags = (tpl.extra_flags || []).join(' ');
+
+  if (tpl.input_mode === 'arg') {
+    return {
+      EXTRA_FLAGS: flags,
+      INPUT_FRAGMENT: `<<< ${shQuoteLiteral(userText || "")}`
+    };
+  }
+
+  if (tpl.input_mode === 'stdin') {
+    return {
+      EXTRA_FLAGS: flags,
+      STDIN_PIPE: `printf %s ${shQuoteLiteral(userText || "")} |`,
+      INPUT_FRAGMENT: ""
+    };
+  }
+
+  if (tpl.input_mode === 'file') {
+    return {
+      EXTRA_FLAGS: flags,
+      FILE_PATH: shQuoteLiteral(filePath || "input.txt"),
+      INPUT_FRAGMENT: ""
+    };
+  }
+
+  return { EXTRA_FLAGS: flags, INPUT_FRAGMENT: "" };
+}
+
+function composeLlmCommand(tpl, systemPrompt, userText, filePath, minify) {
+  const sysText = minify ? systemPrompt.replace(/\s+/g, ' ').trim() : systemPrompt;
+  const sysHeredoc = buildSysHeredoc(sysText);
+  const frags = buildInputFragment(tpl, userText, filePath);
+
+  // Build the command by replacing all placeholders
+  let cmd = String(tpl.cmd_template || '');
+
+  // Replace required placeholders
+  cmd = cmd.replace(/\{\{SYS_HEREDOC\}\}/g, sysHeredoc);
+  cmd = cmd.replace(/\{\{MODEL\}\}/g, tpl.model || '');
+  cmd = cmd.replace(/\{\{INPUT_FRAGMENT\}\}/g, frags.INPUT_FRAGMENT || '');
+
+  // Replace optional placeholders
+  cmd = cmd.replace(/\{\{EXTRA_FLAGS\}\}/g, frags.EXTRA_FLAGS || '');
+  cmd = cmd.replace(/\{\{STDIN_PIPE\}\}/g, frags.STDIN_PIPE || '');
+  cmd = cmd.replace(/\{\{FILE_PATH\}\}/g, frags.FILE_PATH || '');
+
+  // Clean up:
+  // 1. Collapse multiple spaces into single space
+  cmd = cmd.replace(/ {2,}/g, ' ');
+  // 2. Remove trailing spaces on lines
+  cmd = cmd.replace(/[ \t]+$/gm, '');
+  // 3. Ensure final newline
+  cmd = cmd.trim() + "\n";
+
+  return cmd;
+}
+
+function getCurrentSystemPrompt() {
+  // Get the current composed prompt, stripping markdown fences if present
+  let prompt = $('out').value;
+  if ($('markdown').checked) {
+    // Remove leading ``` and trailing ```
+    prompt = prompt.replace(/^```\n/, '').replace(/\n```$/, '');
+  }
+  return prompt;
+}
+
+function updateLlmPreview() {
+  const templates = DATA.llm_templates || [];
+  const selectedId = $('llm_template').value;
+  const tpl = templates.find(t => t.id === selectedId);
+
+  if (!tpl) {
+    $('llm_preview').value = '';
+    return;
+  }
+
+  const systemPrompt = getCurrentSystemPrompt();
+  const userText = $('llm_user_input').value;
+  const filePath = $('llm_file_path').value;
+  const minify = $('llm_minify').checked;
+
+  const command = composeLlmCommand(tpl, systemPrompt, userText, filePath, minify);
+  $('llm_preview').value = command;
+}
+
+function openLlmModal() {
+  const templates = DATA.llm_templates || [];
+
+  if (templates.length === 0) {
+    toast('No LLM templates found');
+    return;
+  }
+
+  // Populate template selector
+  const sel = $('llm_template');
+  sel.innerHTML = '';
+  templates.forEach(tpl => {
+    const opt = document.createElement('option');
+    opt.value = tpl.id;
+    opt.textContent = tpl.label;
+    sel.appendChild(opt);
+  });
+
+  // Restore last used template from localStorage
+  const lastTemplate = localStorage.getItem('llm_last_template');
+  if (lastTemplate && templates.find(t => t.id === lastTemplate)) {
+    sel.value = lastTemplate;
+  }
+
+  // Update description and input mode on template change
+  const updateTemplateUI = () => {
+    const selectedId = sel.value;
+    const tpl = templates.find(t => t.id === selectedId);
+    if (!tpl) return;
+
+    $('llm_template_desc').textContent = tpl.description || '';
+
+    // Show/hide input fields based on input_mode
+    if (tpl.input_mode === 'file') {
+      $('llm_input_row').style.display = 'none';
+      $('llm_file_row').style.display = 'flex';
+    } else {
+      $('llm_input_row').style.display = 'flex';
+      $('llm_file_row').style.display = 'none';
+
+      if (tpl.input_mode === 'stdin') {
+        $('llm_input_hint').textContent = 'Will be piped to stdin';
+      } else {
+        $('llm_input_hint').textContent = 'Will be passed as bash here-string (<<<)';
+      }
+    }
+
+    // Update preview whenever template changes
+    updateLlmPreview();
+  };
+
+  sel.onchange = updateTemplateUI;
+
+  // Update preview on input changes
+  $('llm_user_input').oninput = updateLlmPreview;
+  $('llm_file_path').oninput = updateLlmPreview;
+  $('llm_minify').onchange = updateLlmPreview;
+
+  updateTemplateUI();
+
+  // Clear inputs (but preserve file path default)
+  $('llm_user_input').value = '';
+  $('llm_file_path').value = 'input.txt';
+  $('llm_minify').checked = false;
+
+  // Initial preview
+  updateLlmPreview();
+
+  $('llmModal').style.display = 'flex';
+}
+
+function closeLlmModal() {
+  $('llmModal').style.display = 'none';
+}
+
+function copyLlmCommand() {
+  const command = $('llm_preview').value;
+
+  if (!command) {
+    toast('No command to copy');
+    return;
+  }
+
+  // Save the selected template to localStorage
+  const selectedId = $('llm_template').value;
+  if (selectedId) {
+    localStorage.setItem('llm_last_template', selectedId);
+  }
+
+  navigator.clipboard.writeText(command).then(() => {
+    toast('Command copied to clipboard!');
+    // Don't close the modal - let user copy again or review
+  }).catch(err => {
+    console.error('Copy failed:', err);
+    toast('Copy failed - see console');
+  });
+}
+
+// Wire up LLM modal events
+$('copyLlmBtn').addEventListener('click', openLlmModal);
+$('llm_close').addEventListener('click', closeLlmModal);
+$('llm_cancel').addEventListener('click', closeLlmModal);
+$('llm_copy').addEventListener('click', copyLlmCommand);
+$('llmModal').addEventListener('click', e => {
+  if (e.target && e.target.id === 'llmModal') closeLlmModal();
+});
 
 /* ------------ Wire up UI ------------ */
 $('search').addEventListener('input', ()=>{ STATE.filter=$('search').value; renderCapsules(); });
