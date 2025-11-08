@@ -2,13 +2,13 @@ id: llm.fermi_estimation_v1
 version: 1.0.0
 domain: llm
 title: Fermi Estimation
-statement: "Produce an order‑of‑magnitude estimate with explicit factors,\
-  \ ranges, and resulting uncertainty (log‑scale)."
+statement: Produce an order‑of‑magnitude estimate with explicit factors, ranges, and
+  resulting uncertainty (log‑scale).
 assumptions:
-- "A back‑of‑the‑envelope answer is acceptable to guide decision making."
+- A back‑of‑the‑envelope answer is acceptable to guide decision making.
 pedagogy:
 - kind: Socratic
-  text: "What are the 3–5 multiplicative factors?"
+  text: What are the 3–5 multiplicative factors?
 - kind: Aphorism
   text: Be roughly right faster, then refine.
 witnesses: []
@@ -28,7 +28,7 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: 70d581a4503460f99018d30bb1f1bc0e6ccc598e9c95381b63acdc65e121b841
+    digest: ff0b085cd83a53d0c4493dc44bfe48847f27d399227bb1abcdf0af3155fd29d8
     signature: null
 applies_to:
 - conversation

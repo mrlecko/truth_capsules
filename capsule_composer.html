@@ -158,7 +158,7 @@ section#right{ padding-right:0; }   /* optional */
 <body>
 <header class="toolbar">
   <h1>Truth Capsule Composer</h1>
-  <div class="small">Generated 2025-11-08T16:15:50.427771Z</div>
+  <div class="small">Generated 2025-11-08T16:30:16.333302Z</div>
   <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
     <button class="btn" id="composeBtn" title="Compose (Ctrl/Cmd+Enter)">🟢 Compose</button>
     <button class="btn" id="copyBtn" title="Copy prompt">📋 Copy</button>
@@ -471,7 +471,7 @@ const DATA = {
           "method": "ed25519",
           "key_id": null,
           "pubkey": null,
-          "digest": "030e4a3273b5d9aecf6e5bdcd1a8465c63b9113e5c0fe9c62bded0e4ee76f538",
+          "digest": "10679b47e25ea1c981f846f04fc1866994737d7dcc52f8d5888e6774d9debf5f",
           "signature": null
         }
       },
@@ -487,7 +487,7 @@ const DATA = {
         "notes": ""
       },
       "_file": "./capsules/llm.pr_deploy_checklist_v1.yaml",
-      "_raw": "id: llm.pr_deploy_checklist_v1\nversion: 1.0.0\ndomain: pr_review\ntitle: \"PR Review - Deploy Checklist\"\nstatement: 'Gate deploy on: feature flag (if risky), migration plan + rollback, observability\n  hooks, on-call acknowledgement.'\nassumptions:\n- You can defer large refactors; ship safely first.\npedagogy:\n- kind: Socratic\n  text: If we had to roll back in 5 minutes, how?\n- kind: Aphorism\n  text: Plan the rollback before the rollout.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 030e4a3273b5d9aecf6e5bdcd1a8465c63b9113e5c0fe9c62bded0e4ee76f538\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
+      "_raw": "id: llm.pr_deploy_checklist_v1\nversion: 1.0.0\ndomain: pr_review\ntitle: PR Review - Deploy Checklist\nstatement: 'Gate deploy on: feature flag (if risky), migration plan + rollback, observability\n  hooks, on-call acknowledgement.'\nassumptions:\n- You can defer large refactors; ship safely first.\npedagogy:\n- kind: Socratic\n  text: If we had to roll back in 5 minutes, how?\n- kind: Aphorism\n  text: Plan the rollback before the rollout.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 10679b47e25ea1c981f846f04fc1866994737d7dcc52f8d5888e6774d9debf5f\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
     },
     "llm.pr_test_hints_v1": {
       "id": "llm.pr_test_hints_v1",
@@ -526,7 +526,7 @@ const DATA = {
           "method": "ed25519",
           "key_id": null,
           "pubkey": null,
-          "digest": "5805f25cf9ab26a69030c1849005c33062c93ec43aadbf92edbeb9e675533bbc",
+          "digest": "9a9f2f0b564e7630e4fec39fbe9762f65a5e68eae959ff9038a4a0f014399641",
           "signature": null
         }
       },
@@ -542,7 +542,7 @@ const DATA = {
         "notes": ""
       },
       "_file": "./capsules/llm.pr_test_hints_v1.yaml",
-      "_raw": "id: llm.pr_test_hints_v1\nversion: 1.0.0\ndomain: pr_review\ntitle: \"PR Review - Minimal Tests\"\nstatement: \"Propose 2–4 smallest tests that would catch a regression introduced\\\n  \\ by this diff (include inputs/edges).\"\nassumptions:\n- Some testing harness exists (unit/integration).\npedagogy:\n- kind: Socratic\n  text: \"What’s the cheapest test that would fail if you’re wrong?\"\n- kind: Aphorism\n  text: One failing test beats ten opinions.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 5805f25cf9ab26a69030c1849005c33062c93ec43aadbf92edbeb9e675533bbc\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
+      "_raw": "id: llm.pr_test_hints_v1\nversion: 1.0.0\ndomain: pr_review\ntitle: PR Review - Minimal Tests\nstatement: Propose 2–4 smallest tests that would catch a regression introduced by\n  this diff (include inputs/edges).\nassumptions:\n- Some testing harness exists (unit/integration).\npedagogy:\n- kind: Socratic\n  text: What’s the cheapest test that would fail if you’re wrong?\n- kind: Aphorism\n  text: One failing test beats ten opinions.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 9a9f2f0b564e7630e4fec39fbe9762f65a5e68eae959ff9038a4a0f014399641\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
     },
     "llm.pii_redaction_guard_v1": {
       "id": "llm.pii_redaction_guard_v1",
@@ -636,7 +636,7 @@ const DATA = {
           "method": "ed25519",
           "key_id": null,
           "pubkey": null,
-          "digest": "fd38a3ba1949c1534f09066142346820a1f93b1de83564f61348dfb70c2e8bc7",
+          "digest": "58c5802699d64ffa2632d255638c27617e0b3cbd1be1c7aa5a6d6bba9eff39a2",
           "signature": null
         }
       },
@@ -652,7 +652,7 @@ const DATA = {
         "notes": ""
       },
       "_file": "./capsules/llm.pr_risk_tags_v1.yaml",
-      "_raw": "id: llm.pr_risk_tags_v1\nversion: 1.0.0\ndomain: pr_review\ntitle: \"PR Review - Risk Tags\"\nstatement: \"Assign risk tags {security, performance, availability, migration, breaking_change,\\\n  \\ data_loss} with 0–1 severity and 1–2 line rationale.\"\nassumptions:\n- Risk framing helps prioritize deeper review and testing.\npedagogy:\n- kind: Socratic\n  text: Which user/system risk is most plausible here?\n- kind: Aphorism\n  text: Name the risk, shrink the risk.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: fd38a3ba1949c1534f09066142346820a1f93b1de83564f61348dfb70c2e8bc7\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
+      "_raw": "id: llm.pr_risk_tags_v1\nversion: 1.0.0\ndomain: pr_review\ntitle: PR Review - Risk Tags\nstatement: Assign risk tags {security, performance, availability, migration, breaking_change,\n  data_loss} with 0–1 severity and 1–2 line rationale.\nassumptions:\n- Risk framing helps prioritize deeper review and testing.\npedagogy:\n- kind: Socratic\n  text: Which user/system risk is most plausible here?\n- kind: Aphorism\n  text: Name the risk, shrink the risk.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 58c5802699d64ffa2632d255638c27617e0b3cbd1be1c7aa5a6d6bba9eff39a2\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
     },
     "llm.evidence_gap_triage_v1": {
       "id": "llm.evidence_gap_triage_v1",
@@ -746,7 +746,7 @@ const DATA = {
           "method": "ed25519",
           "key_id": null,
           "pubkey": null,
-          "digest": "aab51bbcfc3e082d3d8b63c05234c9fdf4cde425aefdf6ba0f62986c4be0bdaf",
+          "digest": "cb5ede16f518629a9bb6118a91ad15595d7b72c6bec8952edc9a9deb5fcb0fab",
           "signature": null
         }
       },
@@ -762,7 +762,7 @@ const DATA = {
         "notes": ""
       },
       "_file": "./capsules/llm.pr_change_impact_v1.yaml",
-      "_raw": "id: llm.pr_change_impact_v1\nversion: 1.0.0\ndomain: pr_review\ntitle: \"PR Review - Change Impact\"\nstatement: Describe user-facing impact (if any), docs to update, and a single line\n  release note.\nassumptions:\n- Every externally visible change gets a note or is explicitly internal-only.\npedagogy:\n- kind: Socratic\n  text: Who will notice this change tomorrow?\n- kind: Aphorism\n  text: If it matters, document it.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: aab51bbcfc3e082d3d8b63c05234c9fdf4cde425aefdf6ba0f62986c4be0bdaf\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
+      "_raw": "id: llm.pr_change_impact_v1\nversion: 1.0.0\ndomain: pr_review\ntitle: PR Review - Change Impact\nstatement: Describe user-facing impact (if any), docs to update, and a single line\n  release note.\nassumptions:\n- Every externally visible change gets a note or is explicitly internal-only.\npedagogy:\n- kind: Socratic\n  text: Who will notice this change tomorrow?\n- kind: Aphorism\n  text: If it matters, document it.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: cb5ede16f518629a9bb6118a91ad15595d7b72c6bec8952edc9a9deb5fcb0fab\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
     },
     "llm.counterfactual_probe_v1": {
       "id": "llm.counterfactual_probe_v1",
@@ -802,7 +802,7 @@ const DATA = {
           "method": "ed25519",
           "key_id": null,
           "pubkey": null,
-          "digest": "91174a97fb956099dee011e1afc0db1391851d0103a034f121af80779bc22a10",
+          "digest": "97645585b83080f11a69418850b492fdde87eb8a9e6b4183d5fbb1ee017f569a",
           "signature": null
         }
       },
@@ -818,7 +818,7 @@ const DATA = {
         "notes": ""
       },
       "_file": "./capsules/llm.counterfactual_probe_v1.yaml",
-      "_raw": "id: llm.counterfactual_probe_v1\nversion: 1.0.0\ndomain: llm\ntitle: Counterfactual Probe\nstatement: \"Before concluding, generate 2–3 counterfactual worlds that would\\\n  \\ flip the decision; list the observable tests that would distinguish them.\"\nassumptions:\n- There is uncertainty worth exploring.\n- \"Budget allows 1–3 tiny tests.\"\npedagogy:\n- kind: Socratic\n  text: What would have to be true for the opposite decision to be best?\n- kind: Aphorism\n  text: Seek disconfirming evidence first.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 91174a97fb956099dee011e1afc0db1391851d0103a034f121af80779bc22a10\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
+      "_raw": "id: llm.counterfactual_probe_v1\nversion: 1.0.0\ndomain: llm\ntitle: Counterfactual Probe\nstatement: Before concluding, generate 2–3 counterfactual worlds that would flip the\n  decision; list the observable tests that would distinguish them.\nassumptions:\n- There is uncertainty worth exploring.\n- Budget allows 1–3 tiny tests.\npedagogy:\n- kind: Socratic\n  text: What would have to be true for the opposite decision to be best?\n- kind: Aphorism\n  text: Seek disconfirming evidence first.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 97645585b83080f11a69418850b492fdde87eb8a9e6b4183d5fbb1ee017f569a\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
     },
     "llm.red_team_assessment_v1": {
       "id": "llm.red_team_assessment_v1",
@@ -871,7 +871,7 @@ const DATA = {
           "method": "ed25519",
           "key_id": null,
           "pubkey": null,
-          "digest": "dff4abbd0fa625d7d9fc3dd94c26b9831188f1281aebdae9b78f4528c63c8f83",
+          "digest": "a7ee80b6f0de049176869e5168f2d9968fbcdd97da2dac47206f46c508fcf942",
           "signature": null
         }
       },
@@ -887,7 +887,7 @@ const DATA = {
         "notes": ""
       },
       "_file": "./capsules/llm.red_team_assessment_v1.yaml",
-      "_raw": "id: llm.red_team_assessment_v1\nversion: 1.0.0\ndomain: llm\ntitle: Red Team Assessment Protocol\nstatement: \"On a red-team request, perform an adversarial evaluation: clarify objective\\\n  \\ & asset, list assumptions, identify actors & capabilities, enumerate plausible\\\n  \\ attacks, show at least one concrete exploit path, rate severity\\xD7likelihood\\\n  \\ (0–1), propose mitigations and a 48‑hour action plan.\"\nassumptions:\n- The user explicitly requests a red-team assessment for constructive hardening.\n- Information provided is for defense; do not share sensitive exploit details beyond\n  what is necessary to mitigate.\n- Follow platform safety policies; redact secrets and PII.\npedagogy:\n- kind: Socratic\n  text: What asset are we protecting and from whom (top 2 threat actors)?\n- kind: Socratic\n  text: What assumption, if false, makes failure most likely?\n- kind: Socratic\n  text: What is the cheapest path to impact for an attacker?\n- kind: Aphorism\n  text: Assume a breach; prove recovery.\n- kind: Aphorism\n  text: Strong claims require strong evidence.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: dff4abbd0fa625d7d9fc3dd94c26b9831188f1281aebdae9b78f4528c63c8f83\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
+      "_raw": "id: llm.red_team_assessment_v1\nversion: 1.0.0\ndomain: llm\ntitle: Red Team Assessment Protocol\nstatement: 'On a red-team request, perform an adversarial evaluation: clarify objective\n  & asset, list assumptions, identify actors & capabilities, enumerate plausible attacks,\n  show at least one concrete exploit path, rate severity×likelihood (0–1), propose\n  mitigations and a 48‑hour action plan.'\nassumptions:\n- The user explicitly requests a red-team assessment for constructive hardening.\n- Information provided is for defense; do not share sensitive exploit details beyond\n  what is necessary to mitigate.\n- Follow platform safety policies; redact secrets and PII.\npedagogy:\n- kind: Socratic\n  text: What asset are we protecting and from whom (top 2 threat actors)?\n- kind: Socratic\n  text: What assumption, if false, makes failure most likely?\n- kind: Socratic\n  text: What is the cheapest path to impact for an attacker?\n- kind: Aphorism\n  text: Assume a breach; prove recovery.\n- kind: Aphorism\n  text: Strong claims require strong evidence.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: a7ee80b6f0de049176869e5168f2d9968fbcdd97da2dac47206f46c508fcf942\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
     },
     "llm.tool_json_contract_v1": {
       "id": "llm.tool_json_contract_v1",
@@ -981,7 +981,7 @@ const DATA = {
           "method": "ed25519",
           "key_id": null,
           "pubkey": null,
-          "digest": "b151771866cdfb14419d887310d5bcd1be4584404e8470edbbfcccd195c2050d",
+          "digest": "1bbdd1db6b770ba4b9a73c6fe6e9f9d309cc4524e6edb4105199ce83922bc563",
           "signature": null
         }
       },
@@ -997,7 +997,7 @@ const DATA = {
         "notes": ""
       },
       "_file": "./capsules/llm.five_whys_root_cause_v1.yaml",
-      "_raw": "id: llm.five_whys_root_cause_v1\nversion: 1.0.0\ndomain: llm\ntitle: Five Whys (Root Cause)\nstatement: \"Perform a 3–5 Whys drill; propose a countermeasure for the root cause\\\n  \\ and one guardrail to prevent regression.\"\nassumptions:\n- Event or defect is concrete and recent.\npedagogy:\n- kind: Socratic\n  text: Why did this happen? Why was that possible? (repeat)\n- kind: Aphorism\n  text: Fix the system, not the symptom.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: b151771866cdfb14419d887310d5bcd1be4584404e8470edbbfcccd195c2050d\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
+      "_raw": "id: llm.five_whys_root_cause_v1\nversion: 1.0.0\ndomain: llm\ntitle: Five Whys (Root Cause)\nstatement: Perform a 3–5 Whys drill; propose a countermeasure for the root cause and\n  one guardrail to prevent regression.\nassumptions:\n- Event or defect is concrete and recent.\npedagogy:\n- kind: Socratic\n  text: Why did this happen? Why was that possible? (repeat)\n- kind: Aphorism\n  text: Fix the system, not the symptom.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 1bbdd1db6b770ba4b9a73c6fe6e9f9d309cc4524e6edb4105199ce83922bc563\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
     },
     "llm.judge_answer_quality_v1": {
       "id": "llm.judge_answer_quality_v1",
@@ -1146,7 +1146,7 @@ const DATA = {
           "method": "ed25519",
           "key_id": null,
           "pubkey": null,
-          "digest": "70d581a4503460f99018d30bb1f1bc0e6ccc598e9c95381b63acdc65e121b841",
+          "digest": "ff0b085cd83a53d0c4493dc44bfe48847f27d399227bb1abcdf0af3155fd29d8",
           "signature": null
         }
       },
@@ -1162,7 +1162,7 @@ const DATA = {
         "notes": ""
       },
       "_file": "./capsules/llm.fermi_estimation_v1.yaml",
-      "_raw": "id: llm.fermi_estimation_v1\nversion: 1.0.0\ndomain: llm\ntitle: Fermi Estimation\nstatement: \"Produce an order‑of‑magnitude estimate with explicit factors,\\\n  \\ ranges, and resulting uncertainty (log‑scale).\"\nassumptions:\n- \"A back‑of‑the‑envelope answer is acceptable to guide decision making.\"\npedagogy:\n- kind: Socratic\n  text: \"What are the 3–5 multiplicative factors?\"\n- kind: Aphorism\n  text: Be roughly right faster, then refine.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 70d581a4503460f99018d30bb1f1bc0e6ccc598e9c95381b63acdc65e121b841\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
+      "_raw": "id: llm.fermi_estimation_v1\nversion: 1.0.0\ndomain: llm\ntitle: Fermi Estimation\nstatement: Produce an order‑of‑magnitude estimate with explicit factors, ranges, and\n  resulting uncertainty (log‑scale).\nassumptions:\n- A back‑of‑the‑envelope answer is acceptable to guide decision making.\npedagogy:\n- kind: Socratic\n  text: What are the 3–5 multiplicative factors?\n- kind: Aphorism\n  text: Be roughly right faster, then refine.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: ff0b085cd83a53d0c4493dc44bfe48847f27d399227bb1abcdf0af3155fd29d8\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
     },
     "llm.pr_diff_first_v1": {
       "id": "llm.pr_diff_first_v1",
@@ -1202,7 +1202,7 @@ const DATA = {
           "method": "ed25519",
           "key_id": null,
           "pubkey": null,
-          "digest": "25d94b35c205cf2fe32fe8ab6c2bcfdc8bcd6403ed666233501e73529aecac7d",
+          "digest": "b519f3cdb754d00b97862fd38de1fd74c389b78f691986f34b65de370bb45d82",
           "signature": null
         }
       },
@@ -1218,7 +1218,7 @@ const DATA = {
         "notes": ""
       },
       "_file": "./capsules/llm.pr_diff_first_v1.yaml",
-      "_raw": "id: llm.pr_diff_first_v1\nversion: 1.0.0\ndomain: pr_review\ntitle: \"PR Review - Diff First\"\nstatement: \"Always read the diff first. Summarize changes in ≤5 bullets with\\\n  \\ file counts and risky areas (auth, I/O, concurrency, migrations).\"\nassumptions:\n- A textual diff or list of changed files is available.\n- Goal is actionable review, not style nitpicks.\npedagogy:\n- kind: Socratic\n  text: What actually changed (files, functions, interfaces)?\n- kind: Aphorism\n  text: Review behavior, not just syntax.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 25d94b35c205cf2fe32fe8ab6c2bcfdc8bcd6403ed666233501e73529aecac7d\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
+      "_raw": "id: llm.pr_diff_first_v1\nversion: 1.0.0\ndomain: pr_review\ntitle: PR Review - Diff First\nstatement: Always read the diff first. Summarize changes in ≤5 bullets with file counts\n  and risky areas (auth, I/O, concurrency, migrations).\nassumptions:\n- A textual diff or list of changed files is available.\n- Goal is actionable review, not style nitpicks.\npedagogy:\n- kind: Socratic\n  text: What actually changed (files, functions, interfaces)?\n- kind: Aphorism\n  text: Review behavior, not just syntax.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: b519f3cdb754d00b97862fd38de1fd74c389b78f691986f34b65de370bb45d82\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
     },
     "llm.bias_checklist_v1": {
       "id": "llm.bias_checklist_v1",
@@ -1257,7 +1257,7 @@ const DATA = {
           "method": "ed25519",
           "key_id": null,
           "pubkey": null,
-          "digest": "5af42141ed903462592bc8f9f5a0613449c5fffb64cbdebd04409a599acc42a1",
+          "digest": "ac2b51c4e496a89372de921918c2cacd072e548934aaf385f15f9b0678da2dbb",
           "signature": null
         }
       },
@@ -1273,7 +1273,7 @@ const DATA = {
         "notes": ""
       },
       "_file": "./capsules/llm.bias_checklist_v1.yaml",
-      "_raw": "id: llm.bias_checklist_v1\nversion: 1.0.0\ndomain: llm\ntitle: Bias & Mode Collapse Check\nstatement: 'Before finalizing, scan for common failure modes: confirmation bias, selection\n  bias, overconfident tone, mode collapse.'\nassumptions:\n- \"Brief self‑audit improves reliability.\"\npedagogy:\n- kind: Socratic\n  text: Which plausible alternative did we ignore?\n- kind: Aphorism\n  text: Doubt is a feature.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 5af42141ed903462592bc8f9f5a0613449c5fffb64cbdebd04409a599acc42a1\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
+      "_raw": "id: llm.bias_checklist_v1\nversion: 1.0.0\ndomain: llm\ntitle: Bias & Mode Collapse Check\nstatement: 'Before finalizing, scan for common failure modes: confirmation bias, selection\n  bias, overconfident tone, mode collapse.'\nassumptions:\n- Brief self‑audit improves reliability.\npedagogy:\n- kind: Socratic\n  text: Which plausible alternative did we ignore?\n- kind: Aphorism\n  text: Doubt is a feature.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: ac2b51c4e496a89372de921918c2cacd072e548934aaf385f15f9b0678da2dbb\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
     },
     "llm.plan_verify_answer_v1": {
       "id": "llm.plan_verify_answer_v1",
@@ -1312,7 +1312,7 @@ const DATA = {
           "method": "ed25519",
           "key_id": null,
           "pubkey": null,
-          "digest": "498a688e13793db937ba0ef133254bdb015106b6a01b5f3aad72e8d6a60dbf79",
+          "digest": "0aab055bc4c1b504cca4d9ddb8be1074a71835c9b3aab076d7c511c425a9664f",
           "signature": null
         }
       },
@@ -1328,7 +1328,7 @@ const DATA = {
         "notes": ""
       },
       "_file": "./capsules/llm.plan_verify_answer_v1.yaml",
-      "_raw": "id: llm.plan_verify_answer_v1\nversion: 1.0.0\ndomain: llm\ntitle: \"Plan → Verify → Answer\"\nstatement: \"Plan→Verify→Answer. The final answer references collected evidence.\"\nassumptions:\n- Operating in a general context\npedagogy:\n- kind: Socratic\n  text: What evidence supports this claim?\n- kind: Aphorism\n  text: Cite or abstain.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:53:50.511776Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 498a688e13793db937ba0ef133254bdb015106b6a01b5f3aad72e8d6a60dbf79\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
+      "_raw": "id: llm.plan_verify_answer_v1\nversion: 1.0.0\ndomain: llm\ntitle: Plan → Verify → Answer\nstatement: Plan→Verify→Answer. The final answer references collected evidence.\nassumptions:\n- Operating in a general context\npedagogy:\n- kind: Socratic\n  text: What evidence supports this claim?\n- kind: Aphorism\n  text: Cite or abstain.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:53:50.511776Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 0aab055bc4c1b504cca4d9ddb8be1074a71835c9b3aab076d7c511c425a9664f\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
     },
     "llm.assumption_to_test_v1": {
       "id": "llm.assumption_to_test_v1",
@@ -1367,7 +1367,7 @@ const DATA = {
           "method": "ed25519",
           "key_id": null,
           "pubkey": null,
-          "digest": "f810b90bf12c4f5c7314dcd769720b058cbf3f39b3fb7e0d2722e2f8216c3154",
+          "digest": "9695ca488e9ab7912ff2e76b08a7205b08fb08627e1cab70fe0caa5fb9f54ed5",
           "signature": null
         }
       },
@@ -1383,7 +1383,7 @@ const DATA = {
         "notes": ""
       },
       "_file": "./capsules/llm.assumption_to_test_v1.yaml",
-      "_raw": "id: llm.assumption_to_test_v1\nversion: 1.0.0\ndomain: llm\ntitle: \"Assumptions → Tests\"\nstatement: \"Convert each critical assumption into a falsifiable micro-test with owner,\\\n  \\ required evidence, and a 24–72h timebox.\"\nassumptions:\n- Assumptions are enumerated or can be elicited with one question.\npedagogy:\n- kind: Socratic\n  text: Which single assumption, if wrong, invalidates the plan?\n- kind: Aphorism\n  text: Make failure explicit and reversible.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: f810b90bf12c4f5c7314dcd769720b058cbf3f39b3fb7e0d2722e2f8216c3154\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
+      "_raw": "id: llm.assumption_to_test_v1\nversion: 1.0.0\ndomain: llm\ntitle: Assumptions → Tests\nstatement: Convert each critical assumption into a falsifiable micro-test with owner,\n  required evidence, and a 24–72h timebox.\nassumptions:\n- Assumptions are enumerated or can be elicited with one question.\npedagogy:\n- kind: Socratic\n  text: Which single assumption, if wrong, invalidates the plan?\n- kind: Aphorism\n  text: Make failure explicit and reversible.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 9695ca488e9ab7912ff2e76b08a7205b08fb08627e1cab70fe0caa5fb9f54ed5\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
     },
     "llm.steelmanning_v1": {
       "id": "llm.steelmanning_v1",
@@ -1480,7 +1480,7 @@ const DATA = {
           "method": "ed25519",
           "key_id": null,
           "pubkey": null,
-          "digest": "7d49f0480040a28da9ea3fbac4873986577418cf15b516471798fb1cc508aff7",
+          "digest": "b797a413841b047de9564e761934526f7b6b22d98b284aa418d4f2775e099a8a",
           "signature": null
         }
       },
@@ -1496,7 +1496,7 @@ const DATA = {
         "notes": ""
       },
       "_file": "./capsules/pedagogy/pedagogy.problem_solving_v1.yaml",
-      "_raw": "id: pedagogy.problem_solving_v1\nversion: 1.0.0\ntitle: Five-step problem-solving discipline\ndomain: pedagogy\nstatement: 'A valid solution includes: (1) objective, (2) assumptions, (3) plan, (4)\n  evidence, (5) summary with trade-offs and next step.'\npedagogy:\n- kind: Socratic\n  text: What is the concrete objective and success criteria?\n- kind: Aphorism\n  text: One small experiment beats a thousand meetings.\nwitnesses:\n- name: five_step_gate\n  language: python\n  code: |- \n    import json, os\n\n    p = os.getenv(\"PS_REPORT\", \"artifacts/examples/problem_solving_ok.json\")\n\n    r = json.load(open(p))\n\n    need = [\"objective\",\"assumptions\",\"plan\",\"evidence\",\"summary\"]\n\n    missing = [k for k in need if not r.get(k)]\n\n    assert not missing, f\"Missing fields: {missing}\"\n\n    assert isinstance(r[\"assumptions\"], list) and len(r[\"assumptions\"])>=1\n\n    assert isinstance(r[\"evidence\"], list) and any(len(str(e))>=10 for e in r[\"evidence\"])\nprovenance:\n  author: Truth Capsules\n  license: MIT\n  schema: provenance.v1\n  org: Truth Capsules Demo\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:53:50.511776Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 7d49f0480040a28da9ea3fbac4873986577418cf15b516471798fb1cc508aff7\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
+      "_raw": "id: pedagogy.problem_solving_v1\nversion: 1.0.0\ntitle: Five-step problem-solving discipline\ndomain: pedagogy\nstatement: 'A valid solution includes: (1) objective, (2) assumptions, (3) plan, (4)\n  evidence, (5) summary with trade-offs and next step.'\npedagogy:\n- kind: Socratic\n  text: What is the concrete objective and success criteria?\n- kind: Aphorism\n  text: One small experiment beats a thousand meetings.\nwitnesses:\n- name: five_step_gate\n  language: python\n  code: 'import json, os\n\n\n    p = os.getenv(\"PS_REPORT\", \"artifacts/examples/problem_solving_ok.json\")\n\n\n    r = json.load(open(p))\n\n\n    need = [\"objective\",\"assumptions\",\"plan\",\"evidence\",\"summary\"]\n\n\n    missing = [k for k in need if not r.get(k)]\n\n\n    assert not missing, f\"Missing fields: {missing}\"\n\n\n    assert isinstance(r[\"assumptions\"], list) and len(r[\"assumptions\"])>=1\n\n\n    assert isinstance(r[\"evidence\"], list) and any(len(str(e))>=10 for e in r[\"evidence\"])'\nprovenance:\n  author: Truth Capsules\n  license: MIT\n  schema: provenance.v1\n  org: Truth Capsules Demo\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:53:50.511776Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: b797a413841b047de9564e761934526f7b6b22d98b284aa418d4f2775e099a8a\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
     },
     "business.decision_log_v1": {
       "id": "business.decision_log_v1",
@@ -1527,7 +1527,7 @@ const DATA = {
           "method": "ed25519",
           "key_id": null,
           "pubkey": null,
-          "digest": "aaaa74594ea1f7a6a9a1bb5393376d7b50cca234bcf94ace66e9a76f0472b8ef",
+          "digest": "9995e16cf46a4ab739588b7fce1d3ee6d6e30372921e301587da28181d230b9d",
           "signature": null
         }
       },
@@ -1543,7 +1543,7 @@ const DATA = {
         "notes": ""
       },
       "_file": "./capsules/business/business.decision_log_v1.yaml",
-      "_raw": "id: business.decision_log_v1\nversion: 1.0.0\nstatement: \"Decision records must include decision, ≥3 options, ≥2 criteria,\\\n  \\ and a rationale mentioning a trade-off.\"\ndomain: business\nwitnesses:\n- name: decision_log_gate\n  language: python\n  code: |-\n    import json, os\n\n    p = os.getenv(\"DEC_REPORT\", \"artifacts/examples/decision_log_ok.json\")\n\n    r = json.load(open(p))\n\n    assert r.get(\"decision\")\n\n    assert isinstance(r.get(\"options\"), list) and len(r[\"options\"])>=3\n\n    assert isinstance(r.get(\"criteria\"), list) and len(r[\"criteria\"])>=2\n\n    assert \"trade-off\" in (r.get(\"rationale\",\"\")+\"\").lower() or \"because\" in (r.get(\"rationale\",\"\")+\"\").lower()\nprovenance:\n  author: Truth Capsules\n  license: MIT\n  schema: provenance.v1\n  org: Truth Capsules Demo\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:53:50.511776Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: aaaa74594ea1f7a6a9a1bb5393376d7b50cca234bcf94ace66e9a76f0472b8ef\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
+      "_raw": "id: business.decision_log_v1\nversion: 1.0.0\nstatement: Decision records must include decision, ≥3 options, ≥2 criteria, and a\n  rationale mentioning a trade-off.\ndomain: business\nwitnesses:\n- name: decision_log_gate\n  language: python\n  code: 'import json, os\n\n\n    p = os.getenv(\"DEC_REPORT\", \"artifacts/examples/decision_log_ok.json\")\n\n\n    r = json.load(open(p))\n\n\n    assert r.get(\"decision\")\n\n\n    assert isinstance(r.get(\"options\"), list) and len(r[\"options\"])>=3\n\n\n    assert isinstance(r.get(\"criteria\"), list) and len(r[\"criteria\"])>=2\n\n\n    assert \"trade-off\" in (r.get(\"rationale\",\"\")+\"\").lower() or \"because\" in (r.get(\"rationale\",\"\")+\"\").lower()'\nprovenance:\n  author: Truth Capsules\n  license: MIT\n  schema: provenance.v1\n  org: Truth Capsules Demo\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:53:50.511776Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 9995e16cf46a4ab739588b7fce1d3ee6d6e30372921e301587da28181d230b9d\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
     },
     "ops.rollback_plan_v1": {
       "id": "ops.rollback_plan_v1",
@@ -1574,7 +1574,7 @@ const DATA = {
           "method": "ed25519",
           "key_id": null,
           "pubkey": null,
-          "digest": "f61cf94b2bab0b65151a110ccbb77b6f2763179f16c826d5ed5c03288493e5c8",
+          "digest": "b9bec3aa69fed5788d0b9ba19137ae352fa8ce057ca2119d779c9f14c2ad6047",
           "signature": null
         }
       },
@@ -1590,7 +1590,7 @@ const DATA = {
         "notes": ""
       },
       "_file": "./capsules/ops/ops.rollback_plan_v1.yaml",
-      "_raw": "id: ops.rollback_plan_v1\nversion: 1.0.0\nstatement: Deploy plans must include a rollback step with trigger conditions and owner.\ndomain: ops\nwitnesses:\n- name: rollback_present\n  language: python\n  code: |-\n    import json, os\n\n    p = os.getenv(\"OPS_PLAN\", \"artifacts/examples/ops_plan_ok.json\")\n\n    r = json.load(open(p))\n\n    rb = r.get(\"rollback\", {})\n\n    assert rb.get(\"steps\") and rb.get(\"trigger\") and rb.get(\"owner\"), \"Rollback incomplete\"\nprovenance:\n  author: Truth Capsules\n  license: MIT\n  schema: provenance.v1\n  org: Truth Capsules Demo\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:53:50.511776Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: f61cf94b2bab0b65151a110ccbb77b6f2763179f16c826d5ed5c03288493e5c8\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
+      "_raw": "id: ops.rollback_plan_v1\nversion: 1.0.0\nstatement: Deploy plans must include a rollback step with trigger conditions and owner.\ndomain: ops\nwitnesses:\n- name: rollback_present\n  language: python\n  code: 'import json, os\n\n\n    p = os.getenv(\"OPS_PLAN\", \"artifacts/examples/ops_plan_ok.json\")\n\n\n    r = json.load(open(p))\n\n\n    rb = r.get(\"rollback\", {})\n\n\n    assert rb.get(\"steps\") and rb.get(\"trigger\") and rb.get(\"owner\"), \"Rollback incomplete\"'\nprovenance:\n  author: Truth Capsules\n  license: MIT\n  schema: provenance.v1\n  org: Truth Capsules Demo\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:53:50.511776Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: b9bec3aa69fed5788d0b9ba19137ae352fa8ce057ca2119d779c9f14c2ad6047\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
     }
   },
   "bundles": {

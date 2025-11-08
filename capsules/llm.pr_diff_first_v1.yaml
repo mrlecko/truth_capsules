@@ -1,9 +1,9 @@
 id: llm.pr_diff_first_v1
 version: 1.0.0
 domain: pr_review
-title: "PR Review - Diff First"
-statement: "Always read the diff first. Summarize changes in ≤5 bullets with\
-  \ file counts and risky areas (auth, I/O, concurrency, migrations)."
+title: PR Review - Diff First
+statement: Always read the diff first. Summarize changes in ≤5 bullets with file counts
+  and risky areas (auth, I/O, concurrency, migrations).
 assumptions:
 - A textual diff or list of changed files is available.
 - Goal is actionable review, not style nitpicks.
@@ -29,7 +29,7 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: 25d94b35c205cf2fe32fe8ab6c2bcfdc8bcd6403ed666233501e73529aecac7d
+    digest: b519f3cdb754d00b97862fd38de1fd74c389b78f691986f34b65de370bb45d82
     signature: null
 applies_to:
 - conversation

@@ -1,14 +1,14 @@
 id: llm.pr_test_hints_v1
 version: 1.0.0
 domain: pr_review
-title: "PR Review - Minimal Tests"
-statement: "Propose 2–4 smallest tests that would catch a regression introduced\
-  \ by this diff (include inputs/edges)."
+title: PR Review - Minimal Tests
+statement: Propose 2–4 smallest tests that would catch a regression introduced by
+  this diff (include inputs/edges).
 assumptions:
 - Some testing harness exists (unit/integration).
 pedagogy:
 - kind: Socratic
-  text: "What’s the cheapest test that would fail if you’re wrong?"
+  text: What’s the cheapest test that would fail if you’re wrong?
 - kind: Aphorism
   text: One failing test beats ten opinions.
 witnesses: []
@@ -28,7 +28,7 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: 5805f25cf9ab26a69030c1849005c33062c93ec43aadbf92edbeb9e675533bbc
+    digest: 9a9f2f0b564e7630e4fec39fbe9762f65a5e68eae959ff9038a4a0f014399641
     signature: null
 applies_to:
 - conversation

@@ -5,7 +5,7 @@ title: Bias & Mode Collapse Check
 statement: 'Before finalizing, scan for common failure modes: confirmation bias, selection
   bias, overconfident tone, mode collapse.'
 assumptions:
-- "Brief self‑audit improves reliability."
+- Brief self‑audit improves reliability.
 pedagogy:
 - kind: Socratic
   text: Which plausible alternative did we ignore?
@@ -28,7 +28,7 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: 5af42141ed903462592bc8f9f5a0613449c5fffb64cbdebd04409a599acc42a1
+    digest: ac2b51c4e496a89372de921918c2cacd072e548934aaf385f15f9b0678da2dbb
     signature: null
 applies_to:
 - conversation

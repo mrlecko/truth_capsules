@@ -2,8 +2,8 @@ id: llm.five_whys_root_cause_v1
 version: 1.0.0
 domain: llm
 title: Five Whys (Root Cause)
-statement: "Perform a 3–5 Whys drill; propose a countermeasure for the root cause\
-  \ and one guardrail to prevent regression."
+statement: Perform a 3–5 Whys drill; propose a countermeasure for the root cause and
+  one guardrail to prevent regression.
 assumptions:
 - Event or defect is concrete and recent.
 pedagogy:
@@ -28,7 +28,7 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: b151771866cdfb14419d887310d5bcd1be4584404e8470edbbfcccd195c2050d
+    digest: 1bbdd1db6b770ba4b9a73c6fe6e9f9d309cc4524e6edb4105199ce83922bc563
     signature: null
 applies_to:
 - conversation

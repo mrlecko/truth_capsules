@@ -2,10 +2,10 @@ id: llm.red_team_assessment_v1
 version: 1.0.0
 domain: llm
 title: Red Team Assessment Protocol
-statement: "On a red-team request, perform an adversarial evaluation: clarify objective\
-  \ & asset, list assumptions, identify actors & capabilities, enumerate plausible\
-  \ attacks, show at least one concrete exploit path, rate severity\xD7likelihood\
-  \ (0–1), propose mitigations and a 48‑hour action plan."
+statement: 'On a red-team request, perform an adversarial evaluation: clarify objective
+  & asset, list assumptions, identify actors & capabilities, enumerate plausible attacks,
+  show at least one concrete exploit path, rate severity×likelihood (0–1), propose
+  mitigations and a 48‑hour action plan.'
 assumptions:
 - The user explicitly requests a red-team assessment for constructive hardening.
 - Information provided is for defense; do not share sensitive exploit details beyond
@@ -39,7 +39,7 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: dff4abbd0fa625d7d9fc3dd94c26b9831188f1281aebdae9b78f4528c63c8f83
+    digest: a7ee80b6f0de049176869e5168f2d9968fbcdd97da2dac47206f46c508fcf942
     signature: null
 applies_to:
 - conversation

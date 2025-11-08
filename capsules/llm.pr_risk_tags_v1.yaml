@@ -1,9 +1,9 @@
 id: llm.pr_risk_tags_v1
 version: 1.0.0
 domain: pr_review
-title: "PR Review - Risk Tags"
-statement: "Assign risk tags {security, performance, availability, migration, breaking_change,\
-  \ data_loss} with 0–1 severity and 1–2 line rationale."
+title: PR Review - Risk Tags
+statement: Assign risk tags {security, performance, availability, migration, breaking_change,
+  data_loss} with 0–1 severity and 1–2 line rationale.
 assumptions:
 - Risk framing helps prioritize deeper review and testing.
 pedagogy:
@@ -28,7 +28,7 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: fd38a3ba1949c1534f09066142346820a1f93b1de83564f61348dfb70c2e8bc7
+    digest: 58c5802699d64ffa2632d255638c27617e0b3cbd1be1c7aa5a6d6bba9eff39a2
     signature: null
 applies_to:
 - conversation

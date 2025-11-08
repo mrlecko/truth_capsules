@@ -43,6 +43,36 @@ python scripts/capsule_linter.py capsules --strict --json
 
 ---
 
+## 1.5) Digest Management
+
+Capsules use SHA256 digests for integrity verification. The digest is calculated from core fields (id, version, domain, title, statement, assumptions, pedagogy).
+
+```bash
+# Verify all digests are correct
+make digest-verify
+# or
+python scripts/capsule_digest.py capsules --verify
+
+# Update/reset all digests (if capsule content changed)
+make digest
+# or
+make digest-reset
+# or
+python scripts/capsule_digest.py capsules
+
+# Get JSON output for CI/automation
+python scripts/capsule_digest.py capsules --verify --json
+```
+
+**When to update digests:**
+- After editing capsule content (title, statement, assumptions, pedagogy)
+- Before signing capsules (digest must be current)
+- When migrating from old digest calculation method
+
+**Note:** Digests are stored in `provenance.signing.digest` and should be updated before creating signatures.
+
+---
+
 ## 2) Discover Profiles & Bundles
 
 ```bash
@@ -101,13 +131,26 @@ python scripts/run_witnesses.py capsules [--json]
 
 ## 5) Sign / Verify (optional)
 
-```bash
-# Sign (Ed25519)
-python scripts/capsule_sign.py capsules --key $SIGNING_KEY
+**Important:** Always update digests before signing!
 
-# Verify
+```bash
+# 1. Update digests first
+make digest
+
+# 2. Sign with Ed25519
+python scripts/capsule_sign.py capsules --key $SIGNING_KEY
+# or
+make sign SIGNING_KEY=keys/my_key.pem
+
+# 3. Verify signatures
 python scripts/capsule_verify.py capsules --pubkey $PUBLIC_KEY
+# or
+make verify
 ```
+
+**Workflow:**
+1. Edit capsule → update digest → sign → commit
+2. Never sign without updating digest first (signature will be invalid)
 
 ---
 

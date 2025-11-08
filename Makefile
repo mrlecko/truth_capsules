@@ -1,18 +1,22 @@
-.PHONY: help setup lint test kg sign verify compose clean
+.PHONY: help setup lint test kg sign verify compose clean digest digest-verify digest-reset spa
 
 PY=python3
 
 help:
 	@echo "Truth Capsules - Common Tasks"
 	@echo ""
-	@echo "  make setup      - Create venv and install dependencies"
-	@echo "  make lint       - Run linter on capsules"
-	@echo "  make test       - Run test suite (when available)"
-	@echo "  make kg         - Export knowledge graph and validate"
-	@echo "  make sign       - Sign capsules (requires SIGNING_KEY)"
-	@echo "  make verify     - Verify capsule signatures"
-	@echo "  make compose    - Compose example prompts from bundles"
-	@echo "  make clean      - Remove generated artifacts"
+	@echo "  make setup         - Create venv and install dependencies"
+	@echo "  make lint          - Run linter on capsules"
+	@echo "  make test          - Run test suite (when available)"
+	@echo "  make kg            - Export knowledge graph and validate"
+	@echo "  make digest        - Update digests for all capsules"
+	@echo "  make digest-verify - Verify all capsule digests"
+	@echo "  make digest-reset  - Reset all digests (same as digest)"
+	@echo "  make sign          - Sign capsules (requires SIGNING_KEY)"
+	@echo "  make verify        - Verify capsule signatures"
+	@echo "  make compose       - Compose example prompts from bundles"
+	@echo "  make spa           - Generate SPA (capsule_composer.html)"
+	@echo "  make clean         - Remove generated artifacts"
 
 setup:
 	$(PY) -m venv .venv
@@ -27,6 +31,16 @@ lint:
 test:
 	@echo "Tests not yet implemented. Coming in v1.1"
 	@# $(PY) -m pytest tests/
+
+digest:
+	$(PY) scripts/capsule_digest.py capsules
+	@echo ""
+	@echo "✓ Digests updated for all capsules"
+
+digest-verify:
+	$(PY) scripts/capsule_digest.py capsules --verify
+
+digest-reset: digest
 
 kg:
 	$(PY) scripts/export_kg.py
@@ -53,6 +67,11 @@ compose:
 		--manifest artifacts/composed/example_manifest.json
 	@echo ""
 	@echo "✓ Composed prompt: artifacts/composed/example_prompt.txt"
+
+spa:
+	$(PY) scripts/spa/generate_spa.py --root . --output capsule_composer.html
+	@echo ""
+	@echo "✓ Generated SPA: capsule_composer.html"
 
 clean:
 	rm -rf artifacts/out/*.ttl artifacts/out/*.ndjson

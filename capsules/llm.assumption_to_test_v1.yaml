@@ -1,9 +1,9 @@
 id: llm.assumption_to_test_v1
 version: 1.0.0
 domain: llm
-title: "Assumptions → Tests"
-statement: "Convert each critical assumption into a falsifiable micro-test with owner,\
-  \ required evidence, and a 24–72h timebox."
+title: Assumptions → Tests
+statement: Convert each critical assumption into a falsifiable micro-test with owner,
+  required evidence, and a 24–72h timebox.
 assumptions:
 - Assumptions are enumerated or can be elicited with one question.
 pedagogy:
@@ -28,7 +28,7 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: f810b90bf12c4f5c7314dcd769720b058cbf3f39b3fb7e0d2722e2f8216c3154
+    digest: 9695ca488e9ab7912ff2e76b08a7205b08fb08627e1cab70fe0caa5fb9f54ed5
     signature: null
 applies_to:
 - conversation

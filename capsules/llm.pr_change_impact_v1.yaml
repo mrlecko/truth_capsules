@@ -1,7 +1,7 @@
 id: llm.pr_change_impact_v1
 version: 1.0.0
 domain: pr_review
-title: "PR Review - Change Impact"
+title: PR Review - Change Impact
 statement: Describe user-facing impact (if any), docs to update, and a single line
   release note.
 assumptions:
@@ -28,7 +28,7 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: aab51bbcfc3e082d3d8b63c05234c9fdf4cde425aefdf6ba0f62986c4be0bdaf
+    digest: cb5ede16f518629a9bb6118a91ad15595d7b72c6bec8952edc9a9deb5fcb0fab
     signature: null
 applies_to:
 - conversation

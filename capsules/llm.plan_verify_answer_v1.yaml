@@ -1,8 +1,8 @@
 id: llm.plan_verify_answer_v1
 version: 1.0.0
 domain: llm
-title: "Plan → Verify → Answer"
-statement: "Plan→Verify→Answer. The final answer references collected evidence."
+title: Plan → Verify → Answer
+statement: Plan→Verify→Answer. The final answer references collected evidence.
 assumptions:
 - Operating in a general context
 pedagogy:
@@ -27,7 +27,7 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: 498a688e13793db937ba0ef133254bdb015106b6a01b5f3aad72e8d6a60dbf79
+    digest: 0aab055bc4c1b504cca4d9ddb8be1074a71835c9b3aab076d7c511c425a9664f
     signature: null
 applies_to:
 - conversation

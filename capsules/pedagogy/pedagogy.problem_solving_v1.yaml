@@ -12,22 +12,28 @@ pedagogy:
 witnesses:
 - name: five_step_gate
   language: python
-  code: |- 
-    import json, os
+  code: 'import json, os
+
 
     p = os.getenv("PS_REPORT", "artifacts/examples/problem_solving_ok.json")
 
+
     r = json.load(open(p))
+
 
     need = ["objective","assumptions","plan","evidence","summary"]
 
+
     missing = [k for k in need if not r.get(k)]
+
 
     assert not missing, f"Missing fields: {missing}"
 
+
     assert isinstance(r["assumptions"], list) and len(r["assumptions"])>=1
 
-    assert isinstance(r["evidence"], list) and any(len(str(e))>=10 for e in r["evidence"])
+
+    assert isinstance(r["evidence"], list) and any(len(str(e))>=10 for e in r["evidence"])'
 provenance:
   author: Truth Capsules
   license: MIT
@@ -44,7 +50,7 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: 7d49f0480040a28da9ea3fbac4873986577418cf15b516471798fb1cc508aff7
+    digest: b797a413841b047de9564e761934526f7b6b22d98b284aa418d4f2775e099a8a
     signature: null
 applies_to:
 - conversation

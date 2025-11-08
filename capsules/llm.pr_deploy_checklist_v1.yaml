@@ -1,7 +1,7 @@
 id: llm.pr_deploy_checklist_v1
 version: 1.0.0
 domain: pr_review
-title: "PR Review - Deploy Checklist"
+title: PR Review - Deploy Checklist
 statement: 'Gate deploy on: feature flag (if risky), migration plan + rollback, observability
   hooks, on-call acknowledgement.'
 assumptions:
@@ -28,7 +28,7 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: 030e4a3273b5d9aecf6e5bdcd1a8465c63b9113e5c0fe9c62bded0e4ee76f538
+    digest: 10679b47e25ea1c981f846f04fc1866994737d7dcc52f8d5888e6774d9debf5f
     signature: null
 applies_to:
 - conversation
