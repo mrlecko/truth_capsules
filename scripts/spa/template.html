@@ -43,7 +43,7 @@
       margin: 0;
       background: var(--bg);
       color: var(--text);
-      font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      font: 18px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
     }
 
     /* Global *webkit* scrollbars (applied to every scrollable element) */
@@ -162,7 +162,7 @@
     }
 
     .small {
-      font-size: 12px;
+      font-size: 16px;
       color: var(--muted)
     }
 
@@ -224,7 +224,7 @@
     }
 
     .btn.small {
-      font-size: 12px;
+      font-size: 14px;
       padding: 4px 8px
     }
 
@@ -234,7 +234,8 @@
       border: 1px solid var(--border);
       color: var(--text);
       padding: 6px;
-      border-radius: 8px
+      border-radius: 8px;
+      font-size:16px;
     }
 
     /* code / text areas */
@@ -246,11 +247,11 @@
       word-break: break-word;
       background: var(--panel-alt);
       border: 1px solid var(--border);
-      color: var(--text);
+      color: #00ff68; /* var(--text); */
       border-radius: 10px;
       padding: 12px;
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-      font-size: 13.5px;
+      font-size: 15.5px;
       line-height: 1.5;
       tab-size: 2
     }
@@ -262,7 +263,7 @@
       border-radius: 10px;
       background: #20314a;
       color: #c2d1f3;
-      font-size: 11px;
+      font-size: 13px;
       border: 1px solid #1a2537
     }
 
@@ -408,17 +409,17 @@
 <body>
   <header class="toolbar">
     <h1>Truth Capsule Prompt Composer</h1>
-    <div class="small">Generated {{ generated_at }}</div>
+    <div class="small" style="font-size:12px; margin-top:5px;">Generated {{ generated_at }}</div>
     <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-      <button class="btn" id="composeBtn" title="Compose (Ctrl/Cmd+Enter)">🟢 Compose</button>
-      <button class="btn" id="copyBtn" title="Copy prompt">📋 Copy</button>
-      <button class="btn" id="copyLlmBtn" title="Copy LLM command">💻 Copy LLM Cmd</button>
-      <button class="btn" id="dlBtn" title="Download prompt">⬇️ Download</button>
-      <button class="btn" id="dlJsonBtn" title="Download manifest JSON">⬇️ Download JSON</button>
-      <button class="btn" id="loadJsonBtn" title="Load manifest JSON">⬆️ Load JSON</button>
-      <button class="btn" id="shareLinkBtn" title="Copy shareable link">📋 Share Link</button>
-      <button class="btn" id="validateAllBtn" title="Validate digests for selected">🔐 Validate All</button>
-      <button class="btn warn" id="clearBtn" title="Clear selection">🗑️ Clear Selected Capsules</button>
+      <button  class="btn" id="composeBtn" title="Compose (Ctrl/Cmd+Enter)">🟢 Compose</button>
+      <button class="btn" id="copyBtn" title="Copy prompt">📋 Copy Prompt</button>
+      <button class="btn" id="copyLlmBtn" title="Copy LLM command">💻 Copy LLM Bash</button>
+      <button class="btn" id="dlBtn" title="Download prompt">⬇️ Download Prompt</button>
+      <button class="btn" id="dlJsonBtn" title="Download manifest JSON">⬇️ Download JSON Manifest</button>
+      <button class="btn" id="loadJsonBtn" title="Load manifest JSON">⬆️ Load JSON Manifest</button>
+      <button class="btn" id="shareLinkBtn" title="Copy shareable link">📋 Share Deeplink</button>
+      <button class="btn" id="validateAllBtn" title="Validate digests for selected">🔐 Validate Digests</button>
+      <button class="btn warn" id="clearBtn" title="Clear selection">🗑️ Clear Capsules</button>
     </div>
   </header>
 
@@ -452,7 +453,7 @@
       <section id="right">
         <div class="card">
           <div class="row">
-            <label><input type="checkbox" id="includePed" checked> include pedagogy</label>
+            <label style="display:none;"><input type="checkbox" id="includePed" checked> include pedagogy</label>
             <label><input type="checkbox" id="markdown"> markdown preview</label>
             <span class="small">Drag to reorder in Preview</span>
           </div>
@@ -462,12 +463,12 @@
           <div class="row" style="justify-content:space-between">
             <strong>COMPOSED SYSTEM PROMPT</strong>
           </div>
-          <textarea id="out"></textarea>
+          <textarea id="out" style="margin-top:5px;"></textarea>
         </div>
 
         <div class="card">
           <strong>PREVIEW – SELECTED CAPSULES (DRAG TO REORDER)</strong>
-          <div id="preview" class="list"></div>
+          <div id="preview" style="margin-top:5px;" class="list"></div>
         </div>
       </section>
     </div>
@@ -528,7 +529,7 @@
       <div class="form-row">
         <label for="llm_preview">Generated command:</label>
         <textarea id="llm_preview" readonly
-          style="min-height:200px;font-family:monospace;font-size:12px;background:var(--bg);color:var(--text)"></textarea>
+          style="min-height:200px;font-family:monospace;font-size:12px;background:var(--bg);color:#00ff68;"></textarea>
         <div class="hint">This is what will be copied to your clipboard</div>
       </div>
 
