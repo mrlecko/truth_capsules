@@ -10,17 +10,34 @@ Exit non-zero on any violation.
 """
 import os, sys, json, base64, yaml, hashlib, argparse
 
+def canonical_json(obj):
+    """Canonical JSON - deterministic ordering, no whitespace."""
+    if isinstance(obj, list):
+        return "[" + ",".join(canonical_json(item) for item in obj) + "]"
+    elif isinstance(obj, dict):
+        keys = sorted(obj.keys())
+        pairs = [json.dumps(k) + ":" + canonical_json(obj[k]) for k in keys]
+        return "{" + ",".join(pairs) + "}"
+    else:
+        return json.dumps(obj, ensure_ascii=False, separators=(',', ':'))
+
 def norm_capsule_for_digest(c):
+    pedagogy = c.get("pedagogy") or []
+    if isinstance(pedagogy, list):
+        pedagogy = [{"kind": p.get("kind"), "text": p.get("text")} for p in pedagogy if isinstance(p, dict)]
+    else:
+        pedagogy = []
+
     core = {
         "id": c.get("id"),
         "version": c.get("version"),
         "domain": c.get("domain"),
         "title": c.get("title"),
         "statement": c.get("statement"),
-        "assumptions": c.get("assumptions") or [],
-        "pedagogy": [{"kind": p.get("kind"), "text": p.get("text")} for p in (c.get("pedagogy") or [])],
+        "assumptions": c.get("assumptions") if isinstance(c.get("assumptions"), list) else [],
+        "pedagogy": pedagogy
     }
-    s = json.dumps(core, sort_keys=True, ensure_ascii=False)
+    s = canonical_json(core)
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
 
 def main():
@@ -56,7 +73,7 @@ def main():
             errors += 1
             continue
 
-        if args.require-signature-on-approved and status == "approved":
+        if args.require_signature_on_approved and status == "approved":
             if not HAVE_NACL:
                 print(f"[error] approved requires signature verification but pynacl not available: {fn}")
                 errors += 1

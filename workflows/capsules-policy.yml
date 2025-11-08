@@ -15,6 +15,6 @@ jobs:
       - name: Install deps
         run: pip install pyyaml pynacl
       - name: Lint capsules
-        run: python capsule_linter.py truth-capsules-v1/capsules
+        run: python scripts/capsule_linter.py capsules
       - name: Policy check (signatures enforced on approved)
-        run: python capsule_policy_check.py truth-capsules-v1/capsules --require-signature-on-approved
+        run: python scripts/capsule_policy_check.py capsules --require-signature-on-approved
