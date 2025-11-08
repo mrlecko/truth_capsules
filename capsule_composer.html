@@ -158,7 +158,7 @@ section#right{ padding-right:0; }   /* optional */
 <body>
 <header class="toolbar">
   <h1>Truth Capsule Composer</h1>
-  <div class="small">Generated 2025-11-08T16:46:18.797822Z</div>
+  <div class="small">Generated 2025-11-08T16:50:20.664564Z</div>
   <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
     <button class="btn" id="composeBtn" title="Compose (Ctrl/Cmd+Enter)">🟢 Compose</button>
     <button class="btn" id="copyBtn" title="Copy prompt">📋 Copy</button>
@@ -1502,8 +1502,23 @@ const DATA = {
     "business.decision_log_v1": {
       "id": "business.decision_log_v1",
       "version": "1.0.0",
-      "statement": "Decision records must include decision, ≥3 options, ≥2 criteria, and a rationale mentioning a trade-off.",
       "domain": "business",
+      "title": "Decision Log Gate",
+      "statement": "Decision records must include decision, ≥3 options, ≥2 criteria, and a rationale mentioning a trade-off.",
+      "assumptions": [
+        "Decision records are structured as JSON",
+        "Criteria and options can be enumerated"
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "Which option best satisfies the stated criteria?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Make trade-offs explicit, not implicit."
+        }
+      ],
       "witnesses": [
         {
           "name": "decision_log_gate",
@@ -1528,7 +1543,7 @@ const DATA = {
           "method": "ed25519",
           "key_id": null,
           "pubkey": null,
-          "digest": "9995e16cf46a4ab739588b7fce1d3ee6d6e30372921e301587da28181d230b9d",
+          "digest": "7f5356a5eb951df4478793f0a90c927331e39ae9031e1197236f18e519c331cb",
           "signature": null
         }
       },
@@ -1544,13 +1559,28 @@ const DATA = {
         "notes": ""
       },
       "_file": "./capsules/business/business.decision_log_v1.yaml",
-      "_raw": "id: business.decision_log_v1\nversion: 1.0.0\nstatement: Decision records must include decision, ≥3 options, ≥2 criteria, and a\n  rationale mentioning a trade-off.\ndomain: business\nwitnesses:\n- name: decision_log_gate\n  language: python\n  code: 'import json, os\n\n\n    p = os.getenv(\"DEC_REPORT\", \"artifacts/examples/decision_log_ok.json\")\n\n\n    r = json.load(open(p))\n\n\n    assert r.get(\"decision\")\n\n\n    assert isinstance(r.get(\"options\"), list) and len(r[\"options\"])>=3\n\n\n    assert isinstance(r.get(\"criteria\"), list) and len(r[\"criteria\"])>=2\n\n\n    assert \"trade-off\" in (r.get(\"rationale\",\"\")+\"\").lower() or \"because\" in (r.get(\"rationale\",\"\")+\"\").lower()'\nprovenance:\n  author: Truth Capsules\n  license: MIT\n  schema: provenance.v1\n  org: Truth Capsules Demo\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:53:50.511776Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 9995e16cf46a4ab739588b7fce1d3ee6d6e30372921e301587da28181d230b9d\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
+      "_raw": "id: business.decision_log_v1\nversion: 1.0.0\ndomain: business\ntitle: Decision Log Gate\nstatement: Decision records must include decision, ≥3 options, ≥2 criteria, and a\n  rationale mentioning a trade-off.\nassumptions:\n- Decision records are structured as JSON\n- Criteria and options can be enumerated\npedagogy:\n- kind: Socratic\n  text: Which option best satisfies the stated criteria?\n- kind: Aphorism\n  text: Make trade-offs explicit, not implicit.\nwitnesses:\n- name: decision_log_gate\n  language: python\n  code: 'import json, os\n\n\n    p = os.getenv(\"DEC_REPORT\", \"artifacts/examples/decision_log_ok.json\")\n\n\n    r = json.load(open(p))\n\n\n    assert r.get(\"decision\")\n\n\n    assert isinstance(r.get(\"options\"), list) and len(r[\"options\"])>=3\n\n\n    assert isinstance(r.get(\"criteria\"), list) and len(r[\"criteria\"])>=2\n\n\n    assert \"trade-off\" in (r.get(\"rationale\",\"\")+\"\").lower() or \"because\" in (r.get(\"rationale\",\"\")+\"\").lower()'\nprovenance:\n  author: Truth Capsules\n  license: MIT\n  schema: provenance.v1\n  org: Truth Capsules Demo\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:53:50.511776Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 7f5356a5eb951df4478793f0a90c927331e39ae9031e1197236f18e519c331cb\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
     },
     "ops.rollback_plan_v1": {
       "id": "ops.rollback_plan_v1",
       "version": "1.0.0",
-      "statement": "Deploy plans must include a rollback step with trigger conditions and owner.",
       "domain": "ops",
+      "title": "Rollback Plan Required",
+      "statement": "Deploy plans must include a rollback step with trigger conditions and owner.",
+      "assumptions": [
+        "Rollback procedures can be documented in advance",
+        "Trigger conditions are measurable"
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "What is the worst-case failure mode, and how do we reverse it?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Make failure explicit and reversible."
+        }
+      ],
       "witnesses": [
         {
           "name": "rollback_present",
@@ -1575,7 +1605,7 @@ const DATA = {
           "method": "ed25519",
           "key_id": null,
           "pubkey": null,
-          "digest": "b9bec3aa69fed5788d0b9ba19137ae352fa8ce057ca2119d779c9f14c2ad6047",
+          "digest": "7be5f47e5ffd7349c81b50a6e46736573221a938df472aa94fc842ff06eedafe",
           "signature": null
         }
       },
@@ -1591,7 +1621,7 @@ const DATA = {
         "notes": ""
       },
       "_file": "./capsules/ops/ops.rollback_plan_v1.yaml",
-      "_raw": "id: ops.rollback_plan_v1\nversion: 1.0.0\nstatement: Deploy plans must include a rollback step with trigger conditions and owner.\ndomain: ops\nwitnesses:\n- name: rollback_present\n  language: python\n  code: 'import json, os\n\n\n    p = os.getenv(\"OPS_PLAN\", \"artifacts/examples/ops_plan_ok.json\")\n\n\n    r = json.load(open(p))\n\n\n    rb = r.get(\"rollback\", {})\n\n\n    assert rb.get(\"steps\") and rb.get(\"trigger\") and rb.get(\"owner\"), \"Rollback incomplete\"'\nprovenance:\n  author: Truth Capsules\n  license: MIT\n  schema: provenance.v1\n  org: Truth Capsules Demo\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:53:50.511776Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: b9bec3aa69fed5788d0b9ba19137ae352fa8ce057ca2119d779c9f14c2ad6047\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
+      "_raw": "id: ops.rollback_plan_v1\nversion: 1.0.0\ndomain: ops\ntitle: Rollback Plan Required\nstatement: Deploy plans must include a rollback step with trigger conditions and owner.\nassumptions:\n- Rollback procedures can be documented in advance\n- Trigger conditions are measurable\npedagogy:\n- kind: Socratic\n  text: What is the worst-case failure mode, and how do we reverse it?\n- kind: Aphorism\n  text: Make failure explicit and reversible.\nwitnesses:\n- name: rollback_present\n  language: python\n  code: 'import json, os\n\n\n    p = os.getenv(\"OPS_PLAN\", \"artifacts/examples/ops_plan_ok.json\")\n\n\n    r = json.load(open(p))\n\n\n    rb = r.get(\"rollback\", {})\n\n\n    assert rb.get(\"steps\") and rb.get(\"trigger\") and rb.get(\"owner\"), \"Rollback incomplete\"'\nprovenance:\n  author: Truth Capsules\n  license: MIT\n  schema: provenance.v1\n  org: Truth Capsules Demo\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:53:50.511776Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 7be5f47e5ffd7349c81b50a6e46736573221a938df472aa94fc842ff06eedafe\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n"
     }
   },
   "bundles": {

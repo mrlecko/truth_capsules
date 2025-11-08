@@ -1,8 +1,17 @@
 id: business.decision_log_v1
 version: 1.0.0
+domain: business
+title: Decision Log Gate
 statement: Decision records must include decision, ≥3 options, ≥2 criteria, and a
   rationale mentioning a trade-off.
-domain: business
+assumptions:
+- Decision records are structured as JSON
+- Criteria and options can be enumerated
+pedagogy:
+- kind: Socratic
+  text: Which option best satisfies the stated criteria?
+- kind: Aphorism
+  text: Make trade-offs explicit, not implicit.
 witnesses:
 - name: decision_log_gate
   language: python
@@ -41,7 +50,7 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: 9995e16cf46a4ab739588b7fce1d3ee6d6e30372921e301587da28181d230b9d
+    digest: 7f5356a5eb951df4478793f0a90c927331e39ae9031e1197236f18e519c331cb
     signature: null
 applies_to:
 - conversation
