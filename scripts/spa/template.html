@@ -395,15 +395,32 @@
 
   </style>
 
-  <!-- Prism for YAML/JSON highlighting -->
-  <link rel="stylesheet" href="https://unpkg.com/prismjs/themes/prism-tomorrow.min.css">
-  <script src="https://unpkg.com/prismjs/prism.js"></script>
-  <script src="https://unpkg.com/prismjs/components/prism-yaml.min.js"></script>
-  <script src="https://unpkg.com/prismjs/components/prism-json.min.js"></script>
+  <!-- Prism / Split / Sortable -->
+  {% if inline_cdn %}
+    <!-- digests (supply-chain breadcrumbs) -->
+    <!-- prism_css: sha256={{ digests['prism_css'] }} -->
+    <!-- prism_core: sha256={{ digests['prism_core'] }} -->
+    <!-- prism_yaml: sha256={{ digests['prism_yaml'] }} -->
+    <!-- prism_json: sha256={{ digests['prism_json'] }} -->
+    <!-- split_js: sha256={{ digests['split_js'] }} -->
+    <!-- sortable_js: sha256={{ digests['sortable_js'] }} -->
 
-  <!-- Split.js (resizable panes) + SortableJS (drag to reorder) -->
-  <script src="https://unpkg.com/split.js/dist/split.min.js"></script>
-  <script src="https://unpkg.com/sortablejs@1.15.2/Sortable.min.js"></script>
+    <style>{{ prism_css_inline | safe }}</style>
+    <script>{{ prism_core_inline | safe }}</script>
+    <script>{{ prism_yaml_inline | safe }}</script>
+    <script>{{ prism_json_inline | safe }}</script>
+    <script>{{ split_js_inline | safe }}</script>
+    <script>{{ sortable_js_inline | safe }}</script>
+  {% else %}
+    <!-- CDN fallback (deterministic, pinned) -->
+    <link rel="stylesheet" href="{{ cdn_urls['prism_css'] }}">
+    <script src="{{ cdn_urls['prism_core'] }}"></script>
+    <script src="{{ cdn_urls['prism_yaml'] }}"></script>
+    <script src="{{ cdn_urls['prism_json'] }}"></script>
+    <script src="{{ cdn_urls['split_js'] }}"></script>
+    <script src="{{ cdn_urls['sortable_js'] }}"></script>
+  {% endif %}
+
 </head>
 
 <body>
@@ -601,7 +618,9 @@
         MODAL = c;
         $('m_title').textContent = title;
         $('m_body_code').textContent = (c._raw || '');
-        Prism.highlightElement($('m_body_code'));
+        if (window.Prism && Prism.highlightElement) {
+          Prism.highlightElement($('m_body_code'));
+        }
         $('m_result').textContent = 'idle'; $('m_result').className = 'badge';
         $('modal').style.display = 'flex';
       }

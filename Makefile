@@ -154,9 +154,20 @@ list-profiles: $(PYBIN)
 	$(PYBIN) scripts/compose_capsules_cli.py --root . --list-profiles
 
 # --- SPA build ---------------------------------------------------------------
-spa: $(PYBIN)
-	$(PYBIN) scripts/spa/generate_spa.py --root . --output $(SPA_OUT)
+# Inline / offline SPA (single self-contained HTML)
+spa:
+	$(PYBIN) scripts/spa/generate_spa.py --root . --output $(SPA_OUT) --embed-cdn --vendor-dir scripts/spa/vendor
 	@echo "✓ Generated SPA: $(SPA_OUT)"
+
+# Strict offline build (fails if vendor cache missing)
+spa-offline:
+	$(PYBIN) scripts/spa/generate_spa.py --root . --output $(SPA_OUT) --embed-cdn --offline --vendor-dir scripts/spa/vendor
+	@echo "✓ Generated SPA (offline): $(SPA_OUT)"
+
+# Populate/refresh vendor cache (one-time, networked)
+spa-vendor:
+	$(PYBIN) scripts/spa/generate_spa.py --root . --output /dev/null --embed-cdn --vendor-dir scripts/spa/vendor
+	@echo "✓ Cached vendor libs in scripts/spa/vendor"
 
 spa-pages: $(PYBIN)
 	@mkdir -p $(DOCS)
