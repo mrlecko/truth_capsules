@@ -139,12 +139,31 @@ def index_llm_templates(root_dir):
     return templates
 
 def collect_data(root_dir):
+    """
+    Walk the repo and collect capsules, bundles, profiles, schemas, and llm templates.
+    Adds a derived `posture` to capsules:
+      - "witnessed"      => non-empty witnesses (list or dict)
+      - "informational"  => otherwise
+    """
+    def _derive_posture(obj: dict) -> str:
+        w = obj.get("witnesses")
+        nonempty = False
+        if isinstance(w, list):
+            nonempty = len(w) > 0
+        elif isinstance(w, dict):
+            nonempty = len(w.keys()) > 0
+        return "witnessed" if nonempty else "informational"
+
     capsules, bundles, profiles, schemas = {}, {}, {}, {}
     yaml_files = glob.glob(os.path.join(root_dir, "**", "*.yml"), recursive=True) + \
                  glob.glob(os.path.join(root_dir, "**", "*.yaml"), recursive=True)
+
     for filepath in yaml_files:
         data = read_yaml(filepath)
-        if not isinstance(data, dict): continue
+        if not isinstance(data, dict):
+            continue
+
+        # Profiles
         if data.get("kind") == "profile" and data.get("id"):
             profiles[data["id"]] = {
                 "id": data["id"],
@@ -155,7 +174,10 @@ def collect_data(root_dir):
                 "download": data.get("download", {"suggested_ext": "txt"}),
                 "_file": filepath,
                 "_raw": data.get("_raw", ""),
-            }; continue
+            }
+            continue
+
+        # Bundles (heuristic: has 'capsules' list, but isn't a single-capsule doc)
         if ("capsules" in data and isinstance(data["capsules"], list)
             and ("id" not in data or "witnesses" not in data)):
             name = data.get("name") or os.path.splitext(os.path.basename(filepath))[0]
@@ -173,15 +195,42 @@ def collect_data(root_dir):
                 "notes": data.get("notes", ""),
                 "env": data.get("env", {}),
                 "secrets": data.get("secrets", []),
-                "_file": filepath
-            }; continue
+                "_file": filepath,
+            }
+            continue
+
+        # Capsules (single)
         if data.get("id") and data.get("version") and data.get("domain"):
-            capsules[data["id"]] = data; continue
+            cap = dict(data)  # shallow copy to avoid mutating original
+            cap["_file"] = filepath
+            # posture + small helper fields
+            cap["posture"] = _derive_posture(cap)
+            w = cap.get("witnesses")
+            if isinstance(w, list):
+                cap["_witness_count"] = len(w)
+            elif isinstance(w, dict):
+                cap["_witness_count"] = len(w.keys())
+            else:
+                cap["_witness_count"] = 0
+            capsules[cap["id"]] = cap
+            continue
+
+        # Schemas
         if data.get("kind") == "schema" and data.get("id"):
-            schemas[data["id"]] = data; continue
+            sch = dict(data)
+            sch["_file"] = filepath
+            schemas[data["id"]] = sch
+            continue
+
     llm_templates = index_llm_templates(root_dir)
-    return {"capsules": capsules, "bundles": bundles, "profiles": profiles,
-            "schemas": schemas, "llm_templates": llm_templates}
+    return {
+        "capsules": capsules,
+        "bundles": bundles,
+        "profiles": profiles,
+        "schemas": schemas,
+        "llm_templates": llm_templates,
+    }
+
 
 def ensure_dir(p): os.makedirs(p, exist_ok=True)
 

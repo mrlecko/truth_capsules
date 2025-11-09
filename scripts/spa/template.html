@@ -273,6 +273,9 @@
       border-color: #1b3a30
     }
 
+    .badge.witnessed {
+      background:rgb(142, 47, 47);
+    }
     .badge.err {
       background: color-mix(in oklab, var(--danger), #000 75%);
       color: #ffd6d6;
@@ -612,6 +615,17 @@
         const p = c.provenance || {}; const b = document.createElement('span'); b.className = 'badge'; b.textContent = (p.author || '?'); return b;
       }
 
+      function badgePosture(c) {
+        const b = document.createElement('span');
+        const isWitnessed = (c.posture === 'witnessed');
+        b.className = 'badge' + (isWitnessed ? ' witnessed' : '');
+        b.textContent = isWitnessed ? 'witnessed' : 'informational';
+        const n = (typeof c._witness_count === 'number') ? c._witness_count : 0;
+        b.title = isWitnessed ? `${n} witness${n === 1 ? '' : 'es'}` : 'No witnesses';
+        return b;
+      }
+
+
       /* ------------ Modal ------------ */
       let MODAL = null;
       function openModal(title, c) {
@@ -655,7 +669,10 @@
         row.appendChild(cb);
 
         const ttl = document.createElement('div'); ttl.textContent = (c.title || id) + '  -  ' + (c.domain || ''); row.appendChild(ttl);
-        row.appendChild(badgeAuthor(c)); row.appendChild(badgeDigest(c));
+        
+        row.appendChild(badgeAuthor(c)); 
+        row.appendChild(badgeDigest(c));
+        row.appendChild(badgePosture(c));
 
         const btn = document.createElement('button'); btn.className = 'btn small'; btn.textContent = 'View'; btn.onclick = () => openModal(c.title || id, c);
         row.appendChild(btn);
@@ -781,7 +798,11 @@
       }
       function composeLegacy(c, includePedagogy) {
         const lines = [];
-        lines.push("BEGIN CAPSULE id=" + (c.id || '') + " version=" + (c.version || '1.0.0') + " domain=" + (c.domain || ''));
+        /* lines.push("BEGIN CAPSULE id=" + (c.id || '') + " version=" + (c.version || '1.0.0') + " domain=" + (c.domain || '')); */
+        lines.push("BEGIN CAPSULE id=" + (c.id || '') + 
+          " version=" + (c.version || '1.0.0') +
+          " domain=" + (c.domain || '') +
+          " posture=" + (c.posture || 'informational') + ")");
         if (c.statement) lines.push("STATEMENT: " + c.statement);
         if (includePedagogy && c.pedagogy) {
           const ped = c.pedagogy.map(p => (p.kind + ': ' + p.text)).join('\n');
