@@ -1,0 +1,16 @@
+FROM python:3.11-slim
+
+# system deps (node/bash/jq so all witness languages work)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    nodejs curl bash jq ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
+# working dir (we will mount the project at /work)
+WORKDIR /work
+
+# preinstall Python deps from your requirements
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install -U pip && pip install -r /tmp/requirements.txt
+
+# default entry; we'll pass the script path and flags at run-time
+ENTRYPOINT ["python3"]

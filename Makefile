@@ -1,6 +1,6 @@
 .PHONY: help setup lint lint-strict test digest digest-verify digest-reset sign verify kg compose compose-bundle \
         spa spa-pages smoke keygen clean clean-venv preflight list-bundles list-profiles \
-        scaffold run-witness witness-pass witness-fail witness-skip freeze
+        scaffold run-witness witness-pass witness-fail witness-skip freeze sandbox-image sandbox-smoke 
 
 # --- Paths & tools -----------------------------------------------------------
 PY        ?= python3
@@ -16,6 +16,11 @@ NDJSONSIG := $(ART)/capsules.signed.ndjson
 CONTEXT   := contexts/truthcapsule.context.jsonld
 ONTOLOGY  := ontology/truthcapsule.ttl
 SHACL     := shacl/truthcapsule.shacl.ttl
+# Defaults to keep 'warn-undefined-variables' happy
+ENV_VARS ?=
+CAPSULE  ?=
+WITNESS  ?=
+JSON     ?= 0
 
 # --- Make settings -----------------------------------------------------------
 SHELL := /bin/bash
@@ -55,6 +60,28 @@ help:
 	@echo "  make preflight          - Check external tools (openssl, pyshacl)"
 	@echo "  make clean              - Remove generated artifacts"
 	@echo "  make clean-venv         - Remove .venv"
+	@echo "  make sandbox-image      - Build sandbox image"
+	@echo "  make sandbox-smoke      - Run sandbox smoke tests"
+	@echo "  make witness-sandbox    - Run witness in the sandbox"
+
+
+# --- Sandbox container config ------------------------------------------------
+SANDBOX_ENGINE ?= docker
+SANDBOX_IMAGE  ?= truthcapsules/runner:0.1
+SANDBOX_USER   ?= $(shell id -u):$(shell id -g)
+SANDBOX_FLAGS  ?= --rm \
+                  --user $(SANDBOX_USER) \
+                  --read-only \
+                  --cpus=1 --memory=256m --pids-limit=64 \
+                  --cap-drop=ALL --security-opt no-new-privileges \
+                  --network=none \
+                  --tmpfs /tmp:rw,nosuid,nodev,mode=1777,size=64m \
+                  -w /work
+
+
+# Resolve engine/image at make-time (empty env won't blank them out)
+ENGINE := $(if $(strip $(SANDBOX_ENGINE)), $(SANDBOX_ENGINE), docker)
+IMAGE  := $(if $(strip $(SANDBOX_IMAGE)), $(SANDBOX_IMAGE), truthcapsules/runner:0.1)
 
 # --- Venv bootstrap (auto) ---------------------------------------------------
 $(PYBIN):
@@ -70,6 +97,60 @@ setup:
 	$(PIP) install -r requirements.txt
 	@echo ""
 	@echo "✓ Setup complete. Activate with: source $(VENV)/bin/activate"
+
+# --- Witness Execution Sandbox -----------------------------------------------
+
+sandbox-build:
+	@echo "🔧 Building sandbox image $(SANDBOX_IMAGE) ..."
+	@$(SANDBOX_ENGINE) build -f container/Dockerfile.runner -t $(SANDBOX_IMAGE) .
+	@echo "✓ Sandbox image built."
+
+sandbox-image:
+	@echo "🔧 Building sandbox image $(SANDBOX_IMAGE) ..."
+	@$(SANDBOX_ENGINE) build -f container/Dockerfile.runner -t $(SANDBOX_IMAGE) .
+	@echo "✓ Sandbox image built."
+
+# Quick smoke: mounts /tmp/tc_wit (created here) RO at /in and runs a trivial Python witness
+sandbox-smoke: sandbox-image
+	@echo "🧪 Running sandbox smoke test..."
+	@tmpdir="$$(mktemp -d)"; \
+	  printf '%s\n' 'print("hello from sandbox")' > $$tmpdir/wit.py; \
+	  $(SANDBOX_ENGINE) run $(SANDBOX_FLAGS) \
+	    -v "$$tmpdir:/in:ro" \
+	    -v "$$(pwd)/artifacts:/work/artifacts:ro" \
+	    $(SANDBOX_IMAGE) python /in/wit.py; \
+	  rc=$$?; rm -rf "$$tmpdir"; exit $$rc
+
+# Example:
+#   make witness-sandbox CAPSULE=llm.pr_risk_tags_v1 WITNESS=pr_review_covers_risks JSON=1 \
+#     ENV_VARS='-e REVIEW_PATH=artifacts/examples/pr_review.md -e DIFF_PATH=artifacts/examples/pr_diff.patch'
+witness-sandbox:
+	@set -Eeuo pipefail; \
+	CAPS=""; [ -n "$(CAPSULE)" ] && CAPS="--capsule $(CAPSULE)"; \
+	WIT="";  [ -n "$(WITNESS)" ] && WIT="--witness $(WITNESS)"; \
+	JSONF=""; [ "$(JSON)" = "1" ] && JSONF="--json"; \
+	ENV_VARS_STR="$${ENV_VARS:-}"; \
+	ENV_VARS_STR="$${ENV_VARS_STR%\"}"; ENV_VARS_STR="$${ENV_VARS_STR#\"}"; \
+	ENV_VARS_STR="$${ENV_VARS_STR%\'}"; ENV_VARS_STR="$${ENV_VARS_STR#\'}"; \
+	if [ -n "$$ENV_VARS_STR" ]; then IFS=' ' read -r -a EV_ARR <<< "$$ENV_VARS_STR"; else EV_ARR=(); fi; \
+	CMD="python3 scripts/run_witnesses.py capsules $$JSONF $$CAPS $$WIT"; \
+	echo "→ Engine : $(SANDBOX_ENGINE)"; \
+	echo "→ Image  : $(SANDBOX_IMAGE)"; \
+	echo "→ User   : $(SANDBOX_USER)"; \
+	echo "→ Flags  : $(SANDBOX_FLAGS)"; \
+	echo "→ Env    : $$ENV_VARS_STR"; \
+	echo "→ Command: $$CMD"; \
+	set -x; \
+	$(SANDBOX_ENGINE) run $(SANDBOX_FLAGS) \
+	  -v "$$(pwd)":/work:ro \
+	  "$${EV_ARR[@]}" \
+	  --entrypoint /bin/sh \
+	  $(SANDBOX_IMAGE) -lc "$$CMD"; \
+	rc=$$?; set +x; \
+	exit $$rc
+
+
+
 
 # --- Quality -----------------------------------------------------------------
 lint: $(PYBIN)

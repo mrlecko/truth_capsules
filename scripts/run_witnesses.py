@@ -21,7 +21,7 @@ import yaml
 from typing import Dict, List, Any
 from pathlib import Path
 import fnmatch
-
+import shutil
 
 # Supported languages and their default entrypoints
 LANGUAGE_ENTRYPOINTS = {
@@ -295,7 +295,20 @@ def format_human_output(all_results: List[Dict[str, Any]]) -> str:
 
     return "\n".join(lines)
 
-
+# --- helper to reconstruct argv without --sandbox flags ---
+def _forward_args_without_sandbox():
+    skip = {"--sandbox", "--sandbox-image", "--sandbox-engine"}
+    out = []
+    it = iter(sys.argv[1:])
+    for a in it:
+        if a in skip:
+            continue
+        if a in ("--sandbox-image", "--sandbox-engine"):
+            next(it, None)  # skip its value
+            continue
+        out.append(a)
+    return out
+    
 def main():
     ap = argparse.ArgumentParser(
         description=__doc__,
@@ -332,10 +345,54 @@ def main():
         action="append",
         help="Run only witnesses with this exact name (repeatable)."
     )
-
+    ap.add_argument(
+        "--sandbox",
+        action="store_true",
+        help="Run the entire invocation inside a container sandbox (docker/podman)."
+    )
+    ap.add_argument(
+        "--sandbox-engine",
+        default=os.getenv("SANDBOX_ENGINE", "docker"),
+        help="Container engine to use (docker or podman). Default: %(default)s"
+    )
+    ap.add_argument(
+        "--sandbox-image",
+        default=os.getenv("SANDBOX_IMAGE", "truthcapsules/runner:0.1"),
+        help="Sandbox image name:tag. Default: %(default)s"
+    )
 
 
     args = ap.parse_args()
+
+    # Transparent re-exec in container
+    if args.sandbox and not os.getenv("TC_IN_SANDBOX"):
+        engine = args.sandbox_engine
+        image  = args.sandbox_image
+
+        # Check engine exists
+        if not shutil.which(engine):
+            print(f"ERROR: container engine '{engine}' not found", file=sys.stderr)
+            sys.exit(2)
+
+        # Build docker/podman run command
+        work = os.getcwd()
+        # pass all env vars through (easy mode); tighten later if you like
+        env_flags = []
+        for k, v in os.environ.items():
+            # Skip some noisy vars if desired; here we forward everything
+            env_flags += ["-e", f"{k}={v}"]
+
+        cmd = [
+            engine, "run", "--rm", "-t",
+            "--network=none", "--pids-limit=256",
+            "-v", f"{work}:/work:ro", "-w", "/work",
+            "-e", "TC_IN_SANDBOX=1",
+            image,
+            "scripts/run_witnesses.py"
+        ] + _forward_args_without_sandbox()
+
+        rc = subprocess.call(cmd)
+        sys.exit(rc)
 
     if not os.path.exists(args.path):
         print(f"ERROR: Path not found: {args.path}", file=sys.stderr)

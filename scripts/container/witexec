@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+LANGUAGE="${1:-}"; CODE="${2:-}"; shift 2 || true
+
+if [[ -z "$LANGUAGE" || -z "$CODE" ]]; then
+  echo "usage: witexec <language> </path/to/code> [args...]" >&2
+  exit 64
+fi
+
+case "$LANGUAGE" in
+  python|python3) exec python3 "$CODE" "$@" ;;
+  node|nodejs)    exec node "$CODE" "$@" ;;
+  bash|sh)        exec bash "$CODE" "$@" ;;
+  *) echo "unsupported language: $LANGUAGE" >&2; exit 65 ;;
+esac
