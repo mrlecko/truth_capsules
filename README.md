@@ -61,42 +61,6 @@ python scripts/compose_capsules_cli.py \
 
 ### 4) Use with your LLM
 
-**OpenAI (Python):**
-
-```python
-from openai import OpenAI
-client = OpenAI()  # uses OPENAI_API_KEY
-
-with open("prompt.txt") as f:
-    system_prompt = f.read()
-
-resp = client.chat.completions.create(
-    model="gpt-4o-mini",
-    messages=[
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": "Your query here"}
-    ]
-)
-print(resp.choices[0].message.content)
-```
-
-**Anthropic (Python):**
-
-```python
-import anthropic
-client = anthropic.Anthropic()  # uses ANTHROPIC_API_KEY
-
-with open("prompt.txt") as f:
-    system_prompt = f.read()
-
-resp = client.messages.create(
-    model="claude-3-5-sonnet-latest",
-    system=system_prompt,
-    messages=[{"role": "user", "content": "Your query here"}]
-)
-print(resp.content[0].text)
-```
-
 See **[QUICKSTART.md](docs/QUICKSTART.md)** for a full tutorial.
 
 ---
@@ -229,6 +193,7 @@ truth-capsules-v1/
 │   └── truthcapsule.shacl.ttl   # SHACL validation shapes
 ├── tests/
 │   └── test_capsules_validate.py
+│   └── test_witnesses.py
 ├── .editorconfig  .gitattributes  .gitignore  CHANGELOG.md  LICENSE
 ├── Makefile  CONTRIBUTING.md  CODE_OF_CONDUCT.md  README.md
 └── requirements.txt  QUICKSTART.md
@@ -379,7 +344,7 @@ Located in `.github/workflows/`:
 2. `capsules-compose.yml` - Generate artifacts for bundles
 3. `capsules-llm-judge.yml` - LLM-as-judge evaluation (optional)
 4. `capsules-policy.yml` - Gate on `review.status=approved`
-5. `kg-smoke.yml` - **Export KG and validate with SHACL**
+5. `kg-smoke.yml` - **Export knowledge graph and validate shape with SHACL**
 
 See **[CI_GUIDE.md](docs/CI_GUIDE.md)**.
 

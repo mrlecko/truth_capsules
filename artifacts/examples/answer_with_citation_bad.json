@@ -1,0 +1,6 @@
+{
+  "answer": "Quantum speedup is proven for all NP problems. See Wikipedia [1]. No other sources.",
+  "references": [
+    {"id": 1, "url": "https://en.wikipedia.org/wiki/NP_(complexity)"}
+  ]
+}
