@@ -8,7 +8,7 @@ from jinja2 import Template
 CDN = {
     # Pin versions for deterministic builds
     "prism_css":  ("prismjs/themes/prism-tomorrow.min.css",               "text/css"),
-    "prism_core": ("prismjs@1.29.0/prism.min.js",                          "application/javascript"),
+    "prism_core": ("prismjs@1.29.0/prism.js",                          "application/javascript"),
     "prism_yaml": ("prismjs@1.29.0/components/prism-yaml.min.js",         "application/javascript"),
     "prism_json": ("prismjs@1.29.0/components/prism-json.min.js",         "application/javascript"),
     "split_js":   ("split.js@1.6.5/dist/split.min.js",                     "application/javascript"),
@@ -284,7 +284,64 @@ def main():
     p.add_argument("--vendor-dir", default="scripts/spa/vendor", help="Where to cache vendor libs")
     p.add_argument("--embed-cdn", action="store_true", help="Inline CDN JS/CSS into the SPA")
     p.add_argument("--offline", action="store_true", help="Do not fetch; use local vendor cache only")
+    p.add_argument("--strict-embed", action="store_true", help="Fail the build if any required CDN asset fails to embed")
     args = p.parse_args()
+
+    # verify cdn files embedded ok
+    try:
+        if args.embed_cdn:
+            libs, digests = embed_libs(args.vendor_dir, args.offline)
+
+            # STRICT mode: fail if any missing
+            if args.strict_embed:
+                missing = [k for k, v in digests.items() if str(v).startswith("missing")]
+                if missing:
+                    print(
+                        f"❌ ERROR: --strict-embed: missing embeds: {', '.join(missing)}",
+                        file=sys.stderr
+                    )
+                    sys.exit(2)
+        else:
+            libs, digests = ({k: "" for k in CDN_ALTS}, {k: "skipped" for k in CDN_ALTS})
+
+        # Prepare render vars
+        data = collect_data(args.root)
+        data_json = json.dumps(data, indent=2, ensure_ascii=False)
+        generated_at = datetime.utcnow().isoformat() + "Z"
+
+        with open(args.template, "r", encoding="utf-8") as f:
+            template_content = f.read()
+        template = Template(template_content)
+
+        html = template.render(
+            data_json=data_json,
+            generated_at=generated_at,
+            prism_css_inline=libs["prism_css"],
+            prism_core_inline=libs["prism_core"],
+            prism_yaml_inline=libs["prism_yaml"],
+            prism_json_inline=libs["prism_json"],
+            split_js_inline=libs["split_js"],
+            sortable_js_inline=libs["sortable_js"],
+            cdn_urls={k: (UNPKG + CDN_ALTS[k][0]) for k in CDN_ALTS},
+            digests=digests,
+            inline_cdn=args.embed_cdn
+        )
+
+        os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
+        with open(args.output, "w", encoding="utf-8") as f:
+            f.write(html)
+
+        print(f"\n✅ Generated {args.output}")
+        if args.embed_cdn:
+            for k, d in digests.items():
+                print(f"  • {k}: sha256={d}")
+
+    except Exception as e:
+        print(f"\n❌ ERROR: {e}", file=sys.stderr)
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
+
 
     if not os.path.isdir(args.root):
         print(f"❌ ERROR: {args.root} is not a directory", file=sys.stderr); sys.exit(1)

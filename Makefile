@@ -40,6 +40,8 @@ help:
 	@echo "  make compose-bundle     - Compose any bundle (BUNDLE=..., PROFILE=...)"
 	@echo "  make spa                - Generate SPA ($(SPA_OUT))"
 	@echo "  make spa-pages          - Generate SPA to docs/index.html"
+	@echo "  make spa-strict         - SPA with embedded libs (strict; fails if any missing)"
+	@echo "  make spa-vendor-refresh - Refresh embedded CDN cache at $(VENDOR_DIR)"	
 	@echo "  make list-bundles       - List bundles"
 	@echo "  make list-profiles      - List profiles"
 	@echo "  make scaffold           - Mint capsule+witness (DOMAIN, NAME, TITLE, STATEMENT, WITNESS, [FORCE=1])"
@@ -173,6 +175,25 @@ spa-pages: $(PYBIN)
 	@mkdir -p $(DOCS)
 	$(PYBIN) scripts/spa/generate_spa.py --root . --output $(DOCS)/index.html
 	@echo "✓ Pages SPA: $(DOCS)/index.html"
+
+spa-strict:
+	$(PYBIN) scripts/spa/generate_spa.py \
+		--root . \
+		--template scripts/spa/template.html \
+		--output capsule_composer.html \
+		--embed-cdn \
+		--vendor-dir scripts/spa/vendor \
+		--strict-embed
+
+spa-vendor-refresh:
+	rm -rf scripts/spa/vendor
+	$(PYBIN) scripts/spa/generate_spa.py \
+		--root . \
+		--template scripts/spa/template.html \
+		--output /dev/null \
+		--embed-cdn \
+		--vendor-dir scripts/spa/vendor
+
 
 # --- Scaffolding -------------------------------------------------------------
 scaffold: $(PYBIN)
