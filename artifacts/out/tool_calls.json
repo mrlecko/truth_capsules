@@ -1,0 +1,12 @@
+{
+  "items": [
+    {
+      "name": "book_meeting",
+      "args": {
+        "title": "Sync",
+        "start_iso": "2025-11-07T15:00:00Z",
+        "duration_min": 30
+      }
+    }
+  ]
+}

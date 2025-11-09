@@ -1,0 +1,10 @@
+{
+  "plan": [
+    "Search docs",
+    "Extract answer"
+  ],
+  "verification_evidence": [
+    "DOC-123: Feature is enabled by default."
+  ],
+  "final_answer": "Per DOC-123, enabled by default."
+}

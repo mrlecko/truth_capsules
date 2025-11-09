@@ -1,0 +1,9 @@
+{
+  "question": "What is the capital of France?",
+  "answer": "Paris is the capital of France.",
+  "citations": [
+    {
+      "url": "https://en.wikipedia.org/wiki/Paris"
+    }
+  ]
+}

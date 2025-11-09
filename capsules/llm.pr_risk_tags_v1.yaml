@@ -11,7 +11,65 @@ pedagogy:
   text: Which user/system risk is most plausible here?
 - kind: Aphorism
   text: Name the risk, shrink the risk.
-witnesses: []
+witnesses:
+  - name: pr_review_covers_risks
+    language: python
+    env:
+      DIFF_PATH: artifacts/examples/pr_diff.patch
+      REVIEW_PATH: artifacts/examples/pr_review.md
+    code: |-
+      import os, re, json, sys, pathlib
+
+      diff_path   = os.getenv("DIFF_PATH",   "artifacts/examples/pr_diff.patch")
+      review_path = os.getenv("REVIEW_PATH", "artifacts/examples/pr_review.md")
+
+      dp = pathlib.Path(diff_path)
+      rp = pathlib.Path(review_path)
+      if not dp.exists():
+        print(json.dumps({"witness":"pr_review_covers_risks","error":f"missing diff: {dp}"})); sys.exit(2)
+      if not rp.exists():
+        print(json.dumps({"witness":"pr_review_covers_risks","error":f"missing review: {rp}"})); sys.exit(2)
+
+      diff   = dp.read_text(encoding="utf-8", errors="replace")
+      review = rp.read_text(encoding="utf-8", errors="replace")
+
+      # Minimal, explainable heuristics → tag the diff
+      TAGS = {
+        "secrets": r"(AWS_|SECRET|api[_-]?key|password\s*=)",
+        "auth":    r"(oauth|jwt|session|login|auth[^a-z])",
+        "net":     r"(http[s]?://|requests\.|fetch\(|socket\.)",
+        "fs":      r"(open\(|os\.remove|shutil\.)",
+        "pii":     r"(ssn|social[- ]?security|^\+?\d{10,}$|[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})",
+      }
+      present = {tag for tag, rgx in TAGS.items() if re.search(rgx, diff, re.I|re.M)}
+
+      # If no risks detected in diff, SKIP (informational)
+      if not present:
+          print(json.dumps({
+              "witness": "pr_review_covers_risks",
+              "found_tags": [],
+              "status": "SKIP",
+              "inputs": {"diff": str(dp), "review": str(rp)}
+          }, indent=2))
+          sys.exit(0)
+
+      # Require review to *name* each risk and have a "Mitigation" mention
+      missing = []
+      for tag in sorted(present):
+        if not re.search(fr"\b{tag}\b", review, re.I):
+          missing.append({"tag": tag, "reason": "tag-not-mentioned"})
+        elif not re.search(r"\bmitigat(ion|e|ed)\b", review, re.I):
+          missing.append({"tag": tag, "reason": "no-mitigation"})
+
+      out = {
+        "witness": "pr_review_covers_risks",
+        "found_tags": sorted(present),
+        "missing": missing,
+        "status": "PASS" if not missing else "FAIL",
+        "inputs": {"diff": str(dp), "review": str(rp)}
+      }
+      print(json.dumps(out, indent=2))
+      sys.exit(0 if out["status"]=="PASS" else 1)
 provenance:
   schema: provenance.v1
   author: John Macgregor
@@ -37,5 +95,5 @@ applies_to:
 dependencies: []
 incompatible_with: []
 security:
-  sensitivity: low
+  sensitivity: medium
   notes: ''

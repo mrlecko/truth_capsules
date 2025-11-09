@@ -1,0 +1,12 @@
+{
+  "objective": "Reduce response time by 20%",
+  "assumptions": [
+    "Triage dominates delay"
+  ],
+  "plan": "Auto-label billing vs tech",
+  "evidence": [
+    "Baseline p50=9h",
+    "Week1 p50=7.1h"
+  ],
+  "summary": "Trade-off: misroutes; next: human-in-loop"
+}

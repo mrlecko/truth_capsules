@@ -1,0 +1,19 @@
+diff --git a/app/auth.py b/app/auth.py
+index 1111111..2222222 100644
+--- a/app/auth.py
++++ b/app/auth.py
+@@ -1,4 +1,16 @@
++import os, requests, shutil, socket
++
++# Networking to internal API (auth & net)
++API_URL = "https://api.internal.example.com/login"
++
++def handler(user_email):
++    # Secrets pattern in code (secrets)
++    password = "supersecret"  # TODO remove hardcoded password
++    token = requests.get(API_URL, timeout=3).text  # net
++    # File system writes (fs) and PII in logs (pii)
++    with open("/tmp/export.csv", "w") as f:
++        f.write(f"user,{user_email}\n")
++    os.remove("/tmp/old.txt")
+     return "ok"

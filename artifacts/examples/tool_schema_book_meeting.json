@@ -1,0 +1,13 @@
+{
+  "name": "book_meeting",
+  "required": [
+    "title",
+    "start_iso",
+    "duration_min"
+  ],
+  "types": {
+    "title": "str",
+    "start_iso": "str",
+    "duration_min": "int"
+  }
+}

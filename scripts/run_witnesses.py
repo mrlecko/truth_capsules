@@ -20,6 +20,8 @@ import tempfile
 import yaml
 from typing import Dict, List, Any
 from pathlib import Path
+import fnmatch
+
 
 # Supported languages and their default entrypoints
 LANGUAGE_ENTRYPOINTS = {
@@ -128,6 +130,8 @@ def run_witness(witness: Dict[str, Any], capsule_file: str) -> Dict[str, Any]:
         safe_env = {}
         for key, value in env_config.items():
             safe_env[key] = str(value)
+        
+        safe_env.update(os.environ)  # OS wins over capsule env
 
         # Prepare command
         cmd = [entrypoint, code_file] + args
@@ -146,13 +150,24 @@ def run_witness(witness: Dict[str, Any], capsule_file: str) -> Dict[str, Any]:
                 input=stdin_data.encode('utf-8') if stdin_data else None
             )
 
+            stdout_text = result.stdout.decode('utf-8', errors='replace')
+            witness_status = None
+            try:
+                maybe = json.loads(stdout_text.strip())
+                if isinstance(maybe, dict) and maybe.get("status") == "SKIP":
+                    witness_status = "SKIP"
+            except Exception:
+                pass
+
             status = "PASS" if result.returncode == 0 else "FAIL"
+            if witness_status == "SKIP":
+                status = "SKIP"
 
             return {
                 "name": name,
                 "status": status,
                 "returncode": result.returncode,
-                "stdout": result.stdout.decode('utf-8', errors='replace'),
+                "stdout": stdout_text,
                 "stderr": result.stderr.decode('utf-8', errors='replace')
             }
 
@@ -192,18 +207,20 @@ def run_witness(witness: Dict[str, Any], capsule_file: str) -> Dict[str, Any]:
             pass
 
 
-def run_capsule_witnesses(capsule: Dict[str, Any]) -> Dict[str, Any]:
+def run_capsule_witnesses(capsule: Dict[str, Any], witness_filter: set = None) -> Dict[str, Any]:
     """Run all witnesses for a capsule.
 
     Args:
         capsule: Capsule dict with witnesses list
-
-    Returns:
-        Result dict with capsule ID, status, and witness results
+        witness_filter: optional set of witness names to include
     """
     capsule_id = capsule.get("id", "unknown")
     capsule_file = capsule.get("__file__", "")
     witnesses = capsule.get("witnesses", [])
+
+    # Optional witness filter (noop if None)
+    if witness_filter:
+        witnesses = [w for w in witnesses if w.get("name") in witness_filter]
 
     if not witnesses:
         return {
@@ -213,20 +230,26 @@ def run_capsule_witnesses(capsule: Dict[str, Any]) -> Dict[str, Any]:
         }
 
     results = []
-    overall_status = "GREEN"
-
     for witness in witnesses:
         result = run_witness(witness, capsule_file)
         results.append(result)
 
-        if result["status"] in ("FAIL", "ERROR", "TIMEOUT"):
-            overall_status = "RED"
+    statuses = [r["status"] for r in results]
+
+    if any(s in ("FAIL", "ERROR", "TIMEOUT") for s in statuses):
+        overall_status = "RED"
+    elif all(s == "SKIP" for s in statuses):
+        overall_status = "SKIP"
+    else:
+        overall_status = "GREEN"
 
     return {
         "capsule": capsule_id,
         "status": overall_status,
         "witness_results": results
     }
+
+
 
 
 def format_human_output(all_results: List[Dict[str, Any]]) -> str:
@@ -261,12 +284,14 @@ def format_human_output(all_results: List[Dict[str, Any]]) -> str:
                 if wr.get("stderr"):
                     for line in wr["stderr"].strip().split("\n"):
                         lines.append(f"    {line}")
-            elif s == "TIMEOUT":
-                lines.append(f"  ⏱ {name} TIMEOUT")
-                lines.append(f"    {wr.get('stderr', 'Execution timeout')}")
             elif s == "ERROR":
                 lines.append(f"  ⚠ {name} ERROR")
                 lines.append(f"    {wr.get('stderr', 'Execution error')}")
+            elif s == "SKIP":
+                lines.append(f"  – {name} SKIP")
+            elif s == "TIMEOUT":
+                lines.append(f"  ⏱ {name} TIMEOUT")
+                lines.append(f"    {wr.get('stderr', 'Execution timeout')}")
 
     return "\n".join(lines)
 
@@ -292,6 +317,24 @@ def main():
         help="Show stdout/stderr for all witnesses (not just failures)"
     )
 
+    ap.add_argument(
+        "--capsule",
+        action="append",
+        help="Run only capsules with this exact capsule id (repeatable)."
+    )
+    ap.add_argument(
+        "--capsule-file",
+        action="append",
+        help="Run capsules whose file name/path matches this glob or exact path (repeatable)."
+    )
+    ap.add_argument(
+        "--witness",
+        action="append",
+        help="Run only witnesses with this exact name (repeatable)."
+    )
+
+
+
     args = ap.parse_args()
 
     if not os.path.exists(args.path):
@@ -300,6 +343,42 @@ def main():
 
     # Load capsules
     capsules = load_capsules(args.path)
+
+    # Optional selection: limit to specific capsules/files
+    if args.capsule or args.capsule_file:
+        selected = []
+        ids = set(args.capsule or [])
+        globs = args.capsule_file or []
+
+        for c in capsules:
+            if "__error__" in c:
+                continue
+            fpath = c.get("__file__", "")
+            base  = os.path.basename(fpath)
+            stem  = os.path.splitext(base)[0]
+
+            match_id = bool(ids) and (c.get("id") in ids)
+            match_file = False
+            if globs:
+                for patt in globs:
+                    if (
+                        fnmatch.fnmatch(base, patt)
+                        or fnmatch.fnmatch(stem, patt)
+                        or os.path.abspath(patt) == os.path.abspath(fpath)
+                    ):
+                        match_file = True
+                        break
+
+            # Include if any filter matches (OR semantics)
+            if (ids and match_id) or (globs and match_file):
+                selected.append(c)
+
+        capsules = selected
+
+    if not capsules:
+        print("No capsules matched the provided filters.", file=sys.stderr)
+        sys.exit(2)
+
 
     if not capsules:
         print(f"No capsules found in: {args.path}", file=sys.stderr)

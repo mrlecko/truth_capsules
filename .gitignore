@@ -24,7 +24,7 @@ build/
 *.egg-info/
 
 # Artifacts & outputs (keep examples/)
-artifacts
+#artifacts
 artifacts/*.log
 
 # Remove /out for release!

@@ -1,0 +1,13 @@
+{
+  "decision": "Adopt heuristic router",
+  "options": [
+    "Do nothing",
+    "Full ML model",
+    "Heuristic + review"
+  ],
+  "criteria": [
+    "Time-to-ship",
+    "Accuracy"
+  ],
+  "rationale": "We accept the trade-off of extra review load because it ships this week."
+}

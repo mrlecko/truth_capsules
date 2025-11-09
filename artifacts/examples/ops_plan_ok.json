@@ -1,0 +1,14 @@
+{
+  "owner": "SRE",
+  "steps": [
+    "Deploy canary",
+    "Monitor 15m"
+  ],
+  "rollback": {
+    "steps": [
+      "Revert to previous image"
+    ],
+    "trigger": "5xx>2%",
+    "owner": "SRE on-call"
+  }
+}

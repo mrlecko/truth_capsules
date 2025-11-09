@@ -1,0 +1,497 @@
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix ns1: <http://schema.org/> .
+@prefix tc: <https://w3id.org/tc#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://w3id.org/tc/capsule/business.decision_log_v1> a tc:Capsule ;
+    dct:created "2025-11-07T03:53:50.511776+00:00"^^xsd:dateTime ;
+    dct:creator "Truth Capsules" ;
+    dct:identifier "business.decision_log_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "code_assistant",
+        "conversation" ;
+    tc:domain "business" ;
+    tc:hasWitness <https://w3id.org/tc/capsule/business.decision_log_v1#w/decision_log_gate> ;
+    tc:inBundle <https://w3id.org/tc/bundle/ci_nonllm_baseline_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Decision records must include decision, ≥3 options, ≥2 criteria, and a rationale mentioning a trade-off." .
+
+<https://w3id.org/tc/capsule/llm.assumption_to_test_v1> a tc:Capsule ;
+    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "llm.assumption_to_test_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:title "Assumptions → Tests" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "code_assistant",
+        "conversation" ;
+    tc:assumption "Assumptions are enumerated or can be elicited with one question." ;
+    tc:domain "llm" ;
+    tc:inBundle <https://w3id.org/tc/bundle/conversation_red_team_baseline_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Convert each critical assumption into a falsifiable micro-test with owner, required evidence, and a 24–72h timebox." .
+
+<https://w3id.org/tc/capsule/llm.bias_checklist_v1> a tc:Capsule ;
+    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "llm.bias_checklist_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:title "Bias & Mode Collapse Check" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "code_assistant",
+        "conversation" ;
+    tc:assumption "Brief self‑audit improves reliability." ;
+    tc:domain "llm" ;
+    tc:inBundle <https://w3id.org/tc/bundle/conversation_red_team_baseline_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Before finalizing, scan for common failure modes: confirmation bias, selection bias, overconfident tone, mode collapse." .
+
+<https://w3id.org/tc/capsule/llm.citation_required_v1> a tc:Capsule ;
+    dct:created "2025-11-07T03:53:50.511776+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "llm.citation_required_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:title "Citations required" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "code_assistant",
+        "conversation" ;
+    tc:assumption "Operating in a general context" ;
+    tc:domain "llm" ;
+    tc:inBundle <https://w3id.org/tc/bundle/assistant_baseline_v1>,
+        <https://w3id.org/tc/bundle/ci_llm_baseline_v1>,
+        <https://w3id.org/tc/bundle/test_v1_1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Answers must include at least one citation or abstain." .
+
+<https://w3id.org/tc/capsule/llm.citation_required_v1_signed> a tc:Capsule ;
+    dct:created "2025-11-07T04:51:20.658919+00:00"^^xsd:dateTime ;
+    dct:creator "Truth Capsules Demo" ;
+    dct:identifier "llm.citation_required_v1_signed" ;
+    dct:license "MIT" ;
+    dct:title "Citations required (signed demo)" ;
+    ns1:affiliation "Truth Capsules" ;
+    ns1:version "1.0.0" ;
+    tc:domain "llm" ;
+    tc:statement "Answers must include at least one citation or abstain." .
+
+<https://w3id.org/tc/capsule/llm.counterfactual_probe_v1> a tc:Capsule ;
+    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "llm.counterfactual_probe_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:title "Counterfactual Probe" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "code_assistant",
+        "conversation" ;
+    tc:assumption "Budget allows 1–3 tiny tests.",
+        "There is uncertainty worth exploring." ;
+    tc:domain "llm" ;
+    tc:inBundle <https://w3id.org/tc/bundle/conversation_red_team_baseline_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Before concluding, generate 2–3 counterfactual worlds that would flip the decision; list the observable tests that would distinguish them." .
+
+<https://w3id.org/tc/capsule/llm.evidence_gap_triage_v1> a tc:Capsule ;
+    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "llm.evidence_gap_triage_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:title "Evidence Gap Triage" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "code_assistant",
+        "conversation" ;
+    tc:assumption "The model/user can ask for one clarifying item." ;
+    tc:domain "llm" ;
+    tc:inBundle <https://w3id.org/tc/bundle/conversation_red_team_baseline_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Identify missing evidence blocking a sound answer; request the single smallest artifact that would unlock progress." .
+
+<https://w3id.org/tc/capsule/llm.fermi_estimation_v1> a tc:Capsule ;
+    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "llm.fermi_estimation_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:title "Fermi Estimation" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "code_assistant",
+        "conversation" ;
+    tc:assumption "A back‑of‑the‑envelope answer is acceptable to guide decision making." ;
+    tc:domain "llm" ;
+    tc:inBundle <https://w3id.org/tc/bundle/conversation_red_team_baseline_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Produce an order‑of‑magnitude estimate with explicit factors, ranges, and resulting uncertainty (log‑scale)." .
+
+<https://w3id.org/tc/capsule/llm.five_whys_root_cause_v1> a tc:Capsule ;
+    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "llm.five_whys_root_cause_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:title "Five Whys (Root Cause)" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "code_assistant",
+        "conversation" ;
+    tc:assumption "Event or defect is concrete and recent." ;
+    tc:domain "llm" ;
+    tc:inBundle <https://w3id.org/tc/bundle/conversation_red_team_baseline_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Perform a 3–5 Whys drill; propose a countermeasure for the root cause and one guardrail to prevent regression." .
+
+<https://w3id.org/tc/capsule/llm.judge_answer_quality_v1> a tc:Capsule ;
+    dct:created "2025-11-07T03:53:50.511776+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "llm.judge_answer_quality_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:title "Judge answer quality" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "code_assistant",
+        "conversation" ;
+    tc:assumption "Operating in a general context" ;
+    tc:domain "llm" ;
+    tc:inBundle <https://w3id.org/tc/bundle/ci_llm_baseline_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "LLM-judge must score >= 0.8 with JSON {score, verdict, justification}." .
+
+<https://w3id.org/tc/capsule/llm.pii_redaction_guard_v1> a tc:Capsule ;
+    dct:created "2025-11-07T03:53:50.511776+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "llm.pii_redaction_guard_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:title "PII redaction" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "code_assistant",
+        "conversation" ;
+    tc:assumption "Operating in a general context" ;
+    tc:domain "llm" ;
+    tc:inBundle <https://w3id.org/tc/bundle/assistant_baseline_v1>,
+        <https://w3id.org/tc/bundle/ci_llm_baseline_v1>,
+        <https://w3id.org/tc/bundle/test_v1_1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Output must not contain raw PII (emails/phones). Use placeholders or abstain." .
+
+<https://w3id.org/tc/capsule/llm.plan_backtest_v1> a tc:Capsule ;
+    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "llm.plan_backtest_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:title "Plan Backtest" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "code_assistant",
+        "conversation" ;
+    tc:assumption "We can reference at least one analogous case (internal or public)." ;
+    tc:domain "llm" ;
+    tc:inBundle <https://w3id.org/tc/bundle/conversation_red_team_baseline_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Backtest the plan on a prior similar case; report differences and whether the plan would have succeeded." .
+
+<https://w3id.org/tc/capsule/llm.plan_verify_answer_v1> a tc:Capsule ;
+    dct:created "2025-11-07T03:53:50.511776+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "llm.plan_verify_answer_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:title "Plan → Verify → Answer" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "code_assistant",
+        "conversation" ;
+    tc:assumption "Operating in a general context" ;
+    tc:domain "llm" ;
+    tc:inBundle <https://w3id.org/tc/bundle/assistant_baseline_v1>,
+        <https://w3id.org/tc/bundle/ci_llm_baseline_v1>,
+        <https://w3id.org/tc/bundle/test_v1_1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Plan→Verify→Answer. The final answer references collected evidence." .
+
+<https://w3id.org/tc/capsule/llm.pr_change_impact_v1> a tc:Capsule ;
+    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "llm.pr_change_impact_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:title "PR Review - Change Impact" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "code_assistant",
+        "conversation" ;
+    tc:assumption "Every externally visible change gets a note or is explicitly internal-only." ;
+    tc:domain "pr_review" ;
+    tc:inBundle <https://w3id.org/tc/bundle/pr_review_minibundle_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Describe user-facing impact (if any), docs to update, and a single line release note." .
+
+<https://w3id.org/tc/capsule/llm.pr_deploy_checklist_v1> a tc:Capsule ;
+    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "llm.pr_deploy_checklist_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:title "PR Review - Deploy Checklist" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "code_assistant",
+        "conversation" ;
+    tc:assumption "You can defer large refactors; ship safely first." ;
+    tc:domain "pr_review" ;
+    tc:inBundle <https://w3id.org/tc/bundle/pr_review_minibundle_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Gate deploy on: feature flag (if risky), migration plan + rollback, observability hooks, on-call acknowledgement." .
+
+<https://w3id.org/tc/capsule/llm.pr_diff_first_v1> a tc:Capsule ;
+    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "llm.pr_diff_first_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:title "PR Review - Diff First" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "code_assistant",
+        "conversation" ;
+    tc:assumption "A textual diff or list of changed files is available.",
+        "Goal is actionable review, not style nitpicks." ;
+    tc:domain "pr_review" ;
+    tc:inBundle <https://w3id.org/tc/bundle/pr_review_minibundle_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Always read the diff first. Summarize changes in ≤5 bullets with file counts and risky areas (auth, I/O, concurrency, migrations)." .
+
+<https://w3id.org/tc/capsule/llm.pr_risk_tags_v1> a tc:Capsule ;
+    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "llm.pr_risk_tags_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:title "PR Review - Risk Tags" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "code_assistant",
+        "conversation" ;
+    tc:assumption "Risk framing helps prioritize deeper review and testing." ;
+    tc:domain "pr_review" ;
+    tc:inBundle <https://w3id.org/tc/bundle/pr_review_minibundle_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Assign risk tags {security, performance, availability, migration, breaking_change, data_loss} with 0–1 severity and 1–2 line rationale." .
+
+<https://w3id.org/tc/capsule/llm.pr_test_hints_v1> a tc:Capsule ;
+    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "llm.pr_test_hints_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:title "PR Review - Minimal Tests" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "code_assistant",
+        "conversation" ;
+    tc:assumption "Some testing harness exists (unit/integration)." ;
+    tc:domain "pr_review" ;
+    tc:inBundle <https://w3id.org/tc/bundle/pr_review_minibundle_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Propose 2–4 smallest tests that would catch a regression introduced by this diff (include inputs/edges)." .
+
+<https://w3id.org/tc/capsule/llm.red_team_assessment_v1> a tc:Capsule ;
+    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "llm.red_team_assessment_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:title "Red Team Assessment Protocol" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "code_assistant",
+        "conversation" ;
+    tc:assumption "Follow platform safety policies; redact secrets and PII.",
+        "Information provided is for defense; do not share sensitive exploit details beyond what is necessary to mitigate.",
+        "The user explicitly requests a red-team assessment for constructive hardening." ;
+    tc:domain "llm" ;
+    tc:inBundle <https://w3id.org/tc/bundle/conversation_red_team_baseline_v1>,
+        <https://w3id.org/tc/bundle/test_v1_1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "On a red-team request, perform an adversarial evaluation: clarify objective & asset, list assumptions, identify actors & capabilities, enumerate plausible attacks, show at least one concrete exploit path, rate severity×likelihood (0–1), propose mitigations and a 48‑hour action plan." .
+
+<https://w3id.org/tc/capsule/llm.safety_refusal_guard_v1> a tc:Capsule ;
+    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "llm.safety_refusal_guard_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:title "Safety & Refusal Guard" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "code_assistant",
+        "conversation" ;
+    tc:assumption "Policies and safety priorities apply to this context." ;
+    tc:domain "llm" ;
+    tc:inBundle <https://w3id.org/tc/bundle/conversation_red_team_baseline_v1>,
+        <https://w3id.org/tc/bundle/test_v1_1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "If a request risks policy or safety violations, refuse with a brief reason and offer the closest safe alternative." .
+
+<https://w3id.org/tc/capsule/llm.steelmanning_v1> a tc:Capsule ;
+    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "llm.steelmanning_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:title "Steelmanning" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "code_assistant",
+        "conversation" ;
+    tc:assumption "There exists an alternative that a reasonable expert could endorse." ;
+    tc:domain "llm" ;
+    tc:inBundle <https://w3id.org/tc/bundle/conversation_red_team_baseline_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Before critiquing, restate the strongest version of the opposing view in 3 bullets, then highlight one genuine crux." .
+
+<https://w3id.org/tc/capsule/llm.tool_json_contract_v1> a tc:Capsule ;
+    dct:created "2025-11-07T03:53:50.511776+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "llm.tool_json_contract_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:title "Tool JSON contract" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "code_assistant",
+        "conversation" ;
+    tc:assumption "Operating in a general context" ;
+    tc:domain "llm" ;
+    tc:inBundle <https://w3id.org/tc/bundle/assistant_baseline_v1>,
+        <https://w3id.org/tc/bundle/ci_llm_baseline_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Tool call args must match the JSON schema (required fields & types)." .
+
+<https://w3id.org/tc/capsule/ops.rollback_plan_v1> a tc:Capsule ;
+    dct:created "2025-11-07T03:53:50.511776+00:00"^^xsd:dateTime ;
+    dct:creator "Truth Capsules" ;
+    dct:identifier "ops.rollback_plan_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "code_assistant",
+        "conversation" ;
+    tc:domain "ops" ;
+    tc:hasWitness <https://w3id.org/tc/capsule/ops.rollback_plan_v1#w/rollback_present> ;
+    tc:inBundle <https://w3id.org/tc/bundle/ci_nonllm_baseline_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Deploy plans must include a rollback step with trigger conditions and owner." .
+
+<https://w3id.org/tc/capsule/pedagogy.problem_solving_v1> a tc:Capsule ;
+    dct:created "2025-11-07T03:53:50.511776+00:00"^^xsd:dateTime ;
+    dct:creator "Truth Capsules" ;
+    dct:identifier "pedagogy.problem_solving_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:title "Five-step problem-solving discipline" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "code_assistant",
+        "conversation" ;
+    tc:domain "pedagogy" ;
+    tc:hasWitness <https://w3id.org/tc/capsule/pedagogy.problem_solving_v1#w/five_step_gate> ;
+    tc:inBundle <https://w3id.org/tc/bundle/conversation_pedagogy_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "A valid solution includes: (1) objective, (2) assumptions, (3) plan, (4) evidence, (5) summary with trade-offs and next step." .
+
+<https://w3id.org/tc/bundle/conversation_pedagogy_v1> a tc:Bundle ;
+    dct:identifier "conversation_pedagogy_v1" .
+
+<https://w3id.org/tc/capsule/business.decision_log_v1#w/decision_log_gate> a tc:Witness ;
+    tc:codeHash "ea539ac492c81d14ac49a8b3fd28388e608af6c0464903649244733a932bf69e" ;
+    tc:language "python" .
+
+<https://w3id.org/tc/capsule/ops.rollback_plan_v1#w/rollback_present> a tc:Witness ;
+    tc:codeHash "0d01bb163fe6c196893da5593d778ef786044f19d936c17e6b7e3baed4a3e48f" ;
+    tc:language "python" .
+
+<https://w3id.org/tc/capsule/pedagogy.problem_solving_v1#w/five_step_gate> a tc:Witness ;
+    tc:codeHash "35d267c9c194af04f3a16d2bf7bba7598718b51299a9a1a3b99c7ec351aacc6a" ;
+    tc:language "python" .
+
+<https://w3id.org/tc/bundle/ci_nonllm_baseline_v1> a tc:Bundle ;
+    dct:identifier "ci_nonllm_baseline_v1" .
+
+<https://w3id.org/tc/bundle/assistant_baseline_v1> a tc:Bundle ;
+    dct:identifier "assistant_baseline_v1" .
+
+<https://w3id.org/tc/bundle/ci_llm_baseline_v1> a tc:Bundle ;
+    dct:identifier "ci_llm_baseline_v1" .
+
+<https://w3id.org/tc/bundle/pr_review_minibundle_v1> a tc:Bundle ;
+    dct:identifier "pr_review_minibundle_v1" .
+
+<https://w3id.org/tc/bundle/test_v1_1_bundle> a tc:Bundle ;
+    dct:identifier "test_v1_1_bundle" .
+
+<https://w3id.org/tc/bundle/conversation_red_team_baseline_v1> a tc:Bundle ;
+    dct:identifier "conversation_red_team_baseline_v1" .
+

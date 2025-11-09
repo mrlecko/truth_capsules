@@ -1,0 +1,13 @@
+diff --git a/app/auth.py b/app/auth.py
+--- a/app/auth.py
++++ b/app/auth.py
+@@
++ import os, requests, shutil, socket
++ API_URL = "https://api.internal.example.com/login"
++ def handler(user_email):
++     password = "supersecret"  # TODO remove hardcoded password
++     token = requests.get(API_URL, timeout=3).text
++     with open("/tmp/export.csv", "w") as f:
++         f.write(f"user,{user_email}\n")
++     os.remove("/tmp/old.txt")
++     return "ok"
