@@ -2424,7 +2424,7 @@ Prism.languages.js = Prism.languages.javascript;
 <body>
   <header class="toolbar">
     <h1>Truth Capsule Prompt Composer</h1>
-    <div class="small" style="font-size:12px; margin-top:5px;">Generated 2025-11-10T04:38:25.900449Z</div>
+    <div class="small" style="font-size:12px; margin-top:5px;">Generated 2025-11-10T04:46:15.933678Z</div>
     <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
       <button  class="btn" id="composeBtn" title="Compose (Ctrl/Cmd+Enter)">🟢 Compose</button>
       <button class="btn" id="copyBtn" title="Copy prompt">📋 Copy Prompt</button>
@@ -4467,6 +4467,24 @@ Prism.languages.js = Prism.languages.javascript;
       const $ = id => document.getElementById(id);
       const esc = s => (s == null ? "" : String(s).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])));
 
+      // persist domain open/closed state across renders + reloads
+      STATE.domainOpen = JSON.parse(localStorage.getItem('tc_domain_open') || '{}');
+      const DOMAIN_DEFAULT_OPEN = true; // first render behavior
+
+      function setDomainOpen(domain, open) {
+        const key = String(domain || 'misc').toLowerCase();
+        STATE.domainOpen[key] = !!open;
+        localStorage.setItem('tc_domain_open', JSON.stringify(STATE.domainOpen));
+      }
+
+      function getDomainOpen(domain) {
+        const key = String(domain || 'misc').toLowerCase();
+        return Object.prototype.hasOwnProperty.call(STATE.domainOpen, key)
+          ? !!STATE.domainOpen[key]
+          : DOMAIN_DEFAULT_OPEN;
+      }
+
+
       /* Toast */
       function toast(msg) {
         const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t);
@@ -4539,10 +4557,19 @@ Prism.languages.js = Prism.languages.javascript;
       $('m_validate').addEventListener('click', async () => { if (!MODAL) return; const r = await validateDigest(MODAL); const tag = $('m_result'); tag.textContent = r.ok ? 'digest✓' : 'digest✗'; tag.className = 'badge ' + (r.ok ? 'ok' : 'err'); tag.title = r.ok ? 'OK' : ('have:' + r.have + ' want:' + r.want); });
 
       $('expandAllBtn')?.addEventListener('click', () => {
-        document.querySelectorAll('details.domain-group').forEach(d => d.open = true);
+        document.querySelectorAll('details.domain-group').forEach(d => {
+          d.open = true;
+          const domain = d.querySelector('summary .domain-title')?.textContent || 'misc';
+          setDomainOpen(domain, true);
+        });
       });
+
       $('collapseAllBtn')?.addEventListener('click', () => {
-        document.querySelectorAll('details.domain-group').forEach(d => d.open = false);
+        document.querySelectorAll('details.domain-group').forEach(d => {
+          d.open = false;
+          const domain = d.querySelector('summary .domain-title')?.textContent || 'misc';
+          setDomainOpen(domain, false);
+        });
       });
 
 
@@ -4666,7 +4693,10 @@ Prism.languages.js = Prism.languages.javascript;
           // Group container
           const group = document.createElement('details');
           group.className = 'domain-group';
-          group.open = true;
+          group.open = getDomainOpen(domain);          // ← use saved state
+          group.addEventListener('toggle', () => {     // ← save when user opens/closes
+            setDomainOpen(domain, group.open);
+          });
 
           // Summary header
           const sum = document.createElement('summary');
@@ -4683,6 +4713,8 @@ Prism.languages.js = Prism.languages.javascript;
 
           const selAll = document.createElement('input');
           selAll.type = 'checkbox';
+          selAll.addEventListener('click', e => e.stopPropagation());
+          selAll.addEventListener('mousedown', e => e.stopPropagation());
           const allSelected = ids.every(cid => STATE.selectedCaps.has(cid));
           const someSelected = ids.some(cid => STATE.selectedCaps.has(cid));
           selAll.checked = allSelected;

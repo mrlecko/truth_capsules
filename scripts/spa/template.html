@@ -646,6 +646,24 @@
       const $ = id => document.getElementById(id);
       const esc = s => (s == null ? "" : String(s).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])));
 
+      // persist domain open/closed state across renders + reloads
+      STATE.domainOpen = JSON.parse(localStorage.getItem('tc_domain_open') || '{}');
+      const DOMAIN_DEFAULT_OPEN = true; // first render behavior
+
+      function setDomainOpen(domain, open) {
+        const key = String(domain || 'misc').toLowerCase();
+        STATE.domainOpen[key] = !!open;
+        localStorage.setItem('tc_domain_open', JSON.stringify(STATE.domainOpen));
+      }
+
+      function getDomainOpen(domain) {
+        const key = String(domain || 'misc').toLowerCase();
+        return Object.prototype.hasOwnProperty.call(STATE.domainOpen, key)
+          ? !!STATE.domainOpen[key]
+          : DOMAIN_DEFAULT_OPEN;
+      }
+
+
       /* Toast */
       function toast(msg) {
         const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t);
@@ -718,10 +736,19 @@
       $('m_validate').addEventListener('click', async () => { if (!MODAL) return; const r = await validateDigest(MODAL); const tag = $('m_result'); tag.textContent = r.ok ? 'digest✓' : 'digest✗'; tag.className = 'badge ' + (r.ok ? 'ok' : 'err'); tag.title = r.ok ? 'OK' : ('have:' + r.have + ' want:' + r.want); });
 
       $('expandAllBtn')?.addEventListener('click', () => {
-        document.querySelectorAll('details.domain-group').forEach(d => d.open = true);
+        document.querySelectorAll('details.domain-group').forEach(d => {
+          d.open = true;
+          const domain = d.querySelector('summary .domain-title')?.textContent || 'misc';
+          setDomainOpen(domain, true);
+        });
       });
+
       $('collapseAllBtn')?.addEventListener('click', () => {
-        document.querySelectorAll('details.domain-group').forEach(d => d.open = false);
+        document.querySelectorAll('details.domain-group').forEach(d => {
+          d.open = false;
+          const domain = d.querySelector('summary .domain-title')?.textContent || 'misc';
+          setDomainOpen(domain, false);
+        });
       });
 
 
@@ -845,7 +872,10 @@
           // Group container
           const group = document.createElement('details');
           group.className = 'domain-group';
-          group.open = true;
+          group.open = getDomainOpen(domain);          // ← use saved state
+          group.addEventListener('toggle', () => {     // ← save when user opens/closes
+            setDomainOpen(domain, group.open);
+          });
 
           // Summary header
           const sum = document.createElement('summary');
@@ -862,6 +892,8 @@
 
           const selAll = document.createElement('input');
           selAll.type = 'checkbox';
+          selAll.addEventListener('click', e => e.stopPropagation());
+          selAll.addEventListener('mousedown', e => e.stopPropagation());
           const allSelected = ids.every(cid => STATE.selectedCaps.has(cid));
           const someSelected = ids.some(cid => STATE.selectedCaps.has(cid));
           selAll.checked = allSelected;
