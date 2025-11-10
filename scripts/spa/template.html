@@ -174,7 +174,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      font-size:12px;
+      font-size: 12px;
     }
 
     .chip:hover {
@@ -236,7 +236,7 @@
       color: var(--text);
       padding: 6px;
       border-radius: 8px;
-      font-size:16px;
+      font-size: 16px;
     }
 
     /* code / text areas */
@@ -248,7 +248,8 @@
       word-break: break-word;
       background: var(--panel-alt);
       border: 1px solid var(--border);
-      color: #00ff68; /* var(--text); */
+      color: #00ff68;
+      /* var(--text); */
       border-radius: 10px;
       padding: 12px;
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
@@ -275,8 +276,9 @@
     }
 
     .badge.witnessed {
-      background:rgb(142, 47, 47);
+      background: rgb(142, 47, 47);
     }
+
     .badge.err {
       background: color-mix(in oklab, var(--danger), #000 75%);
       color: #ffd6d6;
@@ -392,10 +394,25 @@
     }
 
     /* accessibility patches */
-    .small{ color: #bac2d6; }               /* was #a9b1c3 */
-    .badge{ color:#d6e1ff; border-color:#253043; }
-    .badge.err{ color:#ffdadd; }
-    :root{ color-scheme: dark; }            /* hints to OS/browser */
+    .small {
+      color: #bac2d6;
+    }
+
+    /* was #a9b1c3 */
+    .badge {
+      color: #d6e1ff;
+      border-color: #253043;
+    }
+
+    .badge.err {
+      color: #ffdadd;
+    }
+
+    :root {
+      color-scheme: dark;
+    }
+
+    /* hints to OS/browser */
 
     /* --- Domain grouping UI --- */
     details.domain-group {
@@ -405,9 +422,11 @@
       background: var(--panel);
     }
 
-    details.domain-group + details.domain-group { margin-top: 8px; }
+    details.domain-group+details.domain-group {
+      margin-top: 8px;
+    }
 
-    details.domain-group > summary {
+    details.domain-group>summary {
       list-style: none;
       display: flex;
       align-items: center;
@@ -420,11 +439,42 @@
       border: 1px solid var(--border);
     }
 
-    details.domain-group > summary::-webkit-details-marker { display: none; }
+    details.domain-group>summary::-webkit-details-marker {
+      display: none;
+    }
 
-    .domain-title { font-weight: 600; }
-    .domain-spacer { flex: 1; }
-    .domain-body { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+    .domain-title {
+      font-weight: 600;
+    }
+
+    .domain-spacer {
+      flex: 1;
+    }
+
+    .domain-body {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    /* Collapsible panel like domain groups */
+    details.panel-collapsible {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--panel);
+    }
+    details.panel-collapsible > summary {
+      list-style: none;
+      cursor: pointer;
+      user-select: none;
+      padding: 6px 8px;
+      border-bottom: 1px solid var(--border);
+      border-radius: 10px;           /* keeps rounded top when open */
+      background: var(--panel-alt);
+    }
+    details.panel-collapsible > summary::-webkit-details-marker { display: none; }
+
 
     /* nicer clamp for statements */
     .clamp-2 {
@@ -435,9 +485,22 @@
     }
 
     /* small chips row */
-    .row-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-    .chip.domain { background: #1f2633; border-color: #2b3343; }
-    .chip.applies { background: #1a2a2a; border-color: #233534; }
+    .row-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .chip.domain {
+      background: #1f2633;
+      border-color: #2b3343;
+    }
+
+    .chip.applies {
+      background: #1a2a2a;
+      border-color: #233534;
+    }
 
     /* compact title row in items */
     .item .title {
@@ -446,35 +509,39 @@
       align-items: center;
       gap: 8px;
     }
-    .item .title .muted { color: var(--muted); font-weight: 400; }
 
-
+    .item .title .muted {
+      color: var(--muted);
+      font-weight: 400;
+    }
   </style>
 
   <!-- Prism / Split / Sortable -->
   {% if inline_cdn %}
-    <!-- digests (supply-chain breadcrumbs) -->
-    <!-- prism_css: sha256={{ digests['prism_css'] }} -->
-    <!-- prism_core: sha256={{ digests['prism_core'] }} -->
-    <!-- prism_yaml: sha256={{ digests['prism_yaml'] }} -->
-    <!-- prism_json: sha256={{ digests['prism_json'] }} -->
-    <!-- split_js: sha256={{ digests['split_js'] }} -->
-    <!-- sortable_js: sha256={{ digests['sortable_js'] }} -->
+  <!-- digests (supply-chain breadcrumbs) -->
+  <!-- prism_css: sha256={{ digests['prism_css'] }} -->
+  <!-- prism_core: sha256={{ digests['prism_core'] }} -->
+  <!-- prism_yaml: sha256={{ digests['prism_yaml'] }} -->
+  <!-- prism_json: sha256={{ digests['prism_json'] }} -->
+  <!-- split_js: sha256={{ digests['split_js'] }} -->
+  <!-- sortable_js: sha256={{ digests['sortable_js'] }} -->
 
-    <style>{{ prism_css_inline | safe }}</style>
-    <script>{{ prism_core_inline | safe }}</script>
-    <script>{{ prism_yaml_inline | safe }}</script>
-    <script>{{ prism_json_inline | safe }}</script>
-    <script>{{ split_js_inline | safe }}</script>
-    <script>{{ sortable_js_inline | safe }}</script>
+  <style>
+    {{prism_css_inline | safe}}
+  </style>
+  <script>{{ prism_core_inline | safe }}</script>
+  <script>{{ prism_yaml_inline | safe }}</script>
+  <script>{{ prism_json_inline | safe }}</script>
+  <script>{{ split_js_inline | safe }}</script>
+  <script>{{ sortable_js_inline | safe }}</script>
   {% else %}
-    <!-- CDN fallback (deterministic, pinned) -->
-    <link rel="stylesheet" href="{{ cdn_urls['prism_css'] }}">
-    <script src="{{ cdn_urls['prism_core'] }}"></script>
-    <script src="{{ cdn_urls['prism_yaml'] }}"></script>
-    <script src="{{ cdn_urls['prism_json'] }}"></script>
-    <script src="{{ cdn_urls['split_js'] }}"></script>
-    <script src="{{ cdn_urls['sortable_js'] }}"></script>
+  <!-- CDN fallback (deterministic, pinned) -->
+  <link rel="stylesheet" href="{{ cdn_urls['prism_css'] }}">
+  <script src="{{ cdn_urls['prism_core'] }}"></script>
+  <script src="{{ cdn_urls['prism_yaml'] }}"></script>
+  <script src="{{ cdn_urls['prism_json'] }}"></script>
+  <script src="{{ cdn_urls['split_js'] }}"></script>
+  <script src="{{ cdn_urls['sortable_js'] }}"></script>
   {% endif %}
 
 </head>
@@ -484,7 +551,7 @@
     <h1>Truth Capsule Prompt Composer</h1>
     <div class="small" style="font-size:12px; margin-top:5px;">Generated {{ generated_at }}</div>
     <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-      <button  class="btn" id="composeBtn" title="Compose (Ctrl/Cmd+Enter)">🟢 Compose</button>
+      <button class="btn" id="composeBtn" title="Compose (Ctrl/Cmd+Enter)">🟢 Compose</button>
       <button class="btn" id="copyBtn" title="Copy prompt">📋 Copy Prompt</button>
       <button class="btn" id="copyLlmBtn" title="Copy LLM command">💻 Copy LLM Bash</button>
       <button class="btn" id="dlBtn" title="Download prompt">⬇️ Download Prompt</button>
@@ -512,9 +579,14 @@
         <!-- RESIZABLE HORIZONTAL SPLIT: Bundles ⟷ Capsules -->
         <div id="leftSplit">
           <div id="bundlesWrap" class="section-block">
-            <div class="section-title">BUNDLES (<span id="bundlesCount">0</span>)</div>
-            <div id="bundles" class="list"></div>
+            <details id="bundlesSection" class="panel-collapsible">
+              <summary class="section-title">
+                BUNDLES (<span id="bundlesCount">0</span>)
+              </summary>
+              <div id="bundles" class="list"></div>
+            </details>
           </div>
+
           <div id="capsulesWrap" class="section-block">
             <div class="section-title">
               CAPSULES (<span id="capsulesCount">0</span>)
@@ -523,8 +595,8 @@
                 <button class="btn small" id="collapseAllBtn">Collapse all</button>
               </span>
             </div>
-          <div id="capsules" class="list"></div>
-        </div>
+            <div id="capsules" class="list"></div>
+          </div>
         </div>
       </aside>
 
@@ -532,7 +604,7 @@
       <section id="right">
         <div class="card">
           <div class="row">
-            <label style="display:none;"><input type="checkbox" id="includePed" checked> include pedagogy</label>
+            <label><input type="checkbox" id="includePed" checked> include pedagogy</label>
             <label><input type="checkbox" id="markdown"> markdown preview</label>
             <span class="small">Drag to reorder in Preview</span>
           </div>
@@ -663,11 +735,28 @@
           : DOMAIN_DEFAULT_OPEN;
       }
 
+      // Bundles panel open/closed state
+      STATE.bundlesOpen = (localStorage.getItem('tc_bundles_open') !== '0'); // default: open
+
+      function setBundlesOpen(open) {
+        STATE.bundlesOpen = !!open;
+        localStorage.setItem('tc_bundles_open', STATE.bundlesOpen ? '1' : '0');
+      }
+      function getBundlesOpen() {
+        return (localStorage.getItem('tc_bundles_open') !== '0');
+      }      
 
       /* Toast */
       function toast(msg) {
         const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t);
         setTimeout(() => t.remove(), 1800);
+      }
+
+      function initBundlesCollapsible() {
+        const d = $('bundlesSection');
+        if (!d) return;
+        d.open = getBundlesOpen();
+        d.addEventListener('toggle', () => setBundlesOpen(d.open));
       }
 
       /* Hashing for digest */
@@ -1014,43 +1103,75 @@
       }
 
       /* ------------ Composition ------------ */
-      function parseFieldSpec(spec) { const m = spec.match(/^([a-z_.]+)(?:\[:(\d+)\])?$/); return { path: m ? m[1] : spec, limit: m && m[2] ? parseInt(m[2]) : null }; }
+      function parseFieldSpec(spec) {
+        const m = String(spec).match(/^([a-z_.]+)(?:\[:(\d+)\])?$/i);
+        return { path: m ? m[1].toLowerCase() : String(spec).toLowerCase(), limit: m && m[2] ? parseInt(m[2], 10) : null };
+      }
+
       function applyProjection(capsule, projection, includePedagogy) {
-        const proj = projection || {}; const include = proj.include || []; const render = proj.render || {};
+        const proj = projection || {};
+        const include = Array.isArray(proj.include) ? proj.include : [];
+        const render = proj.render || {};
+
         const header = render.capsule_header || "BEGIN CAPSULE id={id} version={version} domain={domain}";
         const footer = render.enforcement_footer || "ENFORCEMENT: Ensure outputs satisfy this capsule; otherwise abstain and request the minimal missing info.";
         const aBullet = render.assumption_bullet || "  - {text}";
         const sBullet = render.socratic_bullet || "  - {text}";
         const aphBullet = render.aphorism_bullet || "  - {text}";
-        const lines = [];
 
-        lines.push(header.replace('{id}', capsule.id || '').replace('{version}', capsule.version || '1.0.0').replace('{domain}', capsule.domain || ''));
+        const lines = [];
+        lines.push(
+          header
+            .replace('{id}', capsule.id || '')
+            .replace('{version}', capsule.version || '1.0.0')
+            .replace('{domain}', capsule.domain || '')
+        );
 
         for (const spec of include) {
           const { path, limit } = parseFieldSpec(spec);
-          if (path === 'title') { if (capsule.title) lines.push("TITLE: " + capsule.title); }
-          else if (path === 'statement') { if (capsule.statement) lines.push("STATEMENT: " + capsule.statement); }
+          const lim = (limit == null ? Number.MAX_SAFE_INTEGER : limit);
+
+          if (path === 'title' && capsule.title) lines.push("TITLE: " + capsule.title);
+          else if (path === 'statement' && capsule.statement) lines.push("STATEMENT: " + capsule.statement);
           else if (path === 'assumptions') {
-            const items = (capsule.assumptions || []).slice(0, limit || Number.MAX_SAFE_INTEGER);
-            if (items.length) { lines.push("ASSUMPTIONS:"); items.forEach(a => lines.push(aBullet.replace('{text}', a))); }
+            let items = capsule.assumptions || [];
+            // allow object assumptions: {text: "..."} or {assumption: "..."}
+            items = items.map(a => (typeof a === 'string') ? a : (a?.text || a?.assumption || JSON.stringify(a)));
+            items = items.slice(0, lim);
+            if (items.length) {
+              lines.push("ASSUMPTIONS:");
+              items.forEach(t => lines.push(aBullet.replace('{text}', t)));
+            }
           }
           else if (path === 'pedagogy.socratic' && includePedagogy) {
-            const soc = (capsule.pedagogy || []).filter(p => (p.kind || '').toLowerCase() === 'socratic').slice(0, limit || Number.MAX_SAFE_INTEGER);
-            if (soc.length) { lines.push("PEDAGOGY (Socratic):"); soc.forEach(p => lines.push(sBullet.replace('{text}', p.text || ''))); }
+            const soc = (capsule.pedagogy || [])
+              .filter(p => /socratic/.test((p.kind || '').toLowerCase()))
+              .slice(0, lim);
+            if (soc.length) {
+              lines.push("PEDAGOGY (Socratic):");
+              soc.forEach(p => lines.push(sBullet.replace('{text}', p.text || '')));
+            }
           }
           else if (path === 'pedagogy.aphorisms' && includePedagogy) {
-            const aph = (capsule.pedagogy || []).filter(p => (p.kind || '').toLowerCase() === 'aphorism').slice(0, limit || Number.MAX_SAFE_INTEGER);
-            if (aph.length) { lines.push("PEDAGOGY (Aphorisms):"); aph.forEach(p => lines.push(aphBullet.replace('{text}', p.text || ''))); }
+            const aph = (capsule.pedagogy || [])
+              .filter(p => /aphorism/.test((p.kind || '').toLowerCase()))
+              .slice(0, lim);
+            if (aph.length) {
+              lines.push("PEDAGOGY (Aphorisms):");
+              aph.forEach(p => lines.push(aphBullet.replace('{text}', p.text || '')));
+            }
           }
         }
 
         lines.push(footer);
         return lines.join("\n");
       }
+
+
       function composeLegacy(c, includePedagogy) {
         const lines = [];
         /* lines.push("BEGIN CAPSULE id=" + (c.id || '') + " version=" + (c.version || '1.0.0') + " domain=" + (c.domain || '')); */
-        lines.push("BEGIN CAPSULE id=" + (c.id || '') + 
+        lines.push("BEGIN CAPSULE id=" + (c.id || '') +
           " version=" + (c.version || '1.0.0') +
           " domain=" + (c.domain || '') +
           " posture=" + (c.posture || 'informational') + ")");
@@ -1065,6 +1186,8 @@
       function compose() {
         const prof = DATA.profiles[STATE.profile || ''] || {};
         const response = prof.response || {};
+        const projection = response.projection || null;
+
         const ids = STATE.order.filter(id => STATE.selectedCaps.has(id));
         const blocks = [];
 
@@ -1073,6 +1196,10 @@
         const system_block = response.system_block || ("SYSTEM: Profile=" + (prof.title || 'unknown') + "\nPOLICY: " + policy + "\nFORMAT: " + format);
         blocks.push(system_block);
 
+        // If the profile’s projection includes pedagogy.* then force-enable pedagogy rendering
+        const wantsPed = Array.isArray(projection?.include) && projection.include.some(s => String(s).startsWith('pedagogy.'));
+        const withPed = $('includePed').checked || wantsPed;
+
         blocks.push("SYSTEM: Truth Capsules Loader v1\nPURPOSE: Use curated capsules to scaffold reasoning and enforce acceptance rules.\nMETHOD:\n  1) Load capsule rules (below).\n  2) For each task, follow Plan → Verify → Answer.\n  3) If required fields are missing, ask ONE concise follow-up.\n  4) Cite sources or abstain. Redact PII. Validate tool JSON before calling.\n  5) Emit a JSON report when asked (see REPORT SCHEMA).\nFAILURE POLICY: If a capsule cannot be satisfied, abstain + explain what is missing.");
         blocks.push("SYSTEM: Bootstrap Discipline\n• Curation is king - prefer curated fixtures/evidence; abstain when unsure.\n• Show your work - reference evidence in answers.\n• Make failures explicit and reversible - choose tiny experiments.");
 
@@ -1080,8 +1207,6 @@
           blocks.push('SYSTEM: Capsule Rules (Selected)\n- (No capsules selected)');
         } else {
           blocks.push('SYSTEM: Capsule Rules (Selected)');
-          const projection = response.projection || null;
-          const withPed = $('includePed').checked;
           for (const id of ids) {
             const c = DATA.capsules[id]; if (!c) continue;
             blocks.push((projection && projection.include) ? applyProjection(c, projection, withPed) : composeLegacy(c, withPed));
@@ -1092,6 +1217,8 @@
         if ($('markdown').checked) out = "```\n" + out + "\n```";
         $('out').value = out;
       }
+
+
 
       /* ------------ Manifest + share ------------ */
       function buildManifest() { return { profile: STATE.profile, order: STATE.order.filter(id => STATE.selectedCaps.has(id)), bundles: [...STATE.selectedBundles], ts: new Date().toISOString() }; }
@@ -1413,6 +1540,7 @@ IFS=$'\\n\\t'
       function render() { renderProfiles(); renderBundles(); renderCapsules(); renderPreview(); compose(); }
       render();
       tryHydrateFromUrl();
+      initBundlesCollapsible();
 
       // Remember splits
       const mainSizes = JSON.parse(localStorage.getItem('tc_split_main') || '[30,70]');
