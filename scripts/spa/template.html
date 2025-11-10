@@ -475,6 +475,48 @@
     }
     details.panel-collapsible > summary::-webkit-details-marker { display: none; }
 
+    /* Make the collapsible Bundles panel participate in the flex layout */
+    details.panel-collapsible {
+      display: flex;           /* critical: re-establish flex context */
+      flex-direction: column;
+      min-height: 0;           /* allow children to shrink inside the left pane */
+      max-height: 100%;        /* optional: stay within the pane */
+    }
+
+    /* Header row should not grow */
+    details.panel-collapsible > summary {
+      flex: 0 0 auto;
+    }
+
+    /* The list must flex and scroll */
+    details.panel-collapsible > .list {
+      flex: 1 1 auto;
+      min-height: 0;           /* enables scrolling in nested flex layouts */
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    /* Bundles panel must grow inside #bundlesWrap */
+    #bundlesWrap details.panel-collapsible {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 0;   /* <-- critical: take available height in the left split */
+      min-height: 0; /* allow children to shrink/scroll */
+    }
+
+    /* Summary stays at natural height */
+    #bundlesWrap details.panel-collapsible > summary {
+      flex: 0 0 auto;
+    }
+
+    /* The list fills the remaining space and scrolls */
+    #bundlesWrap details.panel-collapsible > .list {
+      flex: 1 1 0;   /* <-- zero basis prevents “auto height” traps */
+      min-height: 0; 
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
 
     /* nicer clamp for statements */
     .clamp-2 {
@@ -514,6 +556,74 @@
       color: var(--muted);
       font-weight: 400;
     }
+
+    /* Bundles panel: grid = [summary][body] so body gets real height */
+    #bundlesWrap details.panel-collapsible{
+      display: grid;
+      grid-template-rows: auto 1fr;   /* summary height + fill rest */
+      min-height: 0;                  /* allow shrink in the left pane */
+    }
+
+    /* Body becomes a flex column */
+    #bundlesWrap details.panel-collapsible > .panel-body{
+      display: flex;
+      flex-direction: column;
+      min-height: 0;                  /* critical for nested scroll */
+    }
+
+    /* The list finally gets the space and scrolls */
+    #bundlesWrap details.panel-collapsible > .panel-body > .list{
+      flex: 1 1 0;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+/* Collapsible panel (no <details>) */
+#bundlesWrap .collapsible{
+  display:flex;
+  flex-direction:column;
+  flex:1 1 0;         /* take the available height inside .section-block */
+  min-height:0;       /* allow inner scroll */
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:var(--panel);
+}
+
+#bundlesWrap .collapsible-header{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 8px;
+  background:var(--panel-alt);
+  border-bottom:1px solid var(--border);
+  border-radius:10px 10px 0 0;
+}
+
+#bundlesWrap .collapsible-body{
+  display:flex;
+  flex-direction:column;
+  flex:1 1 0;
+  min-height:0;       /* critical for nested scroll */
+  border-radius:0 0 10px 10px;
+}
+
+#bundlesWrap .collapsible-body[hidden]{
+  display:none;       /* collapsed */
+}
+
+#bundlesWrap #bundles.list{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  flex:1 1 0;         /* fills body */
+  min-height:0;       /* enables overflow */
+  overflow-y:auto;
+  overflow-x:hidden;
+}
+
+/* (optional) remove any leftover <details> styles if you keep them for capsules only */
+
   </style>
 
   <!-- Prism / Split / Sortable -->
@@ -579,13 +689,19 @@
         <!-- RESIZABLE HORIZONTAL SPLIT: Bundles ⟷ Capsules -->
         <div id="leftSplit">
           <div id="bundlesWrap" class="section-block">
-            <details id="bundlesSection" class="panel-collapsible">
-              <summary class="section-title">
-                BUNDLES (<span id="bundlesCount">0</span>)
-              </summary>
-              <div id="bundles" class="list"></div>
-            </details>
-          </div>
+  <div id="bundlesPanel" class="collapsible">
+    <div class="collapsible-header">
+      <span class="section-title">BUNDLES (<span id="bundlesCount">0</span>)</span>
+      <span class="domain-spacer"></span>
+      <button id="bundlesToggle" class="btn small" type="button" aria-expanded="true">Hide</button>
+    </div>
+    <div id="bundlesBody" class="collapsible-body">
+      <div id="bundles" class="list"></div>
+    </div>
+  </div>
+</div>
+
+
 
           <div id="capsulesWrap" class="section-block">
             <div class="section-title">
@@ -736,15 +852,33 @@
       }
 
       // Bundles panel open/closed state
-      STATE.bundlesOpen = (localStorage.getItem('tc_bundles_open') !== '0'); // default: open
+      // Bundles open/closed state
+      STATE.bundlesOpen = (localStorage.getItem('tc_bundles_open') !== '0'); // default open
 
-      function setBundlesOpen(open) {
+      function setBundlesOpen(open){
         STATE.bundlesOpen = !!open;
         localStorage.setItem('tc_bundles_open', STATE.bundlesOpen ? '1' : '0');
+        const body = document.getElementById('bundlesBody');
+        const btn  = document.getElementById('bundlesToggle');
+        if (!body || !btn) return;
+        if (STATE.bundlesOpen){
+          body.hidden = false;
+          btn.textContent = 'Hide';
+          btn.setAttribute('aria-expanded','true');
+        } else {
+          body.hidden = true;
+          btn.textContent = 'Show';
+          btn.setAttribute('aria-expanded','false');
+        }
       }
-      function getBundlesOpen() {
-        return (localStorage.getItem('tc_bundles_open') !== '0');
-      }      
+
+      function initBundlesCollapsibleSimple(){
+        const btn = document.getElementById('bundlesToggle');
+        if (!btn) return;
+        setBundlesOpen(STATE.bundlesOpen);      // apply initial state
+        btn.onclick = () => setBundlesOpen(!STATE.bundlesOpen);
+      }
+    
 
       /* Toast */
       function toast(msg) {
@@ -1540,7 +1674,7 @@ IFS=$'\\n\\t'
       function render() { renderProfiles(); renderBundles(); renderCapsules(); renderPreview(); compose(); }
       render();
       tryHydrateFromUrl();
-      initBundlesCollapsible();
+      initBundlesCollapsibleSimple();
 
       // Remember splits
       const mainSizes = JSON.parse(localStorage.getItem('tc_split_main') || '[30,70]');
