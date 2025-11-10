@@ -310,7 +310,7 @@ main{ height: calc(100vh - 54px); position:relative; }
 .gutter.gutter-vertical{
   height:8px; cursor:row-resize;
   width:100% !important;
-  background: linear-gradient(to bottom, transparent, lightgray, transparent);
+  background: var(--gutter-idle);
 }
 .gutter.gutter-vertical:hover{
   background: linear-gradient(to bottom, transparent, rgba(118,162,255,.35), transparent);
@@ -674,7 +674,7 @@ details.panel-collapsible > .list{
   <!-- split_js: sha256={{ digests['split_js'] }} -->
   <!-- sortable_js: sha256={{ digests['sortable_js'] }} -->
 
-  <style>{{prism_css_inline | safe}}</style>
+  <style>{{ prism_css_inline | safe }}</style>
   
   <script>{{ prism_core_inline | safe }}</script>
   <script>{{ prism_yaml_inline | safe }}</script>
@@ -754,7 +754,7 @@ details.panel-collapsible > .list{
       <!-- LEFT COLUMN -->
       <aside id="left">
         <div id="leftTop">
-  <input id="search" type="text" placeholder="Filter by id/title/domain/statement…" style="width:100%">
+  <input id="search" type="text" placeholder="Filter loaded capsules by id/title/domain/statement…" style="width:100%">
 
 <div class="row" style="margin-top:10px; align-items:center; gap:8px">
   <label for="profiles" class="section-title">PROFILES</label>
@@ -812,9 +812,9 @@ details.panel-collapsible > .list{
       <section id="right">
         <div class="card">
           <div class="row">
-            <label><input type="checkbox" id="includePed" checked> include pedagogy</label>
+            <label style="display:none;"><input type="checkbox" id="includePed" checked> include pedagogy</label>
             <label><input type="checkbox" id="markdown"> markdown preview</label>
-            <span class="small">Drag to reorder in Preview</span>
+            <!-- <span class="small">Drag to reorder in Preview</span> -->
           </div>
         </div>
 
@@ -826,7 +826,7 @@ details.panel-collapsible > .list{
         </div>
 
         <div class="card">
-          <strong>PREVIEW – SELECTED CAPSULES (DRAG TO REORDER)</strong>
+          <strong>PREVIEW – SELECTED CAPSULES</strong> (DRAG TO REORDER)
           <div id="preview" style="margin-top:5px;" class="list"></div>
         </div>
       </section>
