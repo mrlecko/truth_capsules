@@ -141,16 +141,16 @@ witness-sandbox:
 	JSONF=""
 	[[ '$(JSON)' = '1'  ]] && JSONF='--json'
 
-	# ENV_VARS string -> bash array (e.g. "-e FOO=bar -e BAZ=qux")
+	# ENV_VARS string -> bash array (handles quotes from tests)
 	ENV_VARS_STR="$${ENV_VARS:-}"
 	ENV_VARS_STR="$${ENV_VARS_STR%\"}"; ENV_VARS_STR="$${ENV_VARS_STR#\"}"
-	ENV_VARS_STR="$${ENV_VARS_STR%\' }"; ENV_VARS_STR="$${ENV_VARS_STR#\'}"
+	ENV_VARS_STR="$${ENV_VARS_STR%\'}"; ENV_VARS_STR="$${ENV_VARS_STR#\'}"
 	EV_ARR=()
 	if [[ -n "$$ENV_VARS_STR" ]]; then
 	  read -r -a EV_ARR <<< "$$ENV_VARS_STR"
 	fi
 
-	# Command that runs inside the container (note: python3 prefix!)
+	# Command executed inside the container
 	CMD="python3 scripts/run_witnesses.py capsules $$JSONF $$CAPS $$WIT"
 
 	echo "→ Engine : $$ENGINE"
@@ -160,9 +160,9 @@ witness-sandbox:
 	echo "→ Env    : $$ENV_VARS_STR"
 	echo "→ Command: $$CMD"
 
-	# Run container; capture STDOUT to OUT_JSON, mirror STDERR to our STDERR.
+	# Run container; capture STDOUT to OUT_RAW, mirror STDERR
 	set +e
-	OUT_JSON="$$( "$$ENGINE" run $(SANDBOX_FLAGS) \
+	OUT_RAW="$$( "$$ENGINE" run $(SANDBOX_FLAGS) \
 	  -v "$$(pwd)":/work:ro \
 	  "$${EV_ARR[@]}" \
 	  --entrypoint /bin/sh \
@@ -170,40 +170,43 @@ witness-sandbox:
 	rc="$$?"
 	set -e
 
-	# Help if nothing came back
-	if [[ -z "$$OUT_JSON" ]]; then
-	  echo "[witness-sandbox] no JSON on stdout from container; check errors above" >&2
+	# If nothing came back, stub an empty list so tests can parse
+	if [[ -z "$$OUT_RAW" ]]; then
+	  OUT_RAW='[]'
 	fi
 
-	# Contract: echo raw JSON to stdout
+	# Normalize shape to: [{"capsule":..., "status":..., "witness_results":[...]}]
+	OUT_JSON="$$( CAP_ID='$(CAPSULE)' python3 -c 'import json,os,sys; raw=sys.argv[1]; cap=os.environ.get("CAP_ID") or "unknown"; data=json.loads(raw); is_capsule=(isinstance(data,list) and data and isinstance(data[0],dict) and "capsule" in data[0] and "witness_results" in data[0]); wrs=(data if isinstance(data,list) and not is_capsule else (data[0]["witness_results"] if is_capsule else ([data] if isinstance(data,dict) else []))); sts=[(w.get("status") or "").upper() for w in wrs]; overall=("RED" if any(s=="FAIL" for s in sts) else ("GREEN" if any(s=="PASS" for s in sts) else ("SKIP" if wrs and all(s=="SKIP" for s in sts) else "ERROR"))); out=(data if is_capsule else [{"capsule":cap,"status":overall,"witness_results":wrs}]); print(json.dumps(out))' "$$OUT_RAW" )"
+
+	# Emit normalized JSON to stdout (tests read the last JSON array on stdout)
 	printf '%s\n' "$$OUT_JSON"
 
 	# Optional signing (non-fatal on failure)
-	if [[ "$${SIGN:-0}" == "1" ]]; then
-	  tmp="$$(mktemp)"
-	  printf '%s' "$$OUT_JSON" > "$$tmp"
+	if [[ "$${SIGN:-0}" == "1" ]]; then \
+	  tmp="$$(mktemp)"; \
+	  printf '%s' "$$OUT_JSON" > "$$tmp"; \
 	  OUT_DIR="$${OUT_DIR:-artifacts/out}" KEY_ID="$${KEY_ID:-dev}" SIGNING_KEY="$${SIGNING_KEY:-keys/dev_ed25519_sk.pem}" \
-	    python3 scripts/sign_witness.py "$$tmp" || echo "[witness-sandbox] signing failed (non-fatal)" >&2
-	  rm -f "$$tmp"
+	    python3 scripts/sign_witness.py "$$tmp" || echo "[witness-sandbox] signing failed (non-fatal)" >&2; \
+	  rm -f "$$tmp"; \
 	fi
 
-		# Optional summary (nice for demos)
-	if [[ -n "$$OUT_JSON" ]]; then
-	  python3 - <<'PY' "$$OUT_JSON" || true
-		import json,sys
-		data=json.loads(sys.argv[1])
-		reds=[d.get("capsule") for d in data if (d.get("status") or "").upper()=="RED"]
-		greens=[d.get("capsule") for d in data if (d.get("status") or "").upper()=="GREEN"]
-		print(f"[witness-sandbox] summary: GREEN={len(greens)} RED={len(reds)}")
-		PY
-	fi
+	# Human summary → STDERR (keeps stdout pure JSON)
+	python3 -c 'import json,sys; d=json.loads(sys.argv[1]); reds=[x.get("capsule") for x in d if (x.get("status") or "").upper()=="RED"]; greens=[x.get("capsule") for x in d if (x.get("status") or "").upper()=="GREEN"]; print(f"[witness-sandbox] summary: GREEN={len(greens)} RED={len(reds)}")' "$$OUT_JSON" 1>&2 || true
 
-	# Soft mode: don’t fail the shell if ALLOW_RED=1
-	if [[ "$${ALLOW_RED:-0}" == "1" ]]; then
-	  rc=0
+	# Decide exit code from overall status unless ALLOW_RED=1 (robust, no tricky parens)
+	if [[ "$${ALLOW_RED:-0}" != "1" ]]; then \
+	  overall="$$(python3 -c 'import json,sys; d=json.loads(sys.argv[1]); st=(d[0].get("status") or "") if isinstance(d,list) and d else ""; print(st.upper() if st else "ERROR")' "$$OUT_JSON")"; \
+	  if [[ "$$overall" == "GREEN" || "$$overall" == "SKIP" ]]; then rc=0; \
+	  elif [[ "$$overall" == "RED" ]]; then rc=1; \
+	  else rc=2; fi; \
 	fi
 
 	exit $$rc
+
+
+
+
+
 
 
 
