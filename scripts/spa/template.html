@@ -396,6 +396,58 @@
     .badge.err{ color:#ffdadd; }
     :root{ color-scheme: dark; }            /* hints to OS/browser */
 
+    /* --- Domain grouping UI --- */
+    details.domain-group {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 6px 6px 8px;
+      background: var(--panel);
+    }
+
+    details.domain-group + details.domain-group { margin-top: 8px; }
+
+    details.domain-group > summary {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+      padding: 4px 6px;
+      border-radius: 8px;
+      background: var(--panel-alt);
+      border: 1px solid var(--border);
+    }
+
+    details.domain-group > summary::-webkit-details-marker { display: none; }
+
+    .domain-title { font-weight: 600; }
+    .domain-spacer { flex: 1; }
+    .domain-body { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+
+    /* nicer clamp for statements */
+    .clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* small chips row */
+    .row-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+    .chip.domain { background: #1f2633; border-color: #2b3343; }
+    .chip.applies { background: #1a2a2a; border-color: #233534; }
+
+    /* compact title row in items */
+    .item .title {
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .item .title .muted { color: var(--muted); font-weight: 400; }
+
+
   </style>
 
   <!-- Prism / Split / Sortable -->
@@ -463,9 +515,15 @@
             <div id="bundles" class="list"></div>
           </div>
           <div id="capsulesWrap" class="section-block">
-            <div class="section-title">CAPSULES (<span id="capsulesCount">0</span>)</div>
-            <div id="capsules" class="list"></div>
-          </div>
+            <div class="section-title">
+              CAPSULES (<span id="capsulesCount">0</span>)
+              <span style="float:right; display:flex; gap:6px;">
+                <button class="btn small" id="expandAllBtn">Expand all</button>
+                <button class="btn small" id="collapseAllBtn">Collapse all</button>
+              </span>
+            </div>
+          <div id="capsules" class="list"></div>
+        </div>
         </div>
       </aside>
 
@@ -566,6 +624,19 @@
     <script>
       /* ------------ Data ------------ */
       const DATA = JSON.parse(document.getElementById('tc-data').textContent);
+
+
+      // Derive posture/witness_count if missing; keep raw yaml if provided upstream
+      (function hydrateCapsules() {
+        const caps = DATA.capsules || {};
+        for (const [id, c] of Object.entries(caps)) {
+          c._id = id;
+          c._witness_count = Array.isArray(c.witnesses) ? c.witnesses.length : (c._witness_count || 0);
+          if (!c.posture) c.posture = c._witness_count > 0 ? 'witnessed' : 'informational';
+          // keep any existing c._raw for modal; nothing to do if not present
+        }
+      })();
+
     </script>
 
     <script>
@@ -645,6 +716,15 @@
       $('m_copy_prov').addEventListener('click', () => { if (!MODAL) return; navigator.clipboard.writeText(JSON.stringify(MODAL.provenance || {}, null, 2)); toast('Provenance copied'); });
       $('m_validate').addEventListener('click', async () => { if (!MODAL) return; const r = await validateDigest(MODAL); const tag = $('m_result'); tag.textContent = r.ok ? 'digest✓' : 'digest✗'; tag.className = 'badge ' + (r.ok ? 'ok' : 'err'); tag.title = r.ok ? 'OK' : ('have:' + r.have + ' want:' + r.want); });
 
+      $('expandAllBtn')?.addEventListener('click', () => {
+        document.querySelectorAll('details.domain-group').forEach(d => d.open = true);
+      });
+      $('collapseAllBtn')?.addEventListener('click', () => {
+        document.querySelectorAll('details.domain-group').forEach(d => d.open = false);
+      });
+
+
+
       /* ------------ Renderers ------------ */
       function renderProfiles() {
         const sel = $('profiles'); sel.innerHTML = '';
@@ -656,41 +736,175 @@
         sel.onchange = () => { STATE.profile = sel.value; $('profileHelp').textContent = (DATA.profiles[STATE.profile] || {}).description || ''; compose(); };
       }
 
-      function capsuleRow(c, id) {
-        const item = document.createElement('div'); item.className = 'item'; item.dataset.id = id;
-        const row = document.createElement('div'); row.className = 'row'; item.appendChild(row);
+      function capsuleRow(c, id, opts = {}) {
+        const showDomainChip = !!opts.showDomainChip;
 
-        const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = STATE.selectedCaps.has(id);
+        const item = document.createElement('div');
+        item.className = 'item';
+        item.dataset.id = id;
+
+        const top = document.createElement('div'); // title + controls row
+        top.className = 'row';
+        item.appendChild(top);
+
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = STATE.selectedCaps.has(id);
         cb.addEventListener('change', () => {
-          if (cb.checked) { STATE.selectedCaps.add(id); STATE.manualCaps.add(id); if (!STATE.order.includes(id)) STATE.order.push(id); }
-          else { STATE.selectedCaps.delete(id); STATE.manualCaps.delete(id); STATE.order = STATE.order.filter(x => x !== id); }
-          renderPreview(); compose();
+          if (cb.checked) {
+            STATE.selectedCaps.add(id);
+            STATE.manualCaps.add(id);
+            if (!STATE.order.includes(id)) STATE.order.push(id);
+          } else {
+            STATE.selectedCaps.delete(id);
+            STATE.manualCaps.delete(id);
+            STATE.order = STATE.order.filter(x => x !== id);
+          }
+          renderCapsules();
+          renderPreview();
+          compose();
         });
-        row.appendChild(cb);
+        top.appendChild(cb);
 
-        const ttl = document.createElement('div'); ttl.textContent = (c.title || id) + '  -  ' + (c.domain || ''); row.appendChild(ttl);
-        
-        row.appendChild(badgeAuthor(c)); 
-        row.appendChild(badgeDigest(c));
-        row.appendChild(badgePosture(c));
+        const title = document.createElement('div');
+        title.className = 'title';
+        title.textContent = (c.title || id);
+        top.appendChild(title);
 
-        const btn = document.createElement('button'); btn.className = 'btn small'; btn.textContent = 'View'; btn.onclick = () => openModal(c.title || id, c);
-        row.appendChild(btn);
+        if (showDomainChip) {
+          const dchip = document.createElement('span');
+          dchip.className = 'chip domain';
+          dchip.textContent = c.domain || 'misc';
+          dchip.title = 'domain';
+          top.appendChild(dchip);
+        }
 
-        const small = document.createElement('div'); small.className = 'small'; small.textContent = (c.statement || ''); item.appendChild(small);
+        top.appendChild(badgeAuthor(c));
+        top.appendChild(badgeDigest(c));
+        top.appendChild(badgePosture(c));
+
+        const btn = document.createElement('button');
+        btn.className = 'btn small';
+        btn.textContent = 'View';
+        btn.onclick = () => openModal(c.title || id, c);
+        top.appendChild(btn);
+
+        const stmt = document.createElement('div');
+        stmt.className = 'small clamp-2';
+        stmt.textContent = (c.statement || '');
+        item.appendChild(stmt);
+
+        // Optional applies_to chips (tiny, muted)
+        if (Array.isArray(c.applies_to) && c.applies_to.length) {
+          const chips = document.createElement('div');
+          chips.className = 'row-chips';
+          c.applies_to.forEach(tag => {
+            const chip = document.createElement('span');
+            chip.className = 'chip applies';
+            chip.textContent = tag;
+            chips.appendChild(chip);
+          });
+          item.appendChild(chips);
+        }
+
         return item;
       }
 
+
       function renderCapsules() {
-        const list = $('capsules'); list.innerHTML = '';
+        const list = $('capsules');
+        list.innerHTML = '';
+
         const f = (STATE.filter || '').toLowerCase();
-        const ids = Object.keys(DATA.capsules || {}).filter(id => {
-          const c = DATA.capsules[id] || {}; const hay = (id + ' ' + (c.title || '') + ' ' + (c.domain || '') + ' ' + (c.statement || '')).toLowerCase();
-          return hay.includes(f);
-        }).sort();
-        ids.forEach(id => list.appendChild(capsuleRow(DATA.capsules[id], id)));
-        $('capsulesCount').textContent = ids.length;
+        const byDomain = new Map(); // domain => [ids]
+
+        const caps = DATA.capsules || {};
+        for (const id of Object.keys(caps)) {
+          const c = caps[id] || {};
+          const hay = (id + ' ' + (c.title || '') + ' ' + (c.domain || '') + ' ' + (c.statement || '')).toLowerCase();
+          if (hay.includes(f)) {
+            const d = (c.domain || 'misc').toLowerCase();
+            if (!byDomain.has(d)) byDomain.set(d, []);
+            byDomain.get(d).push(id);
+          }
+        }
+
+        // sort domains; and titles within domain
+        const domains = Array.from(byDomain.keys()).sort();
+        let total = 0;
+
+        domains.forEach(domain => {
+          const ids = byDomain.get(domain).sort((a, b) => {
+            const A = (caps[a].title || a).toLowerCase();
+            const B = (caps[b].title || b).toLowerCase();
+            return A.localeCompare(B);
+          });
+          total += ids.length;
+
+          // Group container
+          const group = document.createElement('details');
+          group.className = 'domain-group';
+          group.open = true;
+
+          // Summary header
+          const sum = document.createElement('summary');
+          const title = document.createElement('span');
+          title.className = 'domain-title';
+          title.textContent = domain;
+
+          const count = document.createElement('span');
+          count.className = 'badge';
+          count.textContent = String(ids.length);
+
+          const spacer = document.createElement('span');
+          spacer.className = 'domain-spacer';
+
+          const selAll = document.createElement('input');
+          selAll.type = 'checkbox';
+          const allSelected = ids.every(cid => STATE.selectedCaps.has(cid));
+          const someSelected = ids.some(cid => STATE.selectedCaps.has(cid));
+          selAll.checked = allSelected;
+          selAll.indeterminate = !allSelected && someSelected;
+          selAll.title = 'Select all in domain';
+
+          selAll.addEventListener('change', () => {
+            if (selAll.checked) {
+              ids.forEach(cid => {
+                STATE.selectedCaps.add(cid);
+                if (!STATE.order.includes(cid)) STATE.order.push(cid);
+              });
+            } else {
+              ids.forEach(cid => {
+                STATE.selectedCaps.delete(cid);
+                STATE.manualCaps.delete(cid);
+              });
+              STATE.order = STATE.order.filter(x => STATE.selectedCaps.has(x));
+            }
+            renderCapsules();
+            renderPreview();
+            compose();
+          });
+
+          sum.appendChild(title);
+          sum.appendChild(count);
+          sum.appendChild(spacer);
+          sum.appendChild(selAll);
+          group.appendChild(sum);
+
+          // Body
+          const body = document.createElement('div');
+          body.className = 'domain-body';
+          ids.forEach(cid => {
+            body.appendChild(capsuleRow(caps[cid], cid, { showDomainChip: false }));
+          });
+          group.appendChild(body);
+
+          list.appendChild(group);
+        });
+
+        $('capsulesCount').textContent = total;
       }
+
 
       function renderBundles() {
         const list = $('bundles'); list.innerHTML = '';
@@ -740,7 +954,11 @@
 
           const row = document.createElement('div'); row.className = 'row'; item.appendChild(row);
           const handle = document.createElement('span'); handle.className = 'chip drag'; handle.textContent = '☰'; row.appendChild(handle);
-          const ttl = document.createElement('div'); ttl.textContent = (c.title || id) + '  -  ' + (c.domain || ''); row.appendChild(ttl);
+          const ttl = document.createElement('div');
+          ttl.className = 'title';
+          ttl.innerHTML = esc(c.title || id) + ' <span class="muted">— ' + esc(c.domain || '') + '</span>';
+          row.appendChild(ttl);
+
           const btn = document.createElement('button'); btn.className = 'btn small'; btn.textContent = 'View'; btn.onclick = () => openModal(c.title || id, c); row.appendChild(btn);
 
           list.appendChild(item);
