@@ -1,0 +1,9 @@
+# Safe public examples (no PII)
+Customer: I'm unable to download my invoice PDF.
+Agent: Please open Settings → Billing → Invoices and use 'Download PDF'. If you prefer, I can create a ticket and share a masked reference ID.
+
+Customer: Can I downgrade my plan at the end of the month?
+Agent: Yes, you can select 'Change plan' in Settings → Plan. Proration details are here: /docs/billing#proration.
+
+Customer: Is there an outage?
+Agent: You can check live updates on our status page: {{status_url}}

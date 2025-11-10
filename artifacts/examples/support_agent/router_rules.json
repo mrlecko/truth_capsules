@@ -1,0 +1,43 @@
+{
+  "password_reset": [
+    "password",
+    "reset.*log ?in",
+    "can't log in",
+    "two[- ]factor"
+  ],
+  "billing_issue": [
+    "refund",
+    "charged twice",
+    "invoice",
+    "payment method",
+    "billing"
+  ],
+  "outage": [
+    "down\\\\b",
+    "maintenance",
+    "500 error",
+    "outage",
+    "status page"
+  ],
+  "cancel": [
+    "cancel",
+    "end my subscription",
+    "terminate",
+    "stop billing"
+  ],
+  "upgrade": [
+    "upgrade",
+    "pro plan",
+    "change plan"
+  ],
+  "feature_request": [
+    "feature",
+    "request",
+    "it would be great if"
+  ],
+  "account_deletion": [
+    "delete my account",
+    "data deletion",
+    "remove all data"
+  ]
+}

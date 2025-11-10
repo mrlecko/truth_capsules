@@ -1,0 +1,42 @@
+[
+  {
+    "text": "I forgot my password and can't log in",
+    "expected": "password_reset"
+  },
+  {
+    "text": "My card was charged twice, need a refund",
+    "expected": "billing_issue"
+  },
+  {
+    "text": "Is your site down? I see a 500 error",
+    "expected": "outage"
+  },
+  {
+    "text": "I want to cancel my subscription",
+    "expected": "cancel"
+  },
+  {
+    "text": "How do I upgrade to the pro plan?",
+    "expected": "upgrade"
+  },
+  {
+    "text": "I'd love a feature that exports to CSV",
+    "expected": "feature_request"
+  },
+  {
+    "text": "Can I get an invoice PDF for last month?",
+    "expected": "billing_issue"
+  },
+  {
+    "text": "When will the maintenance window finish?",
+    "expected": "outage"
+  },
+  {
+    "text": "Delete my account and all data",
+    "expected": "account_deletion"
+  },
+  {
+    "text": "Where can I change my payment method?",
+    "expected": "billing_issue"
+  }
+]

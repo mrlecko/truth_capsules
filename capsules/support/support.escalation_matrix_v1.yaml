@@ -1,0 +1,48 @@
+id: support.escalation_matrix_v1
+version: 1.0.0
+domain: support
+title: Escalation Matrix & Handoffs
+statement: Route high-risk or restricted requests to the correct queue with a crisp customer explanation.
+escalation:
+  matrix: |
+    +------------------------+---------------------+----------------------+-------------------------+
+    | Scenario               | Tier / Owner        | SLA                  | Customer-Facing Message |
+    +------------------------+---------------------+----------------------+-------------------------+
+    | Outage / Sev-1         | On-call SRE         | 15m ack / hourly upd | "We're experiencing an outage. Status: {status_url}" |
+    | Billing dispute >$500  | Billing Specialist  | 1 business day       | "I've opened a ticket with Billing. Ref: {ticket_id}" |
+    | Refund exceptions      | Billing Supervisor  | 2 business days      | "I'll escalate your refund request for review."        |
+    | Security/Privacy       | Security Team       | 1 business day       | "I've escalated to security for review. Ref: {ticket}" |
+    | Data deletion (GDPR)   | Data Protection Off | 72 hours             | "Your deletion request is in progress. Ref: {ticket}" |
+    +------------------------+---------------------+----------------------+-------------------------+
+  rules:
+    - If severity >= Sev-2 or involves legal/privacy, escalate immediately and provide a reference ID.
+    - Never modify or promise billing credits; create a ticket and route to Billing.
+    - Provide the customer with what will happen next and a timeframe.
+    - Record all escalations with ticket references; avoid free-form DMs.
+    - Do not request or store PII; use masked references only.
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/support
+  created: '2025-11-10T18:12:37Z'
+  updated: '2025-11-10T18:12:37Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- conversation
+- support
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: medium
+  notes: ''

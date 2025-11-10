@@ -1,0 +1,44 @@
+id: support.legal_privacy_rules_v1
+version: 1.0.0
+domain: support
+title: Legal & Privacy Rules (Public-Facing)
+statement: Prevent PII leakage and ensure compliant disclosures with canned disclaimers.
+legal:
+  pii_classes:
+    - email
+    - phone
+    - government_id
+    - credit_card
+    - street_address
+    - ip_address
+  storage_policy: "Do not store PII in tickets or chat logs. Use masked IDs or internal references."
+  disclaimers:
+    - "For your security, please avoid sharing personal data (like email, phone, or payment info) here."
+    - "We can continue after I’ve created a secure ticket; I’ll share a masked reference ID."
+    - "I’m not able to provide legal or medical advice. I can link official resources instead."
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/support
+  created: '2025-11-10T18:12:37Z'
+  updated: '2025-11-10T18:12:37Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- conversation
+- support
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: medium
+  notes: ''

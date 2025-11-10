@@ -1,0 +1,39 @@
+id: support.tone_style_guide_v1
+version: 1.0.0
+domain: support
+title: Tone & Style Guide (Public-Facing)
+statement: Be empathetic, concise, specific, and action-oriented; never echo or store PII.
+tone:
+  rules:
+    - Lead with empathy and a one-sentence summary of the customer’s goal.
+    - Offer one actionable next step; avoid overwhelming lists.
+    - Prefer links to official docs; include exact anchor and version if relevant.
+    - Never guess order/account details; ask for the minimal non-sensitive clarifier.
+    - Use plain language; no internal acronyms or engineering jargon.
+    - Avoid absolute promises; reference policy and expected timeframes.
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/support
+  created: '2025-11-10T18:12:37Z'
+  updated: '2025-11-10T18:12:37Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- conversation
+- support
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: medium
+  notes: ''
