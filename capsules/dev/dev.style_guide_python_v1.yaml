@@ -1,0 +1,44 @@
+id: dev.style_guide_python_v1
+version: 1.0.0
+domain: dev
+title: Python Style Guide (Practical Defaults)
+statement: |-
+  Use boring, reliable defaults to keep diffs clean and onboarding fast.
+
+  Formatter & Lint
+    • Black (line-length 88), isort (profile=black), Ruff (or flake8) with error-level lint.
+    • mypy: --strict for libraries, relaxed for apps; add types for new/changed code.
+
+  Docstrings & Tests
+    • Google or NumPy style docstrings; include Args/Returns/Raises.
+    • pytest for tests; AAA pattern; prefer small, focused tests.
+
+  Examples
+    • Function signature changes require typing + tests.
+    • IO code uses context managers; network calls have timeouts.
+    • Use pathlib, not os.path string munging; f-strings over format().
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/dev
+  created: '2025-11-10T20:25:00Z'
+  updated: '2025-11-10T20:25:00Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- conversation
+- code_assistant
+- review
+security:
+  sensitivity: medium
+  notes: ""

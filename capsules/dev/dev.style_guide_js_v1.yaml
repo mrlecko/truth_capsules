@@ -1,0 +1,43 @@
+id: dev.style_guide_js_v1
+version: 1.0.0
+domain: dev
+title: JS/TS Style Guide (Practical Defaults)
+statement: |-
+  Keep the surface consistent; let tools fight bikeshedding.
+
+  Formatter & Lint
+    • Prettier; ESLint with recommended + security (eslint-plugin-security) + import/order.
+    • TypeScript strict for libraries; app code minimally typed but typed at boundaries.
+
+  Testing & UI
+    • Jest/Vitest + Testing Library; prefer role-based queries; avoid brittle snapshots.
+    • Keep components pure; derive state; lift state when two consumers need it.
+
+  Examples
+    • API calls have abort controllers and sane timeouts.
+    • Avoid implicit any; prefer union types to magic strings.
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/dev
+  created: '2025-11-10T20:25:00Z'
+  updated: '2025-11-10T20:25:00Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- conversation
+- code_assistant
+- review
+security:
+  sensitivity: medium
+  notes: ""

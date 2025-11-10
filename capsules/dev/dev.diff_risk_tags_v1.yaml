@@ -1,0 +1,112 @@
+id: dev.diff_risk_tags_v1
+version: 1.0.0
+domain: dev
+title: Diff-Derived Risk Tags are Addressed in Review
+statement: |-
+  Compute risk tags from the diff and require the review to explicitly address each tag.
+  Tags include (non-exhaustive): security, performance, migration, breaking, dependency,
+  infrastructure, tests, docs. Review must mention each inferred tag.
+
+witnesses:
+  - name: pr_review_covers_risks
+    language: python
+    entrypoint: python3
+    args: []
+    env:
+      REVIEW_PATH: artifacts/examples/dev/pr_review_good.md
+      DIFF_PATH: artifacts/examples/dev/pr_diff.patch
+    timeout_ms: 5000
+    memory_mb: 128
+    net: false
+    fs_mode: ro
+    code: |-
+        import os, re, json, sys
+
+        def read(path):
+            with open(path, "r", errors="ignore") as f:
+                return f.read()
+
+        TAG_PATTERNS = {
+            "security": [r"\bauth\b", r"\bjwt\b", r"\bxss\b", r"\bcsrf\b", r"\bencrypt", r"\bsecret\b", r"\btoken\b", r"\bhash\b", r"\baes\b", r"\brsa\b"],
+            "performance": [r"\bO\([Nn]\)", r"\bhot path\b", r"\blatency\b", r"\bthroughput\b", r"\bcach", r"\balloc"],
+            # Migration: require SQL-ish context or migration frameworks/paths (NO plain 'index')
+            "migration": [
+                r"\bmigrations?/", r"\b(alembic|flyway|liquibase)\b",
+                r"\bcreate\s+(table|index)\b", r"\bdrop\s+(column|table|index)\b",
+                r"\balter\s+table\b", r"\bddl\b", r"\bschema\b"
+            ],
+            "breaking": [r"BREAKING CHANGE", r"\brename\b", r"\bremove public\b", r"\bsignature\b", r"\bsemver[- ]?major\b"],
+            "dependency": [r"package\.json", r"requirements\.txt", r"poetry\.lock", r"yarn\.lock", r"pnpm-lock", r"go\.mod", r"Cargo\.toml"],
+            "infrastructure": [r"Dockerfile", r"\bk8s\b", r"helm", r"terraform", r"ansible", r"systemd"],
+            "tests": [r"\btests?/", r"\btest", r"\bspec\b", r"\bfixture\b", r"\bcoverage\b"],
+            "docs": [r"README", r"\bdocs?/", r"\.md\b"]
+        }
+
+        def infer_tags_from_diff(diff_text):
+            tags = set()
+            lowered = diff_text.lower()
+            for tag, pats in TAG_PATTERNS.items():
+                for pat in pats:
+                    if re.search(pat, lowered):
+                        tags.add(tag); break
+            return sorted(tags)
+
+        def tags_in_text(text):
+            found = set()
+            for tag in TAG_PATTERNS.keys():
+                if re.search(rf"\b{tag}\b", text, flags=re.I):
+                    found.add(tag)
+            m = re.search(r"tags?\s*:\s*([a-z, ]+)", text, flags=re.I)
+            if m:
+                for t in re.split(r"[, ]+", m.group(1).strip()):
+                    if t.lower() in TAG_PATTERNS.keys():
+                        found.add(t.lower())
+            return sorted(found)
+
+        def main():
+            review_path = os.environ.get("REVIEW_PATH", "artifacts/examples/dev/pr_review_good.md")
+            diff_path = os.environ.get("DIFF_PATH", "artifacts/examples/dev/pr_diff.patch")
+            if os.path.isdir(review_path): review_path = os.path.join(review_path, "pr_review_good.md")
+            if os.path.isdir(diff_path):   diff_path   = os.path.join(diff_path, "pr_diff.patch")
+
+            diff_text = read(diff_path)
+            review_text = read(review_path)
+
+            needed  = infer_tags_from_diff(diff_text)
+            present = tags_in_text(review_text)
+            missing = [t for t in needed if t not in present]
+
+            print(json.dumps({
+                "ok": len(missing) == 0,
+                "needed": needed, "present": present, "missing": missing,
+                "review": review_path, "diff": diff_path
+            }, indent=2))
+            sys.exit(0 if not missing else 1)
+
+        if __name__ == "__main__":
+            main()
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/dev
+  created: '2025-11-10T20:25:00Z'
+  updated: '2025-11-10T20:25:00Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- conversation
+- code_assistant
+- review
+security:
+  sensitivity: medium
+  notes: ""

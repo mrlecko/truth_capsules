@@ -1,0 +1,47 @@
+id: dev.prompt_safety_rules_v1
+version: 1.0.0
+domain: dev
+title: Prompt Safety Rules (No Secrets, No PHI/PII, Scratchpad Discipline)
+statement: |-
+  Guardrails for safe, reproducible dev prompting.
+
+  Do
+    • Redact or mask secrets/PHI/PII before pasting (tokens, keys, emails, phone numbers).
+    • Use a scratchpad file; summarize context; paste only minimal diffs, errors, and file paths.
+    • State desired output explicitly (patch/diff, function signature, CLI snippet).
+    • Declare toolchain versions and OS when relevant (python 3.11, node 20, ubuntu 22.04).
+    • Prefer small, testable changes; include tests or commands to verify.
+
+  Don’t
+    • Paste .env, private keys, customer data, or production URLs.
+    • Demand sweeping refactors; avoid touching unrelated files.
+    • Bury the lede — put the objective first; attach diagnostics after.
+
+  Scratchpad discipline
+    • Keep a running PLAN → VERIFY → ANSWER section.
+    • Use fenced code blocks for diffs/patches; keep commit-ready.
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/dev
+  created: '2025-11-10T20:25:00Z'
+  updated: '2025-11-10T20:25:00Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- conversation
+- code_assistant
+- review
+security:
+  sensitivity: medium
+  notes: ""

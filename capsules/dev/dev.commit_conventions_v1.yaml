@@ -1,0 +1,46 @@
+id: dev.commit_conventions_v1
+version: 1.0.0
+domain: dev
+title: Conventional Commits (with Examples)
+statement: |-
+  Consistent messages → better changelogs, semantic versioning, and easier reviews.
+
+  Types
+    • feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
+
+  Format
+    • type(scope): brief imperative summary
+    • Blank line, then optional body; footer for BREAKING CHANGE or issues.
+
+  Examples
+    • feat(api): add pagination to listUsers
+    • fix(auth): handle expired refresh tokens
+    • docs(readme): add quickstart docker commands
+
+  Diff etiquette
+    • Keep PRs small; isolate unrelated changes; include before/after snippets when helpful.
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/dev
+  created: '2025-11-10T20:25:00Z'
+  updated: '2025-11-10T20:25:00Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- conversation
+- code_assistant
+- review
+security:
+  sensitivity: medium
+  notes: ""

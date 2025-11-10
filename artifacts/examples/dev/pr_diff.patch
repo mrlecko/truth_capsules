@@ -1,0 +1,32 @@
+diff --git a/auth/token.py b/auth/token.py
+index 1111111..2222222 100644
+--- a/auth/token.py
++++ b/auth/token.py
+@@ -10,6 +10,14 @@ def refresh_token(token, now):
+-    # TODO: improve expiry handling
++    # FIXME(PROJ-42): handle expiry correctly, avoid leaking token in logs
++    if token.is_expired(now):
++        # security: never log raw token
++        masked = token.mask()
++        # performance: cache user info for 30s in hot path
++        cache.set(f"user:{token.user_id}", token.user_info, ttl=30)
++        return masked.refresh()
+     return token
+
+diff --git a/README.md b/README.md
+index aaaaaaa..bbbbbbb 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,5 @@
+ # Project
++## Upgrade
++Token refresh logic changed. See upgrade notes.
+ 
+diff --git a/tests/test_token.py b/tests/test_token.py
+new file mode 100644
+index 0000000..3333333
+--- /dev/null
++++ b/tests/test_token.py
+@@ -0,0 +1,10 @@
++def test_expired_token_refresh():
++    assert True

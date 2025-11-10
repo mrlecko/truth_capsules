@@ -1,0 +1,33 @@
+name: bundle.dev_code_assistant_v1
+version: 1.0.0
+description: "Immediate utility for devs: safe prompts, language styles, commit conventions, review checklist + light witnesses."
+default_profile: dev.code_assistant.yaml
+applies_to:
+  - conversation
+  - code_assistant
+  - review
+capsules:
+  - dev.prompt_safety_rules_v1
+  - dev.style_guide_python_v1
+  - dev.style_guide_js_v1
+  - dev.commit_conventions_v1
+  - dev.review_checklist_v1
+  - dev.diff_risk_tags_v1
+  - dev.enforce_todo_ticket_v1
+  - dev.secret_scan_baseline_v1
+order:
+  - dev.prompt_safety_rules_v1
+  - dev.style_guide_python_v1
+  - dev.style_guide_js_v1
+  - dev.commit_conventions_v1
+  - dev.review_checklist_v1
+  - dev.diff_risk_tags_v1
+  - dev.enforce_todo_ticket_v1
+  - dev.secret_scan_baseline_v1
+tags:
+  - dev
+  - code
+  - review
+  - v1
+notes: |
+  Info capsules render entirely from `statement`. Witnessed capsules use schema-v1 witness fields.

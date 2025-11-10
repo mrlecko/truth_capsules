@@ -1,0 +1,40 @@
+id: dev.review_checklist_v1
+version: 1.0.0
+domain: dev
+title: PR Review Checklist (Security, Perf, i18n, Docs, Tests)
+statement: |-
+  Minimal checklist for actionable reviews.
+
+  Security
+    • Inputs validated; authz checked; secrets not logged; dependencies sane.
+  Performance
+    • No accidental N^2; hot paths measured; allocations/retries bounded.
+  i18n & UX
+    • Text externalized; RTL and accessibility considered for UI.
+  Docs & Tests
+    • README/CHANGELOG touched if behavior changes; tests added/updated; coverage stable.
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/dev
+  created: '2025-11-10T20:25:00Z'
+  updated: '2025-11-10T20:25:00Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- conversation
+- code_assistant
+- review
+security:
+  sensitivity: medium
+  notes: ""
