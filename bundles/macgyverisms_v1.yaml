@@ -1,0 +1,80 @@
+name: macgyver_core_v1_bundle
+version: 1.0.0
+description: "MacGyver problem-solving bundle: mindset rails, SOP, safety/ethics, and practice drills."
+default_profile: conversational_macgyver.yaml
+applies_to:
+  - conversation
+  - planning
+  - prototyping
+  - training
+capsules:
+  - macgyver.five_rails_v1
+  - macgyver.affordances_over_objects_v1
+  - macgyver.property_matching_v1
+  - macgyver.functional_fixedness_avoidance_v1
+  - macgyver.environment_as_component_v1
+  - macgyver.low_tech_first_v1
+  - macgyver.transduction_chains_v1
+  - macgyver.chain_design_v1
+  - macgyver.problem_collapse_v1
+  - macgyver.sop_10min_loop_v1
+  - macgyver.inventory_thinking_v1
+  - macgyver.affordance_matrix_template_v1
+  - macgyver.stock_verbs_v1
+  - macgyver.parallel_options_v1
+  - macgyver.redundancy_chokepoints_v1
+  - macgyver.latency_control_v1
+  - macgyver.prompts_as_programs_v1
+  - macgyver.prompt_skeleton_v1
+  - macgyver.world_as_typed_graph_v1
+  - macgyver.deliberate_practice_v1
+  - macgyver.reflection_loop_v1
+  - macgyver.blast_radius_humility_v1
+  - macgyver.fail_safe_defaults_v1
+  - macgyver.reality_check_v1
+  - macgyver.legal_ethical_guardrails_v1
+  - macgyver.bias_checklist_v1
+  - macgyver.rails_ledgers_hub_mapping_v1
+excludes: []
+priority_overrides:
+  macgyver.legal_ethical_guardrails_v1: 100
+  macgyver.fail_safe_defaults_v1: 90
+  macgyver.reality_check_v1: 80
+  macgyver.bias_checklist_v1: 70
+  macgyver.sop_10min_loop_v1: 60
+order:
+  - macgyver.legal_ethical_guardrails_v1
+  - macgyver.fail_safe_defaults_v1
+  - macgyver.reality_check_v1
+  - macgyver.bias_checklist_v1
+  - macgyver.sop_10min_loop_v1
+  - macgyver.five_rails_v1
+  - macgyver.affordances_over_objects_v1
+  - macgyver.property_matching_v1
+  - macgyver.functional_fixedness_avoidance_v1
+  - macgyver.environment_as_component_v1
+  - macgyver.low_tech_first_v1
+  - macgyver.transduction_chains_v1
+  - macgyver.chain_design_v1
+  - macgyver.problem_collapse_v1
+  - macgyver.inventory_thinking_v1
+  - macgyver.affordance_matrix_template_v1
+  - macgyver.stock_verbs_v1
+  - macgyver.parallel_options_v1
+  - macgyver.redundancy_chokepoints_v1
+  - macgyver.latency_control_v1
+  - macgyver.prompts_as_programs_v1
+  - macgyver.prompt_skeleton_v1
+  - macgyver.world_as_typed_graph_v1
+  - macgyver.deliberate_practice_v1
+  - macgyver.reflection_loop_v1
+  - macgyver.rails_ledgers_hub_mapping_v1
+tags:
+  - macgyver
+  - kit
+  - v1
+notes: |
+  Core MacGyver kit:
+  - Safety/ethics and fail-safe defaults come first.
+  - SOP and mindset rails drive consistent, low-risk solutions.
+  - Prompts/templates support LLM use with structure and guardrails.

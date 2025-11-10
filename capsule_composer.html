@@ -175,7 +175,7 @@ html[data-theme="light"]{
 
   /* accents & structure */
   --accent:#2563eb;
-  --border:#e6ebf2;             /* neutral, not saturated blue */
+  --border:#568fe0;             /* neutral, not saturated blue */
   --border-strong:#d6dde7;      /* for separators/hover */
   --chip:#f5f7fb;
   --chip-border:#e4eaf4;
@@ -2560,10 +2560,10 @@ Prism.languages.js = Prism.languages.javascript;
 
 <body>
   <header class="toolbar">
-    <h1>Truth Capsule Prompt Composer</h1>
-    <div class="small" style="font-size:12px; margin-top:5px;">Generated 2025-11-10T19:12:35.252828Z</div>
+    <h1>Truth Capsule Viewer & Prompt Composer</h1>
+    <div class="small" style="font-size:12px; margin-top:5px;">Generated 2025-11-10T19:30:04.473509Z</div>
     <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-      <button class="btn" id="composeBtn" title="Compose (Ctrl/Cmd+Enter)">🟢 Compose</button>
+      <button style="display:none;" class="btn" id="composeBtn" title="Compose (Ctrl/Cmd+Enter)">🟢 Compose</button>
       <button class="btn" id="copyBtn" title="Copy prompt">📋 Copy Prompt</button>
       <button class="btn" id="copyLlmBtn" title="Copy LLM command">💻 Copy LLM Bash</button>
       <button class="btn" id="dlBtn" title="Download prompt">⬇️ Download Prompt</button>
@@ -2571,7 +2571,7 @@ Prism.languages.js = Prism.languages.javascript;
       <button class="btn" id="loadJsonBtn" title="Load manifest JSON">⬆️ Load JSON Manifest</button>
       <button class="btn" id="shareLinkBtn" title="Copy shareable link">📋 Share Deeplink</button>
       <button class="btn" id="validateAllBtn" title="Validate digests for selected">🔐 Validate Digests</button>
-      <button class="btn warn" id="clearBtn" title="Clear selection">🗑️ Clear Capsules</button>
+      <button class="btn warn" id="clearBtn" title="Clear selection">🗑️ Clear Selected Capsules</button>
       <button class="btn" id="themeBtn" title="Toggle theme" aria-label="Toggle color theme">🌙</button>
 
     </div>
@@ -6043,6 +6043,92 @@ Prism.languages.js = Prism.languages.javascript;
       "env": {},
       "secrets": [],
       "_file": "./bundles/conversation_red_team_baseline_v1.yaml"
+    },
+    "macgyver_core_v1_bundle": {
+      "name": "macgyver_core_v1_bundle",
+      "version": "1.0.0",
+      "description": "MacGyver problem-solving bundle: mindset rails, SOP, safety/ethics, and practice drills.",
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping",
+        "training"
+      ],
+      "capsules": [
+        "macgyver.five_rails_v1",
+        "macgyver.affordances_over_objects_v1",
+        "macgyver.property_matching_v1",
+        "macgyver.functional_fixedness_avoidance_v1",
+        "macgyver.environment_as_component_v1",
+        "macgyver.low_tech_first_v1",
+        "macgyver.transduction_chains_v1",
+        "macgyver.chain_design_v1",
+        "macgyver.problem_collapse_v1",
+        "macgyver.sop_10min_loop_v1",
+        "macgyver.inventory_thinking_v1",
+        "macgyver.affordance_matrix_template_v1",
+        "macgyver.stock_verbs_v1",
+        "macgyver.parallel_options_v1",
+        "macgyver.redundancy_chokepoints_v1",
+        "macgyver.latency_control_v1",
+        "macgyver.prompts_as_programs_v1",
+        "macgyver.prompt_skeleton_v1",
+        "macgyver.world_as_typed_graph_v1",
+        "macgyver.deliberate_practice_v1",
+        "macgyver.reflection_loop_v1",
+        "macgyver.blast_radius_humility_v1",
+        "macgyver.fail_safe_defaults_v1",
+        "macgyver.reality_check_v1",
+        "macgyver.legal_ethical_guardrails_v1",
+        "macgyver.bias_checklist_v1",
+        "macgyver.rails_ledgers_hub_mapping_v1"
+      ],
+      "excludes": [],
+      "priority_overrides": {
+        "macgyver.legal_ethical_guardrails_v1": 100,
+        "macgyver.fail_safe_defaults_v1": 90,
+        "macgyver.reality_check_v1": 80,
+        "macgyver.bias_checklist_v1": 70,
+        "macgyver.sop_10min_loop_v1": 60
+      },
+      "order": [
+        "macgyver.legal_ethical_guardrails_v1",
+        "macgyver.fail_safe_defaults_v1",
+        "macgyver.reality_check_v1",
+        "macgyver.bias_checklist_v1",
+        "macgyver.sop_10min_loop_v1",
+        "macgyver.five_rails_v1",
+        "macgyver.affordances_over_objects_v1",
+        "macgyver.property_matching_v1",
+        "macgyver.functional_fixedness_avoidance_v1",
+        "macgyver.environment_as_component_v1",
+        "macgyver.low_tech_first_v1",
+        "macgyver.transduction_chains_v1",
+        "macgyver.chain_design_v1",
+        "macgyver.problem_collapse_v1",
+        "macgyver.inventory_thinking_v1",
+        "macgyver.affordance_matrix_template_v1",
+        "macgyver.stock_verbs_v1",
+        "macgyver.parallel_options_v1",
+        "macgyver.redundancy_chokepoints_v1",
+        "macgyver.latency_control_v1",
+        "macgyver.prompts_as_programs_v1",
+        "macgyver.prompt_skeleton_v1",
+        "macgyver.world_as_typed_graph_v1",
+        "macgyver.deliberate_practice_v1",
+        "macgyver.reflection_loop_v1",
+        "macgyver.rails_ledgers_hub_mapping_v1"
+      ],
+      "projection": "",
+      "tags": [
+        "macgyver",
+        "kit",
+        "v1"
+      ],
+      "notes": "Core MacGyver kit:\n- Safety/ethics and fail-safe defaults come first.\n- SOP and mindset rails drive consistent, low-risk solutions.\n- Prompts/templates support LLM use with structure and guardrails.\n",
+      "env": {},
+      "secrets": [],
+      "_file": "./bundles/macgyverisms_v1.yaml"
     }
   },
   "profiles": {
@@ -6546,70 +6632,66 @@ Prism.languages.js = Prism.languages.javascript;
 
 
       /* ------------ Renderers ------------ */
-     function renderProfiles() {
-  const sel    = $('profiles');
-  const descEl = $('profileDesc');
-  const pmap   = DATA.profiles || {};
-  const keys   = Object.keys(pmap).sort();
+      function renderProfiles() {
+        const sel    = $('profiles');
+        const descEl = $('profileDesc');
+        const pmap   = DATA.profiles || {};
+        const keys   = Object.keys(pmap).sort();
 
-  // rebuild options
-  sel.textContent = '';
-  for (const k of keys) {
-    const p = pmap[k] || {};
-    const o = document.createElement('option');
-    o.value = k;
-    o.textContent = (p.title || k) + ' (' + (p.version || '1.0.0') + ')';
-    o.dataset.desc = p.description || '';
-    sel.appendChild(o);
-  }
+        // rebuild options
+        sel.textContent = '';
+        for (const k of keys) {
+          const p = pmap[k] || {};
+          const o = document.createElement('option');
+          o.value = k;
+          o.textContent = (p.title || k) + ' (' + (p.version || '1.0.0') + ')';
+          o.dataset.desc = p.description || '';
+          sel.appendChild(o);
+        }
 
-  // prefer browser-remembered; else STATE; else first
-  const remembered = sel.value;
-  let target =
-    (remembered && pmap[remembered]) ? remembered :
-    (STATE.profile && pmap[STATE.profile]) ? STATE.profile :
-    (keys[0] || '');
+        // prefer browser-remembered; else STATE; else first
+        const remembered = sel.value;
+        let target =
+          (remembered && pmap[remembered]) ? remembered :
+          (STATE.profile && pmap[STATE.profile]) ? STATE.profile :
+          (keys[0] || '');
 
-  sel.value = target;
-  STATE.profile = target;
+        sel.value = target;
+        STATE.profile = target;
 
-  // startup description
-  if (descEl) {
-    const p0 = pmap[target] || {};
-    descEl.textContent = p0.description ? ('— ' + p0.description) : '';
-  }
+        // startup description
+        if (descEl) {
+          const p0 = pmap[target] || {};
+          descEl.textContent = p0.description ? ('— ' + p0.description) : '';
+        }
 
-  // keep your existing change handler
-  sel.onchange = () => {
-    STATE.profile = sel.value;
-    const p = pmap[STATE.profile] || {};
-    if (descEl) descEl.textContent = p.description ? ('— ' + p.description) : '';
-    if (typeof compose === 'function') compose();
-  };
+        // keep your existing change handler
+        sel.onchange = () => {
+          STATE.profile = sel.value;
+          const p = pmap[STATE.profile] || {};
+          if (descEl) descEl.textContent = p.description ? ('— ' + p.description) : '';
+          if (typeof compose === 'function') compose();
+        };
 
-  // --- FAKE TOGGLE TO FORCE ACTIVATION ON LOAD ---
-  // If there’s more than one profile, switch to a different one and back.
-  if (keys.length > 1) {
-    const alt = (keys[0] === target) ? keys[1] : keys[0];
+        // --- FAKE TOGGLE TO FORCE ACTIVATION ON LOAD ---
+        // If there’s more than one profile, switch to a different one and back.
+        if (keys.length > 1) {
+          const alt = (keys[0] === target) ? keys[1] : keys[0];
 
-    // 1) flip to alt (fires any listeners)
-    sel.value = alt;
-    sel.dispatchEvent(new Event('change', { bubbles: true }));
+          // 1) flip to alt (fires any listeners)
+          sel.value = alt;
+          sel.dispatchEvent(new Event('change', { bubbles: true }));
 
-    // 2) next tick, flip back to target (final state correct)
-    setTimeout(() => {
-      sel.value = target;
-      sel.dispatchEvent(new Event('change', { bubbles: true }));
-    }, 0);
-  } else {
-    // only one option: just fire a change to run downstream logic
-    sel.dispatchEvent(new Event('change', { bubbles: true }));
-  }
-}
-
-
-
-
+          // 2) next tick, flip back to target (final state correct)
+          setTimeout(() => {
+            sel.value = target;
+            sel.dispatchEvent(new Event('change', { bubbles: true }));
+          }, 0);
+        } else {
+          // only one option: just fire a change to run downstream logic
+          sel.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
 
       function capsuleRow(c, id, opts = {}) {
         const showDomainChip = !!opts.showDomainChip;
