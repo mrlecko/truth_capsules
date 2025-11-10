@@ -1,26 +1,30 @@
 id: support.knowledge_view_projection_v1
-version: 1.0.0
+version: 1.1.0
 domain: support
 title: Knowledge View & Citation Policy
-statement: Cite official docs with exact anchors; avoid paraphrasing policy-sensitive pages.
-knowledge:
-  sources_policy: "Prefer official docs, status pages, and signed announcements. Avoid blog posts for policy."
-  citation_rules:
-    - "Link the exact doc section and version (e.g., /docs/billing#refunds v3.1)."
-    - "Summarize in one sentence, then provide the link; do not copy large passages."
-    - "If doc is gated, describe the path (Settings → Billing → Invoices)."
-    - "For outages, always include {status_url} and the last update time."
-  link_policy:
-    - "Never link to internal-only resources in public responses."
-    - "If a page moves, provide both old and new paths during the transition."
+statement: |-
+  Cite official docs with exact anchors; avoid paraphrasing policy-sensitive pages.
+
+  Sources policy:
+    • Prefer official docs, status pages, and signed announcements. Avoid blog posts for policy.
+
+  Citation rules:
+    • Link the exact doc section and version (e.g., /docs/billing#refunds v3.1).
+    • Summarize in one sentence, then provide the link; do not copy large passages.
+    • If doc is gated, describe the path (Settings → Billing → Invoices).
+    • For outages, always include {status_url} and the last update time.
+
+  Link policy:
+    • Never link to internal-only resources in public responses.
+    • If a page moves, provide both old and new paths during the transition.
 provenance:
   schema: provenance.v1
   author: John Macgregor
   org: Truth Capsules Demo
   license: MIT
   source_url: https://example.com/truth-capsules/support
-  created: '2025-11-10T18:12:37Z'
-  updated: '2025-11-10T18:12:37Z'
+  created: '2025-11-10T19:05:00Z'
+  updated: '2025-11-10T19:05:00Z'
   review:
     status: draft
     reviewers: []
@@ -34,8 +38,6 @@ provenance:
 applies_to:
 - conversation
 - support
-dependencies: []
-incompatible_with: []
 security:
   sensitivity: medium
-  notes: ''
+  notes: ""

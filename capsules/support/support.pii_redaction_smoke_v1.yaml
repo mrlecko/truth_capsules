@@ -2,7 +2,10 @@ id: support.pii_redaction_smoke_v1
 version: 1.0.0
 domain: support
 title: PII Redaction Smoke Test
-statement: Ensure bundled examples contain no plaintext PII.
+statement: |-
+  Ensure bundled examples contain no plaintext PII. This check scans example transcripts
+  (default: artifacts/examples/support_agent/examples.txt) for emails, phone numbers,
+  credit card patterns, government ID keywords, street addresses, and IP addresses.
 witnesses:
   - name: no_plaintext_pii_in_examples
     language: python

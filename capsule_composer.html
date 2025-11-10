@@ -2561,7 +2561,7 @@ Prism.languages.js = Prism.languages.javascript;
 <body>
   <header class="toolbar">
     <h1>Truth Capsule Viewer & Prompt Composer</h1>
-    <div class="small" style="font-size:12px; margin-top:5px;">Generated 2025-11-10T20:16:46.412456Z</div>
+    <div class="small" style="font-size:12px; margin-top:5px;">Generated 2025-11-10T20:27:49.805995Z</div>
     <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
       <button style="display:none;" class="btn" id="composeBtn" title="Compose (Ctrl/Cmd+Enter)">🟢 Compose</button>
       <button class="btn" id="copyBtn" title="Copy prompt">📋 Copy Prompt</button>
@@ -5777,21 +5777,26 @@ Prism.languages.js = Prism.languages.javascript;
     },
     "support.pii_redaction_smoke_v1": {
       "id": "support.pii_redaction_smoke_v1",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "domain": "support",
       "title": "PII Redaction Smoke Test",
-      "statement": "Ensure bundled examples contain no plaintext PII.",
+      "statement": "Ensure bundled examples contain no plaintext PII. This check scans example transcripts\n(default: artifacts/examples/support_agent/examples.txt) for emails, phone numbers,\ncredit card patterns, government ID keywords, street addresses, and IP addresses.",
       "witnesses": [
         {
           "name": "no_plaintext_pii_in_examples",
           "language": "python",
-          "code": "import os, sys, re, json, glob\n\ndef find_files(path):\n    if os.path.isdir(path):\n        for ext in (\"*.txt\", \"*.md\", \"*.log\"):\n            for p in glob.glob(os.path.join(path, ext)):\n                yield p\n    else:\n        if os.path.exists(path):\n            yield path\n\nEMAIL = re.compile(r\"[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\", re.I)\nPHONE = re.compile(r\"(?:\\+?\\d{1,3}[\\s\\-\\.]?)?(?:\\(?\\d{3}\\)?[\\s\\-\\.]?\\d{3}[\\s\\-\\.]?\\d{4})\")\nCCARD = re.compile(r\"\\b(?:\\d[ -]*?){13,19}\\b\")\nGOVID = re.compile(r\"\\b(?:SSN|NIN|SIN|CPF|DNI|Aadhar)\\b\", re.I)\nADDRESS = re.compile(r\"\\b\\d{1,5}\\s+\\w+\\s+(?:St|Street|Ave|Avenue|Rd|Road|Blvd|Lane|Ln|Dr|Drive)\\b\", re.I)\nIPADDR = re.compile(r\"\\b(?:(?:\\d{1,3}\\.){3}\\d{1,3})\\b\")\n\nMASKED_TOKENS = re.compile(r\"\\*\\*\\*|\\[redacted\\]|\\[masked\\]\", re.I)\n\ndef main():\n    examples_path = os.environ.get(\"EXAMPLES_PATH\", \"\").strip()\n    fail_on_any = os.environ.get(\"FAIL_ON_ANY\", \"true\").lower() == \"true\"\n\n    if not examples_path:\n        print(json.dumps({\"ok\": False, \"error\": \"EXAMPLES_PATH not set\"}))\n        sys.exit(2)\n\n    patterns = {\n        \"email\": EMAIL,\n        \"phone\": PHONE,\n        \"credit_card\": CCARD,\n        \"government_id\": GOVID,\n        \"street_address\": ADDRESS,\n        \"ip_address\": IPADDR,\n    }\n\n    findings = []\n    total_lines = 0\n\n    for fp in find_files(examples_path):\n        with open(fp, \"r\", errors=\"ignore\") as f:\n            for ln, line in enumerate(f, 1):\n                total_lines += 1\n                if MASKED_TOKENS.search(line):\n                    continue\n                for tag, rx in patterns.items():\n                    for m in rx.finditer(line):\n                        findings.append({\"file\": fp, \"line\": ln, \"tag\": tag, \"match\": m.group(0)[:64]})\n\n    ok = len(findings) == 0\n    result = {\"ok\": ok, \"total_lines\": total_lines, \"violations\": findings}\n\n    print(json.dumps(result, indent=2))\n    sys.exit(0 if (ok or not fail_on_any) else 1)\n\nif __name__ == \"__main__\":\n    main()",
+          "entrypoint": "python3",
+          "args": [
+            "scripts/support/pii_smoke_check.py"
+          ],
           "env": {
             "EXAMPLES_PATH": "artifacts/examples/support_agent/examples.txt",
             "FAIL_ON_ANY": "true"
           },
-          "success_message": "No PII found in examples.",
-          "failure_message": "PII detected in examples. Redact or mask before shipping."
+          "timeout_ms": 5000,
+          "memory_mb": 128,
+          "net": false,
+          "fs_mode": "ro"
         }
       ],
       "provenance": {
@@ -5800,8 +5805,8 @@ Prism.languages.js = Prism.languages.javascript;
         "org": "Truth Capsules Demo",
         "license": "MIT",
         "source_url": "https://example.com/truth-capsules/support",
-        "created": "2025-11-10T18:12:37Z",
-        "updated": "2025-11-10T18:12:37Z",
+        "created": "2025-11-10T19:05:00Z",
+        "updated": "2025-11-10T19:05:00Z",
         "review": {
           "status": "draft",
           "reviewers": [],
@@ -5819,59 +5824,29 @@ Prism.languages.js = Prism.languages.javascript;
         "conversation",
         "support"
       ],
-      "dependencies": [],
-      "incompatible_with": [],
       "security": {
         "sensitivity": "medium",
         "notes": ""
       },
       "_file": "./capsules/support/support.pii_redaction_smoke_v1.yaml",
-      "_raw": "id: support.pii_redaction_smoke_v1\nversion: 1.0.0\ndomain: support\ntitle: PII Redaction Smoke Test\nstatement: Ensure bundled examples contain no plaintext PII.\nwitnesses:\n  - name: no_plaintext_pii_in_examples\n    language: python\n    code: |-\n      import os, sys, re, json, glob\n\n      def find_files(path):\n          if os.path.isdir(path):\n              for ext in (\"*.txt\", \"*.md\", \"*.log\"):\n                  for p in glob.glob(os.path.join(path, ext)):\n                      yield p\n          else:\n              if os.path.exists(path):\n                  yield path\n\n      EMAIL = re.compile(r\"[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\", re.I)\n      PHONE = re.compile(r\"(?:\\+?\\d{1,3}[\\s\\-\\.]?)?(?:\\(?\\d{3}\\)?[\\s\\-\\.]?\\d{3}[\\s\\-\\.]?\\d{4})\")\n      CCARD = re.compile(r\"\\b(?:\\d[ -]*?){13,19}\\b\")\n      GOVID = re.compile(r\"\\b(?:SSN|NIN|SIN|CPF|DNI|Aadhar)\\b\", re.I)\n      ADDRESS = re.compile(r\"\\b\\d{1,5}\\s+\\w+\\s+(?:St|Street|Ave|Avenue|Rd|Road|Blvd|Lane|Ln|Dr|Drive)\\b\", re.I)\n      IPADDR = re.compile(r\"\\b(?:(?:\\d{1,3}\\.){3}\\d{1,3})\\b\")\n\n      MASKED_TOKENS = re.compile(r\"\\*\\*\\*|\\[redacted\\]|\\[masked\\]\", re.I)\n\n      def main():\n          examples_path = os.environ.get(\"EXAMPLES_PATH\", \"\").strip()\n          fail_on_any = os.environ.get(\"FAIL_ON_ANY\", \"true\").lower() == \"true\"\n\n          if not examples_path:\n              print(json.dumps({\"ok\": False, \"error\": \"EXAMPLES_PATH not set\"}))\n              sys.exit(2)\n\n          patterns = {\n              \"email\": EMAIL,\n              \"phone\": PHONE,\n              \"credit_card\": CCARD,\n              \"government_id\": GOVID,\n              \"street_address\": ADDRESS,\n              \"ip_address\": IPADDR,\n          }\n\n          findings = []\n          total_lines = 0\n\n          for fp in find_files(examples_path):\n              with open(fp, \"r\", errors=\"ignore\") as f:\n                  for ln, line in enumerate(f, 1):\n                      total_lines += 1\n                      if MASKED_TOKENS.search(line):\n                          continue\n                      for tag, rx in patterns.items():\n                          for m in rx.finditer(line):\n                              findings.append({\"file\": fp, \"line\": ln, \"tag\": tag, \"match\": m.group(0)[:64]})\n\n          ok = len(findings) == 0\n          result = {\"ok\": ok, \"total_lines\": total_lines, \"violations\": findings}\n\n          print(json.dumps(result, indent=2))\n          sys.exit(0 if (ok or not fail_on_any) else 1)\n\n      if __name__ == \"__main__\":\n          main()\n    env:\n      EXAMPLES_PATH: artifacts/examples/support_agent/examples.txt\n      FAIL_ON_ANY: \"true\"\n    success_message: \"No PII found in examples.\"\n    failure_message: \"PII detected in examples. Redact or mask before shipping.\"\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: medium\n  notes: ''\n",
+      "_raw": "id: support.pii_redaction_smoke_v1\nversion: 1.1.0\ndomain: support\ntitle: PII Redaction Smoke Test\nstatement: |-\n  Ensure bundled examples contain no plaintext PII. This check scans example transcripts\n  (default: artifacts/examples/support_agent/examples.txt) for emails, phone numbers,\n  credit card patterns, government ID keywords, street addresses, and IP addresses.\nwitnesses:\n  - name: no_plaintext_pii_in_examples\n    language: python\n    entrypoint: python3\n    args:\n      - scripts/support/pii_smoke_check.py\n    env:\n      EXAMPLES_PATH: artifacts/examples/support_agent/examples.txt\n      FAIL_ON_ANY: \"true\"\n    timeout_ms: 5000\n    memory_mb: 128\n    net: false\n    fs_mode: ro\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T19:05:00Z'\n  updated: '2025-11-10T19:05:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\nsecurity:\n  sensitivity: medium\n  notes: \"\"\n",
       "posture": "witnessed",
       "_witness_count": 1
     },
     "support.billing_basics_v1": {
       "id": "support.billing_basics_v1",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "domain": "support",
       "title": "Billing Playbooks (SaaS)",
-      "statement": "Canonical flows for common billing issues without exposing PII or promising credits.",
-      "billing": {
-        "playbooks": [
-          {
-            "name": "Get invoice PDF",
-            "steps": [
-              "Ask for masked account identifier (e.g., ticket or org slug).",
-              "Guide to: Settings → Billing → Invoices → 'Download PDF'.",
-              "If missing, create ticket for Billing with masked reference."
-            ]
-          },
-          {
-            "name": "Refund request (within policy)",
-            "steps": [
-              "Acknowledge and summarize the reason.",
-              "Link refunds policy (exact section) and timeframe.",
-              "Create Billing ticket; do not promise outcome; share reference ID."
-            ]
-          },
-          {
-            "name": "Plan downgrade / cancel",
-            "steps": [
-              "Confirm effective date and proration link.",
-              "Guide to: Settings → Plan → 'Change plan'.",
-              "If blocked by contract, route to Billing Supervisor."
-            ]
-          }
-        ]
-      },
+      "statement": "Canonical flows for common billing issues without exposing PII or promising credits.\n\nPlaybook: Get invoice PDF\n  1) Ask for masked account identifier (e.g., ticket or org slug).\n  2) Guide to: Settings → Billing → Invoices → \"Download PDF\".\n  3) If missing, create ticket for Billing with masked reference.\n\nPlaybook: Refund request (within policy)\n  1) Acknowledge and summarize the reason.\n  2) Link refunds policy (exact section) and timeframe.\n  3) Create Billing ticket; do not promise outcome; share reference ID.\n\nPlaybook: Plan downgrade / cancel\n  1) Confirm effective date and proration link.\n  2) Guide to: Settings → Plan → \"Change plan\".\n  3) If blocked by contract, route to Billing Supervisor.",
       "provenance": {
         "schema": "provenance.v1",
         "author": "John Macgregor",
         "org": "Truth Capsules Demo",
         "license": "MIT",
         "source_url": "https://example.com/truth-capsules/support",
-        "created": "2025-11-10T18:12:37Z",
-        "updated": "2025-11-10T18:12:37Z",
+        "created": "2025-11-10T19:05:00Z",
+        "updated": "2025-11-10T19:05:00Z",
         "review": {
           "status": "draft",
           "reviewers": [],
@@ -5889,44 +5864,29 @@ Prism.languages.js = Prism.languages.javascript;
         "conversation",
         "support"
       ],
-      "dependencies": [],
-      "incompatible_with": [],
       "security": {
         "sensitivity": "medium",
         "notes": ""
       },
       "_file": "./capsules/support/support.billing_basics_v1.yaml",
-      "_raw": "id: support.billing_basics_v1\nversion: 1.0.0\ndomain: support\ntitle: Billing Playbooks (SaaS)\nstatement: Canonical flows for common billing issues without exposing PII or promising credits.\nbilling:\n  playbooks:\n    - name: \"Get invoice PDF\"\n      steps:\n        - \"Ask for masked account identifier (e.g., ticket or org slug).\"\n        - \"Guide to: Settings → Billing → Invoices → 'Download PDF'.\"\n        - \"If missing, create ticket for Billing with masked reference.\"\n    - name: \"Refund request (within policy)\"\n      steps:\n        - \"Acknowledge and summarize the reason.\"\n        - \"Link refunds policy (exact section) and timeframe.\"\n        - \"Create Billing ticket; do not promise outcome; share reference ID.\"\n    - name: \"Plan downgrade / cancel\"\n      steps:\n        - \"Confirm effective date and proration link.\"\n        - \"Guide to: Settings → Plan → 'Change plan'.\"\n        - \"If blocked by contract, route to Billing Supervisor.\"\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: medium\n  notes: ''\n",
+      "_raw": "id: support.billing_basics_v1\nversion: 1.1.0\ndomain: support\ntitle: Billing Playbooks (SaaS)\nstatement: |-\n  Canonical flows for common billing issues without exposing PII or promising credits.\n\n  Playbook: Get invoice PDF\n    1) Ask for masked account identifier (e.g., ticket or org slug).\n    2) Guide to: Settings → Billing → Invoices → \"Download PDF\".\n    3) If missing, create ticket for Billing with masked reference.\n\n  Playbook: Refund request (within policy)\n    1) Acknowledge and summarize the reason.\n    2) Link refunds policy (exact section) and timeframe.\n    3) Create Billing ticket; do not promise outcome; share reference ID.\n\n  Playbook: Plan downgrade / cancel\n    1) Confirm effective date and proration link.\n    2) Guide to: Settings → Plan → \"Change plan\".\n    3) If blocked by contract, route to Billing Supervisor.\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T19:05:00Z'\n  updated: '2025-11-10T19:05:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\nsecurity:\n  sensitivity: medium\n  notes: \"\"\n",
       "posture": "informational",
       "_witness_count": 0
     },
     "support.knowledge_view_projection_v1": {
       "id": "support.knowledge_view_projection_v1",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "domain": "support",
       "title": "Knowledge View & Citation Policy",
-      "statement": "Cite official docs with exact anchors; avoid paraphrasing policy-sensitive pages.",
-      "knowledge": {
-        "sources_policy": "Prefer official docs, status pages, and signed announcements. Avoid blog posts for policy.",
-        "citation_rules": [
-          "Link the exact doc section and version (e.g., /docs/billing#refunds v3.1).",
-          "Summarize in one sentence, then provide the link; do not copy large passages.",
-          "If doc is gated, describe the path (Settings → Billing → Invoices).",
-          "For outages, always include {status_url} and the last update time."
-        ],
-        "link_policy": [
-          "Never link to internal-only resources in public responses.",
-          "If a page moves, provide both old and new paths during the transition."
-        ]
-      },
+      "statement": "Cite official docs with exact anchors; avoid paraphrasing policy-sensitive pages.\n\nSources policy:\n  • Prefer official docs, status pages, and signed announcements. Avoid blog posts for policy.\n\nCitation rules:\n  • Link the exact doc section and version (e.g., /docs/billing#refunds v3.1).\n  • Summarize in one sentence, then provide the link; do not copy large passages.\n  • If doc is gated, describe the path (Settings → Billing → Invoices).\n  • For outages, always include {status_url} and the last update time.\n\nLink policy:\n  • Never link to internal-only resources in public responses.\n  • If a page moves, provide both old and new paths during the transition.",
       "provenance": {
         "schema": "provenance.v1",
         "author": "John Macgregor",
         "org": "Truth Capsules Demo",
         "license": "MIT",
         "source_url": "https://example.com/truth-capsules/support",
-        "created": "2025-11-10T18:12:37Z",
-        "updated": "2025-11-10T18:12:37Z",
+        "created": "2025-11-10T19:05:00Z",
+        "updated": "2025-11-10T19:05:00Z",
         "review": {
           "status": "draft",
           "reviewers": [],
@@ -5944,41 +5904,29 @@ Prism.languages.js = Prism.languages.javascript;
         "conversation",
         "support"
       ],
-      "dependencies": [],
-      "incompatible_with": [],
       "security": {
         "sensitivity": "medium",
         "notes": ""
       },
       "_file": "./capsules/support/support.knowledge_view_projection_v1.yaml",
-      "_raw": "id: support.knowledge_view_projection_v1\nversion: 1.0.0\ndomain: support\ntitle: Knowledge View & Citation Policy\nstatement: Cite official docs with exact anchors; avoid paraphrasing policy-sensitive pages.\nknowledge:\n  sources_policy: \"Prefer official docs, status pages, and signed announcements. Avoid blog posts for policy.\"\n  citation_rules:\n    - \"Link the exact doc section and version (e.g., /docs/billing#refunds v3.1).\"\n    - \"Summarize in one sentence, then provide the link; do not copy large passages.\"\n    - \"If doc is gated, describe the path (Settings → Billing → Invoices).\"\n    - \"For outages, always include {status_url} and the last update time.\"\n  link_policy:\n    - \"Never link to internal-only resources in public responses.\"\n    - \"If a page moves, provide both old and new paths during the transition.\"\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: medium\n  notes: ''\n",
+      "_raw": "id: support.knowledge_view_projection_v1\nversion: 1.1.0\ndomain: support\ntitle: Knowledge View & Citation Policy\nstatement: |-\n  Cite official docs with exact anchors; avoid paraphrasing policy-sensitive pages.\n\n  Sources policy:\n    • Prefer official docs, status pages, and signed announcements. Avoid blog posts for policy.\n\n  Citation rules:\n    • Link the exact doc section and version (e.g., /docs/billing#refunds v3.1).\n    • Summarize in one sentence, then provide the link; do not copy large passages.\n    • If doc is gated, describe the path (Settings → Billing → Invoices).\n    • For outages, always include {status_url} and the last update time.\n\n  Link policy:\n    • Never link to internal-only resources in public responses.\n    • If a page moves, provide both old and new paths during the transition.\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T19:05:00Z'\n  updated: '2025-11-10T19:05:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\nsecurity:\n  sensitivity: medium\n  notes: \"\"\n",
       "posture": "informational",
       "_witness_count": 0
     },
     "support.escalation_matrix_v1": {
       "id": "support.escalation_matrix_v1",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "domain": "support",
       "title": "Escalation Matrix & Handoffs",
-      "statement": "Route high-risk or restricted requests to the correct queue with a crisp customer explanation.",
-      "escalation": {
-        "matrix": "+------------------------+---------------------+----------------------+-------------------------+\n| Scenario               | Tier / Owner        | SLA                  | Customer-Facing Message |\n+------------------------+---------------------+----------------------+-------------------------+\n| Outage / Sev-1         | On-call SRE         | 15m ack / hourly upd | \"We're experiencing an outage. Status: {status_url}\" |\n| Billing dispute >$500  | Billing Specialist  | 1 business day       | \"I've opened a ticket with Billing. Ref: {ticket_id}\" |\n| Refund exceptions      | Billing Supervisor  | 2 business days      | \"I'll escalate your refund request for review.\"        |\n| Security/Privacy       | Security Team       | 1 business day       | \"I've escalated to security for review. Ref: {ticket}\" |\n| Data deletion (GDPR)   | Data Protection Off | 72 hours             | \"Your deletion request is in progress. Ref: {ticket}\" |\n+------------------------+---------------------+----------------------+-------------------------+\n",
-        "rules": [
-          "If severity >= Sev-2 or involves legal/privacy, escalate immediately and provide a reference ID.",
-          "Never modify or promise billing credits; create a ticket and route to Billing.",
-          "Provide the customer with what will happen next and a timeframe.",
-          "Record all escalations with ticket references; avoid free-form DMs.",
-          "Do not request or store PII; use masked references only."
-        ]
-      },
+      "statement": "Route high-risk or restricted requests to the correct queue with a crisp customer explanation.\n\nMatrix (placeholders in braces are filled by your system):\n  +------------------------+---------------------+----------------------+---------------------------+\n  | Scenario               | Tier / Owner        | SLA                  | Customer-Facing Message   |\n  +------------------------+---------------------+----------------------+---------------------------+\n  | Outage / Sev-1         | On-call SRE         | 15m ack / hourly upd | \"We're experiencing an    |\n  |                        |                     |                      | outage. Status: {status_url}\"    |\n  | Billing dispute >$500  | Billing Specialist  | 1 business day       | \"I've opened a ticket     |\n  |                        |                     |                      | with Billing. Ref: {ticket_id}\"  |\n  | Refund exceptions      | Billing Supervisor  | 2 business days      | \"I'll escalate your refund|\n  |                        |                     |                      | request for review.\"      |\n  | Security/Privacy       | Security Team       | 1 business day       | \"Escalated to security.   |\n  |                        |                     |                      | Ref: {ticket}\"          |\n  | Data deletion (GDPR)   | Data Protection Off | 72 hours             | \"Deletion in progress.    |\n  |                        |                     |                      | Ref: {ticket}\"          |\n  +------------------------+---------------------+----------------------+---------------------------+\n\nRules:\n  • If severity ≥ Sev-2 or involves legal/privacy, escalate immediately and provide a reference ID.\n  • Never modify or promise billing credits; create a ticket and route to Billing.\n  • Provide the customer with what will happen next and a timeframe.\n  • Record all escalations with ticket references; avoid free-form DMs.\n  • Do not request or store PII; use masked references only.",
       "provenance": {
         "schema": "provenance.v1",
         "author": "John Macgregor",
         "org": "Truth Capsules Demo",
         "license": "MIT",
         "source_url": "https://example.com/truth-capsules/support",
-        "created": "2025-11-10T18:12:37Z",
-        "updated": "2025-11-10T18:12:37Z",
+        "created": "2025-11-10T19:05:00Z",
+        "updated": "2025-11-10T19:05:00Z",
         "review": {
           "status": "draft",
           "reviewers": [],
@@ -5996,37 +5944,38 @@ Prism.languages.js = Prism.languages.javascript;
         "conversation",
         "support"
       ],
-      "dependencies": [],
-      "incompatible_with": [],
       "security": {
         "sensitivity": "medium",
         "notes": ""
       },
       "_file": "./capsules/support/support.escalation_matrix_v1.yaml",
-      "_raw": "id: support.escalation_matrix_v1\nversion: 1.0.0\ndomain: support\ntitle: Escalation Matrix & Handoffs\nstatement: Route high-risk or restricted requests to the correct queue with a crisp customer explanation.\nescalation:\n  matrix: |\n    +------------------------+---------------------+----------------------+-------------------------+\n    | Scenario               | Tier / Owner        | SLA                  | Customer-Facing Message |\n    +------------------------+---------------------+----------------------+-------------------------+\n    | Outage / Sev-1         | On-call SRE         | 15m ack / hourly upd | \"We're experiencing an outage. Status: {status_url}\" |\n    | Billing dispute >$500  | Billing Specialist  | 1 business day       | \"I've opened a ticket with Billing. Ref: {ticket_id}\" |\n    | Refund exceptions      | Billing Supervisor  | 2 business days      | \"I'll escalate your refund request for review.\"        |\n    | Security/Privacy       | Security Team       | 1 business day       | \"I've escalated to security for review. Ref: {ticket}\" |\n    | Data deletion (GDPR)   | Data Protection Off | 72 hours             | \"Your deletion request is in progress. Ref: {ticket}\" |\n    +------------------------+---------------------+----------------------+-------------------------+\n  rules:\n    - If severity >= Sev-2 or involves legal/privacy, escalate immediately and provide a reference ID.\n    - Never modify or promise billing credits; create a ticket and route to Billing.\n    - Provide the customer with what will happen next and a timeframe.\n    - Record all escalations with ticket references; avoid free-form DMs.\n    - Do not request or store PII; use masked references only.\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: medium\n  notes: ''\n",
+      "_raw": "id: support.escalation_matrix_v1\nversion: 1.1.0\ndomain: support\ntitle: Escalation Matrix & Handoffs\nstatement: |-\n  Route high-risk or restricted requests to the correct queue with a crisp customer explanation.\n\n  Matrix (placeholders in braces are filled by your system):\n    +------------------------+---------------------+----------------------+---------------------------+\n    | Scenario               | Tier / Owner        | SLA                  | Customer-Facing Message   |\n    +------------------------+---------------------+----------------------+---------------------------+\n    | Outage / Sev-1         | On-call SRE         | 15m ack / hourly upd | \"We're experiencing an    |\n    |                        |                     |                      | outage. Status: {status_url}\"    |\n    | Billing dispute >$500  | Billing Specialist  | 1 business day       | \"I've opened a ticket     |\n    |                        |                     |                      | with Billing. Ref: {ticket_id}\"  |\n    | Refund exceptions      | Billing Supervisor  | 2 business days      | \"I'll escalate your refund|\n    |                        |                     |                      | request for review.\"      |\n    | Security/Privacy       | Security Team       | 1 business day       | \"Escalated to security.   |\n    |                        |                     |                      | Ref: {ticket}\"          |\n    | Data deletion (GDPR)   | Data Protection Off | 72 hours             | \"Deletion in progress.    |\n    |                        |                     |                      | Ref: {ticket}\"          |\n    +------------------------+---------------------+----------------------+---------------------------+\n\n  Rules:\n    • If severity ≥ Sev-2 or involves legal/privacy, escalate immediately and provide a reference ID.\n    • Never modify or promise billing credits; create a ticket and route to Billing.\n    • Provide the customer with what will happen next and a timeframe.\n    • Record all escalations with ticket references; avoid free-form DMs.\n    • Do not request or store PII; use masked references only.\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T19:05:00Z'\n  updated: '2025-11-10T19:05:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\nsecurity:\n  sensitivity: medium\n  notes: \"\"\n",
       "posture": "informational",
       "_witness_count": 0
     },
     "support.intent_router_sanity_v1": {
       "id": "support.intent_router_sanity_v1",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "domain": "support",
       "title": "Intent Router Sanity Check",
-      "statement": "Validate that baseline rules classify common support intents correctly.",
-      "assumptions": null,
-      "pedagogy": null,
+      "statement": "Validate that baseline rules classify common support intents correctly. Defaults read\nfixtures under artifacts/examples/support_agent/. Accuracy must meet or exceed 0.8.",
       "witnesses": [
         {
           "name": "routes_top_intents_correctly",
           "language": "python",
-          "code": "import os, sys, json, re\n\ndef load_json(path):\n    with open(path, \"r\") as f:\n        return json.load(f)\n\ndef classify(text, rules):\n    text_l = text.lower()\n    for intent, pats in rules.items():\n        for pat in pats:\n            if re.search(pat, text_l):\n                return intent\n    return \"unknown\"\n\ndef main():\n    intents_path = os.environ.get(\"INTENTS_JSON\", \"\").strip()\n    rules_path = os.environ.get(\"RULES_JSON\", \"\").strip()\n    acc_threshold = float(os.environ.get(\"ACC_THRESHOLD\", \"0.8\"))\n\n    if not intents_path or not rules_path:\n        print(json.dumps({\"ok\": False, \"error\": \"INTENTS_JSON or RULES_JSON not set\"}))\n        sys.exit(2)\n\n    intents = load_json(intents_path)  # list of {text, expected}\n    rules = load_json(rules_path)      # {intent: [regex,...]}\n\n    total = len(intents)\n    correct = 0\n    details = []\n\n    for item in intents:\n        text = item[\"text\"]\n        expected = item[\"expected\"]\n        pred = classify(text, rules)\n        correct += 1 if pred == expected else 0\n        details.append({\"text\": text, \"expected\": expected, \"pred\": pred})\n\n    acc = (correct / total) if total else 0.0\n    ok = acc >= acc_threshold\n\n    print(json.dumps({\"ok\": ok, \"accuracy\": acc, \"threshold\": acc_threshold, \"total\": total, \"correct\": correct, \"details\": details}, indent=2))\n    sys.exit(0 if ok else 1)\n\nif __name__ == \"__main__\":\n    main()",
+          "entrypoint": "python3",
+          "args": [
+            "scripts/support/intent_router_check.py"
+          ],
           "env": {
             "INTENTS_JSON": "artifacts/examples/support_agent/intents.json",
             "RULES_JSON": "artifacts/examples/support_agent/router_rules.json",
             "ACC_THRESHOLD": "0.8"
           },
-          "success_message": "Intent router accuracy meets threshold.",
-          "failure_message": "Intent router below threshold — refine rules or examples."
+          "timeout_ms": 5000,
+          "memory_mb": 128,
+          "net": false,
+          "fs_mode": "ro"
         }
       ],
       "provenance": {
@@ -6035,8 +5984,8 @@ Prism.languages.js = Prism.languages.javascript;
         "org": "Truth Capsules Demo",
         "license": "MIT",
         "source_url": "https://example.com/truth-capsules/support",
-        "created": "2025-11-10T18:12:37Z",
-        "updated": "2025-11-10T18:12:37Z",
+        "created": "2025-11-10T19:05:00Z",
+        "updated": "2025-11-10T19:05:00Z",
         "review": {
           "status": "draft",
           "reviewers": [],
@@ -6054,41 +6003,29 @@ Prism.languages.js = Prism.languages.javascript;
         "conversation",
         "support"
       ],
-      "dependencies": [],
-      "incompatible_with": [],
       "security": {
         "sensitivity": "medium",
         "notes": ""
       },
       "_file": "./capsules/support/support.intent_router_sanity_v1.yaml",
-      "_raw": "id: support.intent_router_sanity_v1\nversion: 1.0.0\ndomain: support\ntitle: Intent Router Sanity Check\nstatement: Validate that baseline rules classify common support intents correctly.\nassumptions:\npedagogy:\nwitnesses:\n  - name: routes_top_intents_correctly\n    language: python\n    code: |-\n      import os, sys, json, re\n\n      def load_json(path):\n          with open(path, \"r\") as f:\n              return json.load(f)\n\n      def classify(text, rules):\n          text_l = text.lower()\n          for intent, pats in rules.items():\n              for pat in pats:\n                  if re.search(pat, text_l):\n                      return intent\n          return \"unknown\"\n\n      def main():\n          intents_path = os.environ.get(\"INTENTS_JSON\", \"\").strip()\n          rules_path = os.environ.get(\"RULES_JSON\", \"\").strip()\n          acc_threshold = float(os.environ.get(\"ACC_THRESHOLD\", \"0.8\"))\n\n          if not intents_path or not rules_path:\n              print(json.dumps({\"ok\": False, \"error\": \"INTENTS_JSON or RULES_JSON not set\"}))\n              sys.exit(2)\n\n          intents = load_json(intents_path)  # list of {text, expected}\n          rules = load_json(rules_path)      # {intent: [regex,...]}\n\n          total = len(intents)\n          correct = 0\n          details = []\n\n          for item in intents:\n              text = item[\"text\"]\n              expected = item[\"expected\"]\n              pred = classify(text, rules)\n              correct += 1 if pred == expected else 0\n              details.append({\"text\": text, \"expected\": expected, \"pred\": pred})\n\n          acc = (correct / total) if total else 0.0\n          ok = acc >= acc_threshold\n\n          print(json.dumps({\"ok\": ok, \"accuracy\": acc, \"threshold\": acc_threshold, \"total\": total, \"correct\": correct, \"details\": details}, indent=2))\n          sys.exit(0 if ok else 1)\n\n      if __name__ == \"__main__\":\n          main()\n\n    env:\n      INTENTS_JSON: artifacts/examples/support_agent/intents.json\n      RULES_JSON: artifacts/examples/support_agent/router_rules.json\n      ACC_THRESHOLD: \"0.8\"\n    success_message: \"Intent router accuracy meets threshold.\"\n    failure_message: \"Intent router below threshold — refine rules or examples.\"\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: medium\n  notes: ''\n",
+      "_raw": "id: support.intent_router_sanity_v1\nversion: 1.1.0\ndomain: support\ntitle: Intent Router Sanity Check\nstatement: |-\n  Validate that baseline rules classify common support intents correctly. Defaults read\n  fixtures under artifacts/examples/support_agent/. Accuracy must meet or exceed 0.8.\nwitnesses:\n  - name: routes_top_intents_correctly\n    language: python\n    entrypoint: python3\n    args:\n      - scripts/support/intent_router_check.py\n    env:\n      INTENTS_JSON: artifacts/examples/support_agent/intents.json\n      RULES_JSON: artifacts/examples/support_agent/router_rules.json\n      ACC_THRESHOLD: \"0.8\"\n    timeout_ms: 5000\n    memory_mb: 128\n    net: false\n    fs_mode: ro\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T19:05:00Z'\n  updated: '2025-11-10T19:05:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\nsecurity:\n  sensitivity: medium\n  notes: \"\"\n",
       "posture": "witnessed",
       "_witness_count": 1
     },
     "support.tone_style_guide_v1": {
       "id": "support.tone_style_guide_v1",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "domain": "support",
       "title": "Tone & Style Guide (Public-Facing)",
-      "statement": "Be empathetic, concise, specific, and action-oriented; never echo or store PII.",
-      "tone": {
-        "rules": [
-          "Lead with empathy and a one-sentence summary of the customer’s goal.",
-          "Offer one actionable next step; avoid overwhelming lists.",
-          "Prefer links to official docs; include exact anchor and version if relevant.",
-          "Never guess order/account details; ask for the minimal non-sensitive clarifier.",
-          "Use plain language; no internal acronyms or engineering jargon.",
-          "Avoid absolute promises; reference policy and expected timeframes."
-        ]
-      },
+      "statement": "Be empathetic, concise, specific, and action-oriented; never echo or store PII.\nRules:\n  • Lead with empathy and a one-sentence summary of the customer’s goal.\n  • Offer one actionable next step; avoid overwhelming lists.\n  • Prefer links to official docs; include exact anchor and version if relevant.\n  • Never guess order/account details; ask for the minimal non-sensitive clarifier.\n  • Use plain language; avoid internal acronyms or engineering jargon.\n  • Avoid absolute promises; reference policy and expected timeframes.",
       "provenance": {
         "schema": "provenance.v1",
         "author": "John Macgregor",
         "org": "Truth Capsules Demo",
         "license": "MIT",
         "source_url": "https://example.com/truth-capsules/support",
-        "created": "2025-11-10T18:12:37Z",
-        "updated": "2025-11-10T18:12:37Z",
+        "created": "2025-11-10T19:05:00Z",
+        "updated": "2025-11-10T19:05:00Z",
         "review": {
           "status": "draft",
           "reviewers": [],
@@ -6106,47 +6043,29 @@ Prism.languages.js = Prism.languages.javascript;
         "conversation",
         "support"
       ],
-      "dependencies": [],
-      "incompatible_with": [],
       "security": {
         "sensitivity": "medium",
         "notes": ""
       },
       "_file": "./capsules/support/support.tone_style_guide_v1.yaml",
-      "_raw": "id: support.tone_style_guide_v1\nversion: 1.0.0\ndomain: support\ntitle: Tone & Style Guide (Public-Facing)\nstatement: Be empathetic, concise, specific, and action-oriented; never echo or store PII.\ntone:\n  rules:\n    - Lead with empathy and a one-sentence summary of the customer’s goal.\n    - Offer one actionable next step; avoid overwhelming lists.\n    - Prefer links to official docs; include exact anchor and version if relevant.\n    - Never guess order/account details; ask for the minimal non-sensitive clarifier.\n    - Use plain language; no internal acronyms or engineering jargon.\n    - Avoid absolute promises; reference policy and expected timeframes.\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: medium\n  notes: ''\n",
+      "_raw": "id: support.tone_style_guide_v1\nversion: 1.1.0\ndomain: support\ntitle: Tone & Style Guide (Public-Facing)\nstatement: |-\n  Be empathetic, concise, specific, and action-oriented; never echo or store PII.\n  Rules:\n    • Lead with empathy and a one-sentence summary of the customer’s goal.\n    • Offer one actionable next step; avoid overwhelming lists.\n    • Prefer links to official docs; include exact anchor and version if relevant.\n    • Never guess order/account details; ask for the minimal non-sensitive clarifier.\n    • Use plain language; avoid internal acronyms or engineering jargon.\n    • Avoid absolute promises; reference policy and expected timeframes.\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T19:05:00Z'\n  updated: '2025-11-10T19:05:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\nsecurity:\n  sensitivity: medium\n  notes: \"\"\n",
       "posture": "informational",
       "_witness_count": 0
     },
     "support.legal_privacy_rules_v1": {
       "id": "support.legal_privacy_rules_v1",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "domain": "support",
       "title": "Legal & Privacy Rules (Public-Facing)",
-      "statement": "Prevent PII leakage and ensure compliant disclosures with canned disclaimers.",
-      "legal": {
-        "pii_classes": [
-          "email",
-          "phone",
-          "government_id",
-          "credit_card",
-          "street_address",
-          "ip_address"
-        ],
-        "storage_policy": "Do not store PII in tickets or chat logs. Use masked IDs or internal references.",
-        "disclaimers": [
-          "For your security, please avoid sharing personal data (like email, phone, or payment info) here.",
-          "We can continue after I’ve created a secure ticket; I’ll share a masked reference ID.",
-          "I’m not able to provide legal or medical advice. I can link official resources instead."
-        ]
-      },
+      "statement": "Prevent PII leakage and ensure compliant disclosures.\n\nPII classes to avoid in public channels:\n  • email, phone, government_id, credit_card, street_address, ip_address\n\nStorage policy:\n  • Do not store PII in tickets or chat logs. Use masked IDs or internal references.\n\nCustomer-facing disclaimers (choose 1 as needed):\n  • \"For your security, please avoid sharing personal data (like email, phone, or payment info) here.\"\n  • \"We can continue after I’ve created a secure ticket; I’ll share a masked reference ID.\"\n  • \"I’m not able to provide legal or medical advice. I can link official resources instead.\"",
       "provenance": {
         "schema": "provenance.v1",
         "author": "John Macgregor",
         "org": "Truth Capsules Demo",
         "license": "MIT",
         "source_url": "https://example.com/truth-capsules/support",
-        "created": "2025-11-10T18:12:37Z",
-        "updated": "2025-11-10T18:12:37Z",
+        "created": "2025-11-10T19:05:00Z",
+        "updated": "2025-11-10T19:05:00Z",
         "review": {
           "status": "draft",
           "reviewers": [],
@@ -6164,14 +6083,12 @@ Prism.languages.js = Prism.languages.javascript;
         "conversation",
         "support"
       ],
-      "dependencies": [],
-      "incompatible_with": [],
       "security": {
         "sensitivity": "medium",
         "notes": ""
       },
       "_file": "./capsules/support/support.legal_privacy_rules_v1.yaml",
-      "_raw": "id: support.legal_privacy_rules_v1\nversion: 1.0.0\ndomain: support\ntitle: Legal & Privacy Rules (Public-Facing)\nstatement: Prevent PII leakage and ensure compliant disclosures with canned disclaimers.\nlegal:\n  pii_classes:\n    - email\n    - phone\n    - government_id\n    - credit_card\n    - street_address\n    - ip_address\n  storage_policy: \"Do not store PII in tickets or chat logs. Use masked IDs or internal references.\"\n  disclaimers:\n    - \"For your security, please avoid sharing personal data (like email, phone, or payment info) here.\"\n    - \"We can continue after I’ve created a secure ticket; I’ll share a masked reference ID.\"\n    - \"I’m not able to provide legal or medical advice. I can link official resources instead.\"\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: medium\n  notes: ''\n",
+      "_raw": "id: support.legal_privacy_rules_v1\nversion: 1.1.0\ndomain: support\ntitle: Legal & Privacy Rules (Public-Facing)\nstatement: |-\n  Prevent PII leakage and ensure compliant disclosures.\n\n  PII classes to avoid in public channels:\n    • email, phone, government_id, credit_card, street_address, ip_address\n\n  Storage policy:\n    • Do not store PII in tickets or chat logs. Use masked IDs or internal references.\n\n  Customer-facing disclaimers (choose 1 as needed):\n    • \"For your security, please avoid sharing personal data (like email, phone, or payment info) here.\"\n    • \"We can continue after I’ve created a secure ticket; I’ll share a masked reference ID.\"\n    • \"I’m not able to provide legal or medical advice. I can link official resources instead.\"\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T19:05:00Z'\n  updated: '2025-11-10T19:05:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\nsecurity:\n  sensitivity: medium\n  notes: \"\"\n",
       "posture": "informational",
       "_witness_count": 0
     },
@@ -6387,19 +6304,19 @@ Prism.languages.js = Prism.languages.javascript;
     },
     "support_agent_v1_bundle": {
       "name": "support_agent_v1_bundle",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "description": "Public-facing Support Copilot: tone/style, escalation, privacy, knowledge citation, and billing playbooks.",
       "applies_to": [
         "conversation",
         "support"
       ],
       "capsules": [
-        "support.tone_style_guide_v1",
-        "support.escalation_matrix_v1",
         "support.legal_privacy_rules_v1",
+        "support.pii_redaction_smoke_v1",
+        "support.escalation_matrix_v1",
+        "support.tone_style_guide_v1",
         "support.knowledge_view_projection_v1",
         "support.billing_basics_v1",
-        "support.pii_redaction_smoke_v1",
         "support.intent_router_sanity_v1"
       ],
       "excludes": [],
@@ -6421,9 +6338,9 @@ Prism.languages.js = Prism.languages.javascript;
       "tags": [
         "support",
         "kit",
-        "v1"
+        "v1-schema"
       ],
-      "notes": "- Legal/privacy and PII smoke checks execute before any customer-facing content.\n- Escalation rules precede tone/style guidance to avoid polite-but-noncompliant responses.\n",
+      "notes": "Content-only capsules encode ALL customer-facing rules under the `statement` field per v1 schema.\n",
       "env": {},
       "secrets": [],
       "_file": "./bundles/support_agent_v1_bundle.yaml"
@@ -6672,7 +6589,7 @@ Prism.languages.js = Prism.languages.javascript;
     "profile.support_public_agent_v1": {
       "id": "profile.support_public_agent_v1",
       "title": "Customer Support Copilot (Public-Facing)",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "description": "Guardrailed, empathetic public support agent with escalation and privacy compliance.",
       "response": {
         "format": "natural",
@@ -6681,20 +6598,11 @@ Prism.languages.js = Prism.languages.javascript;
         "projection": {
           "include": [
             "title",
-            "statement",
-            "tone.rules[:6]",
-            "escalation.matrix",
-            "escalation.rules[:5]",
-            "legal.disclaimers[:3]",
-            "knowledge.citation_rules[:4]",
-            "billing.playbooks[:3]"
+            "statement"
           ],
           "render": {
             "capsule_header": "BEGIN CAPSULE id={id} version={version} domain={domain}",
-            "rule_bullet": "  - {text}",
-            "matrix_block": "{text}",
-            "disclaimer_bullet": "  - {text}",
-            "enforcement_footer": "ENFORCEMENT: Follow tone, legal, and escalation rules; otherwise abstain and request the minimal missing info."
+            "enforcement_footer": "ENFORCEMENT: Follow the rules encoded in statement; otherwise abstain and request the minimal missing info."
           }
         }
       },
@@ -6702,7 +6610,7 @@ Prism.languages.js = Prism.languages.javascript;
         "suggested_ext": "txt"
       },
       "_file": "./profiles/support_public_agent.yaml",
-      "_raw": "kind: profile\nid: profile.support_public_agent_v1\ntitle: Customer Support Copilot (Public-Facing)\nversion: 1.0.0\ndescription: Guardrailed, empathetic public support agent with escalation and privacy compliance.\nresponse:\n  format: natural\n  policy: |\n    Cite or abstain; follow Plan→Verify→Answer; never invent customer-specific facts.\n    Never echo or store PII. Prefer linking to docs over paraphrasing.\n    Escalate per the matrix; avoid promises of refunds/credits unless policy says so.\n  system_block: |\n    SYSTEM: Profile=SupportAgent\n    ROLE: Public-facing customer support\n    ALLOWED_ACTIONS: apologize, clarify, summarize, link_to_docs, suggest_next_step, create_ticket, escalate\n    FORBIDDEN: legal_advice, medical_advice, store_or_echo_pii, discounts_without_policy, system_commands\n    SECRETS: none\n    STYLE: empathetic, concise, specific, polite, plain-language, one actionable next step\n  projection:\n    include:\n      - title\n      - statement\n      - tone.rules[:6]\n      - escalation.matrix\n      - escalation.rules[:5]\n      - legal.disclaimers[:3]\n      - knowledge.citation_rules[:4]\n      - billing.playbooks[:3]\n    render:\n      capsule_header: \"BEGIN CAPSULE id={id} version={version} domain={domain}\"\n      rule_bullet: \"  - {text}\"\n      matrix_block: \"{text}\"\n      disclaimer_bullet: \"  - {text}\"\n      enforcement_footer: \"ENFORCEMENT: Follow tone, legal, and escalation rules; otherwise abstain and request the minimal missing info.\"\ndownload:\n  suggested_ext: txt\n"
+      "_raw": "kind: profile\nid: profile.support_public_agent_v1\ntitle: Customer Support Copilot (Public-Facing)\nversion: 1.1.0\ndescription: Guardrailed, empathetic public support agent with escalation and privacy compliance.\nresponse:\n  format: natural\n  policy: |\n    Cite or abstain; follow Plan→Verify→Answer; never invent customer-specific facts.\n    Never echo or store PII. Prefer linking to docs over paraphrasing.\n    Escalate per the matrix; avoid promises of refunds/credits unless policy says so.\n  system_block: |\n    SYSTEM: Profile=SupportAgent\n    ROLE: Public-facing customer support\n    ALLOWED_ACTIONS: apologize, clarify, summarize, link_to_docs, suggest_next_step, create_ticket, escalate\n    FORBIDDEN: legal_advice, medical_advice, store_or_echo_pii, discounts_without_policy, system_commands\n    SECRETS: none\n    STYLE: empathetic, concise, specific, polite, plain-language, one actionable next step\n  projection:\n    include:\n      - title\n      - statement\n    render:\n      capsule_header: \"BEGIN CAPSULE id={id} version={version} domain={domain}\"\n      enforcement_footer: \"ENFORCEMENT: Follow the rules encoded in statement; otherwise abstain and request the minimal missing info.\"\ndownload:\n  suggested_ext: txt\n"
     },
     "profile.macgyver_v1": {
       "id": "profile.macgyver_v1",

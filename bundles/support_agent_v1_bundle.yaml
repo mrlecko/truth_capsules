@@ -1,17 +1,17 @@
 name: support_agent_v1_bundle
-version: 1.0.0
+version: 1.1.0
 description: "Public-facing Support Copilot: tone/style, escalation, privacy, knowledge citation, and billing playbooks."
 default_profile: support_public_agent.yaml
 applies_to:
   - conversation
   - support
 capsules:
-  - support.tone_style_guide_v1
-  - support.escalation_matrix_v1
   - support.legal_privacy_rules_v1
+  - support.pii_redaction_smoke_v1
+  - support.escalation_matrix_v1
+  - support.tone_style_guide_v1
   - support.knowledge_view_projection_v1
   - support.billing_basics_v1
-  - support.pii_redaction_smoke_v1
   - support.intent_router_sanity_v1
 excludes: []
 priority_overrides:
@@ -29,7 +29,6 @@ order:
 tags:
   - support
   - kit
-  - v1
+  - v1-schema
 notes: |
-  - Legal/privacy and PII smoke checks execute before any customer-facing content.
-  - Escalation rules precede tone/style guidance to avoid polite-but-noncompliant responses.
+  Content-only capsules encode ALL customer-facing rules under the `statement` field per v1 schema.

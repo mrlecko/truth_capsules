@@ -19,12 +19,11 @@ IPADDR = re.compile(r"\b(?:(?:\d{1,3}\.){3}\d{1,3})\b")
 MASKED_TOKENS = re.compile(r"\*\*\*|\[redacted\]|\[masked\]", re.I)
 
 def main():
-    examples_path = os.environ.get("EXAMPLES_PATH", "").strip()
+    examples_path = os.environ.get("EXAMPLES_PATH", "").strip() or "artifacts/examples/support_agent/examples.txt"
     fail_on_any = os.environ.get("FAIL_ON_ANY", "true").lower() == "true"
 
-    if not examples_path:
-        print(json.dumps({"ok": False, "error": "EXAMPLES_PATH not set"}))
-        sys.exit(2)
+    if os.path.isdir(examples_path):
+        examples_path = os.path.join(examples_path, "examples.txt")
 
     patterns = {
         "email": EMAIL,

@@ -1,33 +1,32 @@
 id: support.billing_basics_v1
-version: 1.0.0
+version: 1.1.0
 domain: support
 title: Billing Playbooks (SaaS)
-statement: Canonical flows for common billing issues without exposing PII or promising credits.
-billing:
-  playbooks:
-    - name: "Get invoice PDF"
-      steps:
-        - "Ask for masked account identifier (e.g., ticket or org slug)."
-        - "Guide to: Settings → Billing → Invoices → 'Download PDF'."
-        - "If missing, create ticket for Billing with masked reference."
-    - name: "Refund request (within policy)"
-      steps:
-        - "Acknowledge and summarize the reason."
-        - "Link refunds policy (exact section) and timeframe."
-        - "Create Billing ticket; do not promise outcome; share reference ID."
-    - name: "Plan downgrade / cancel"
-      steps:
-        - "Confirm effective date and proration link."
-        - "Guide to: Settings → Plan → 'Change plan'."
-        - "If blocked by contract, route to Billing Supervisor."
+statement: |-
+  Canonical flows for common billing issues without exposing PII or promising credits.
+
+  Playbook: Get invoice PDF
+    1) Ask for masked account identifier (e.g., ticket or org slug).
+    2) Guide to: Settings → Billing → Invoices → "Download PDF".
+    3) If missing, create ticket for Billing with masked reference.
+
+  Playbook: Refund request (within policy)
+    1) Acknowledge and summarize the reason.
+    2) Link refunds policy (exact section) and timeframe.
+    3) Create Billing ticket; do not promise outcome; share reference ID.
+
+  Playbook: Plan downgrade / cancel
+    1) Confirm effective date and proration link.
+    2) Guide to: Settings → Plan → "Change plan".
+    3) If blocked by contract, route to Billing Supervisor.
 provenance:
   schema: provenance.v1
   author: John Macgregor
   org: Truth Capsules Demo
   license: MIT
   source_url: https://example.com/truth-capsules/support
-  created: '2025-11-10T18:12:37Z'
-  updated: '2025-11-10T18:12:37Z'
+  created: '2025-11-10T19:05:00Z'
+  updated: '2025-11-10T19:05:00Z'
   review:
     status: draft
     reviewers: []
@@ -41,8 +40,6 @@ provenance:
 applies_to:
 - conversation
 - support
-dependencies: []
-incompatible_with: []
 security:
   sensitivity: medium
-  notes: ''
+  notes: ""

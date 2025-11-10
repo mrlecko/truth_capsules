@@ -2,7 +2,9 @@ id: support.intent_router_sanity_v1
 version: 1.0.0
 domain: support
 title: Intent Router Sanity Check
-statement: Validate that baseline rules classify common support intents correctly.
+statement: |-
+  Validate that baseline rules classify common support intents correctly. Defaults read
+  fixtures under artifacts/examples/support_agent/. Accuracy must meet or exceed 0.8.
 assumptions:
 pedagogy:
 witnesses:

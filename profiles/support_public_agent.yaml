@@ -1,7 +1,7 @@
 kind: profile
 id: profile.support_public_agent_v1
 title: Customer Support Copilot (Public-Facing)
-version: 1.0.0
+version: 1.1.0
 description: Guardrailed, empathetic public support agent with escalation and privacy compliance.
 response:
   format: natural
@@ -20,17 +20,8 @@ response:
     include:
       - title
       - statement
-      - tone.rules[:6]
-      - escalation.matrix
-      - escalation.rules[:5]
-      - legal.disclaimers[:3]
-      - knowledge.citation_rules[:4]
-      - billing.playbooks[:3]
     render:
       capsule_header: "BEGIN CAPSULE id={id} version={version} domain={domain}"
-      rule_bullet: "  - {text}"
-      matrix_block: "{text}"
-      disclaimer_bullet: "  - {text}"
-      enforcement_footer: "ENFORCEMENT: Follow tone, legal, and escalation rules; otherwise abstain and request the minimal missing info."
+      enforcement_footer: "ENFORCEMENT: Follow the rules encoded in statement; otherwise abstain and request the minimal missing info."
 download:
   suggested_ext: txt
