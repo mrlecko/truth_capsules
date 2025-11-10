@@ -1,0 +1,15 @@
+[
+  {
+    "capsule": "llm.citation_required_v1",
+    "status": "RED",
+    "witness_results": [
+      {
+        "name": "citations_cover_claims",
+        "status": "FAIL",
+        "returncode": 1,
+        "stdout": "{\"witness\": \"citations_cover_claims\", \"status\": \"FAIL\", \"reason\": \"file-not-found\", \"inputs\": {\"answer\": \"/work/artifacts/examples/answer_with_citation_good.json\"}}\n",
+        "stderr": ""
+      }
+    ]
+  }
+]

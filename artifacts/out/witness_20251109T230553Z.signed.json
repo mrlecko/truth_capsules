@@ -1,0 +1,18 @@
+{
+  "results": [
+    {
+      "ok": true
+    }
+  ],
+  "proof": {
+    "type": "Ed25519",
+    "created": "20251109T230553Z",
+    "keyId": "test",
+    "canonical": {
+      "algo": "json-c14n-v1",
+      "hash": "sha256",
+      "digest": "e18bfe6707d979ac0efa651ae9559756ab781e4355560127c4f717271ceef2b2"
+    },
+    "signature": "V8WZPTEX2UEW3K2fAZPc6akHP4TfY1lMtz2T3n5d7GyAr7MlZXNmGz8TMCd4UmgZLnUDeq5kub1YqUnWv0BuAw=="
+  }
+}

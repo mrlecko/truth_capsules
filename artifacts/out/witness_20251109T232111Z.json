@@ -1,0 +1,15 @@
+[
+  {
+    "capsule": "llm.citation_required_v1",
+    "status": "GREEN",
+    "witness_results": [
+      {
+        "name": "citations_cover_claims",
+        "status": "PASS",
+        "returncode": 0,
+        "stdout": "{\n  \"witness\": \"citations_cover_claims\",\n  \"status\": \"PASS\",\n  \"coverage\": 1.0,\n  \"sequential_numbering_warn\": false,\n  \"totals\": {\n    \"sentences\": 2,\n    \"cited\": 2,\n    \"refs\": 2\n  },\n  \"inputs\": {\n    \"answer\": \"/work/artifacts/examples/answer_with_citation.json\"\n  }\n}\n",
+        "stderr": ""
+      }
+    ]
+  }
+]

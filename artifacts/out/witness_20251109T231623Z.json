@@ -1,0 +1,15 @@
+[
+  {
+    "capsule": "llm.citation_required_v1",
+    "status": "RED",
+    "witness_results": [
+      {
+        "name": "citations_cover_claims",
+        "status": "FAIL",
+        "returncode": 1,
+        "stdout": "{\"witness\": \"citations_cover_claims\", \"status\": \"FAIL\", \"reason\": \"coverage-too-low\", \"coverage\": 0.3333333333333333, \"min\": 0.6, \"inputs\": {\"answer\": \"/work/artifacts/examples/answer_with_citation_bad.json\"}}\n",
+        "stderr": ""
+      }
+    ]
+  }
+]

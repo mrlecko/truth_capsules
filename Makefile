@@ -24,9 +24,11 @@ JSON     ?= 0
 
 # --- Make settings -----------------------------------------------------------
 SHELL := /bin/bash
+
 SHELLFLAGS := -e -o pipefail -c
 .DEFAULT_GOAL := help
 MAKEFLAGS += --warn-undefined-variables
+.ONESHELL:
 
 # --- Help --------------------------------------------------------------------
 help:
@@ -125,29 +127,90 @@ sandbox-smoke: sandbox-image
 #   make witness-sandbox CAPSULE=llm.pr_risk_tags_v1 WITNESS=pr_review_covers_risks JSON=1 \
 #     ENV_VARS='-e REVIEW_PATH=artifacts/examples/pr_review.md -e DIFF_PATH=artifacts/examples/pr_diff.patch'
 witness-sandbox:
-	@set -Eeuo pipefail; \
-	CAPS=""; [ -n "$(CAPSULE)" ] && CAPS="--capsule $(CAPSULE)"; \
-	WIT="";  [ -n "$(WITNESS)" ] && WIT="--witness $(WITNESS)"; \
-	JSONF=""; [ "$(JSON)" = "1" ] && JSONF="--json"; \
-	ENV_VARS_STR="$${ENV_VARS:-}"; \
-	ENV_VARS_STR="$${ENV_VARS_STR%\"}"; ENV_VARS_STR="$${ENV_VARS_STR#\"}"; \
-	ENV_VARS_STR="$${ENV_VARS_STR%\'}"; ENV_VARS_STR="$${ENV_VARS_STR#\'}"; \
-	if [ -n "$$ENV_VARS_STR" ]; then IFS=' ' read -r -a EV_ARR <<< "$$ENV_VARS_STR"; else EV_ARR=(); fi; \
-	CMD="python3 scripts/run_witnesses.py capsules $$JSONF $$CAPS $$WIT"; \
-	echo "→ Engine : $(SANDBOX_ENGINE)"; \
-	echo "→ Image  : $(SANDBOX_IMAGE)"; \
-	echo "→ User   : $(SANDBOX_USER)"; \
-	echo "→ Flags  : $(SANDBOX_FLAGS)"; \
-	echo "→ Env    : $$ENV_VARS_STR"; \
-	echo "→ Command: $$CMD"; \
-	set -x; \
-	$(SANDBOX_ENGINE) run $(SANDBOX_FLAGS) \
+	@set -Eeuo pipefail
+
+	# Make-time vars → shell vars
+	ENGINE='$(SANDBOX_ENGINE)'
+	IMG='$(SANDBOX_IMAGE)'
+
+	# Optional args from make vars (expand at make time safely)
+	CAPS=""
+	[[ -n '$(CAPSULE)'  ]] && CAPS='--capsule $(CAPSULE)'
+	WIT=""
+	[[ -n '$(WITNESS)'  ]] && WIT='--witness $(WITNESS)'
+	JSONF=""
+	[[ '$(JSON)' = '1'  ]] && JSONF='--json'
+
+	# ENV_VARS string -> bash array (e.g. "-e FOO=bar -e BAZ=qux")
+	ENV_VARS_STR="$${ENV_VARS:-}"
+	ENV_VARS_STR="$${ENV_VARS_STR%\"}"; ENV_VARS_STR="$${ENV_VARS_STR#\"}"
+	ENV_VARS_STR="$${ENV_VARS_STR%\' }"; ENV_VARS_STR="$${ENV_VARS_STR#\'}"
+	EV_ARR=()
+	if [[ -n "$$ENV_VARS_STR" ]]; then
+	  read -r -a EV_ARR <<< "$$ENV_VARS_STR"
+	fi
+
+	# Command that runs inside the container (note: python3 prefix!)
+	CMD="python3 scripts/run_witnesses.py capsules $$JSONF $$CAPS $$WIT"
+
+	echo "→ Engine : $$ENGINE"
+	echo "→ Image  : $$IMG"
+	echo "→ User   : $(SANDBOX_USER)"
+	echo "→ Flags  : $(SANDBOX_FLAGS)"
+	echo "→ Env    : $$ENV_VARS_STR"
+	echo "→ Command: $$CMD"
+
+	# Run container; capture STDOUT to OUT_JSON, mirror STDERR to our STDERR.
+	set +e
+	OUT_JSON="$$( "$$ENGINE" run $(SANDBOX_FLAGS) \
 	  -v "$$(pwd)":/work:ro \
 	  "$${EV_ARR[@]}" \
 	  --entrypoint /bin/sh \
-	  $(SANDBOX_IMAGE) -lc "$$CMD"; \
-	rc=$$?; set +x; \
+	  "$$IMG" -lc "$$CMD" 2> >(tee /dev/stderr) )"
+	rc="$$?"
+	set -e
+
+	# Help if nothing came back
+	if [[ -z "$$OUT_JSON" ]]; then
+	  echo "[witness-sandbox] no JSON on stdout from container; check errors above" >&2
+	fi
+
+	# Contract: echo raw JSON to stdout
+	printf '%s\n' "$$OUT_JSON"
+
+	# Optional signing (non-fatal on failure)
+	if [[ "$${SIGN:-0}" == "1" ]]; then
+	  tmp="$$(mktemp)"
+	  printf '%s' "$$OUT_JSON" > "$$tmp"
+	  OUT_DIR="$${OUT_DIR:-artifacts/out}" KEY_ID="$${KEY_ID:-dev}" SIGNING_KEY="$${SIGNING_KEY:-keys/dev_ed25519_sk.pem}" \
+	    python3 scripts/sign_witness.py "$$tmp" || echo "[witness-sandbox] signing failed (non-fatal)" >&2
+	  rm -f "$$tmp"
+	fi
+
+		# Optional summary (nice for demos)
+	if [[ -n "$$OUT_JSON" ]]; then
+	  python3 - <<'PY' "$$OUT_JSON" || true
+		import json,sys
+		data=json.loads(sys.argv[1])
+		reds=[d.get("capsule") for d in data if (d.get("status") or "").upper()=="RED"]
+		greens=[d.get("capsule") for d in data if (d.get("status") or "").upper()=="GREEN"]
+		print(f"[witness-sandbox] summary: GREEN={len(greens)} RED={len(reds)}")
+		PY
+	fi
+
+	# Soft mode: don’t fail the shell if ALLOW_RED=1
+	if [[ "$${ALLOW_RED:-0}" == "1" ]]; then
+	  rc=0
+	fi
+
 	exit $$rc
+
+
+
+
+
+
+
 
 
 
@@ -332,10 +395,11 @@ freeze: $(PYBIN)
 	$(PIP) freeze > requirements.txt
 	@echo "✓ requirements.txt updated"
 
-preflight:
+preflight: guard-no-privkeys
 	@command -v openssl >/dev/null || (echo "openssl not found"; exit 2)
 	@command -v pyshacl >/dev/null || (echo "pyshacl not found (pip install pyshacl)"; exit 2)
 	@echo "✓ Preflight OK"
+
 
 # --- Clean -------------------------------------------------------------------
 clean:
@@ -348,3 +412,58 @@ clean:
 clean-venv:
 	@rm -rf $(VENV)
 	@echo "✓ Removed $(VENV)"
+
+# --- Conveniences ------------------------------------------------------------
+
+.PHONY: keygen-dev key-fingerprint guard-no-privkeys \
+        demo-cite-green demo-cite-red verify-witness-latest pages-on-docs
+
+# Generate an Ed25519 dev pair with the names the repo already uses by default
+keygen-dev:
+	@mkdir -p keys
+	@openssl genpkey -algorithm ED25519 -out keys/dev_ed25519_sk.pem
+	@openssl pkey -in keys/dev_ed25519_sk.pem -pubout -out keys/dev_ed25519_pk.pem
+	@chmod 600 keys/dev_ed25519_sk.pem
+	@echo "✓ Keys written:"
+	@echo "   - private: keys/dev_ed25519_sk.pem"
+	@echo "   - public : keys/dev_ed25519_pk.pem"
+	@echo "Set KEY_ID to an email or fingerprint, e.g.:"
+	@echo "   KEY_ID="$$(git config user.email || echo demo@example.com)
+
+# Quick fingerprints for a human KEY_ID if you prefer that over an email
+key-fingerprint:
+	@test -f keys/dev_ed25519_pk.pem || (echo "Missing keys/dev_ed25519_pk.pem (run make keygen-dev)"; exit 2)
+	@echo "OpenSSH pub (convenient as KEY_ID):"
+	@ssh-keygen -yf keys/dev_ed25519_sk.pem 2>/dev/null | awk '{print $$2}'
+	@echo "SHA256 fingerprint:"
+	@ssh-keygen -lf keys/dev_ed25519_pk.pem | awk '{print $$2}'
+
+# Hard guard to avoid committing private keys by mistake
+guard-no-privkeys:
+	@test -z "$$(git ls-files -c -- keys/*_sk.pem 2>/dev/null)" || (echo "Refusing: a private key is tracked in git"; exit 2)
+
+# One-line GREEN demo (signed)
+demo-cite-green:
+	$(MAKE) witness-sandbox CAPSULE=llm.citation_required_v1 WITNESS=citations_cover_claims JSON=1 \
+	  ENV_VARS="-e ANSWER_PATH=artifacts/examples/answer_with_citation.json" \
+	  SIGN=1 SIGNING_KEY=keys/dev_ed25519_sk.pem KEY_ID="$$(git config user.email || echo demo@example.com)" \
+	  ALLOW_RED=1
+
+# One-line RED demo (signed, but won't fail the shell)
+demo-cite-red:
+	$(MAKE) witness-sandbox CAPSULE=llm.citation_required_v1 WITNESS=citations_cover_claims JSON=1 \
+	  ENV_VARS="-e ANSWER_PATH=artifacts/examples/answer_with_citation_bad.json" \
+	  SIGN=1 SIGNING_KEY=keys/dev_ed25519_sk.pem KEY_ID="$$(git config user.email || echo demo@example.com)" \
+	  ALLOW_RED=1
+
+# Verify the most recent signed witness receipt using your public key
+verify-witness-latest:
+	@pub="$${PUBLIC_KEY:-keys/dev_ed25519_pk.pem}"; \
+	f="$$(ls -1t artifacts/out/witness_*.signed.json | head -n1)"; \
+	test -n "$$f" || (echo "No signed witness in artifacts/out"; exit 2); \
+	echo "Verifying $$f with $$pub"; \
+	$(PYBIN) scripts/verify_witness.py --in "$$f" --pub "$$pub"
+
+# Zero-infra live demo: publish SPA as /docs/index.html (enable GitHub Pages → /docs)
+pages-on-docs: spa-pages
+	@echo "→ Enable GitHub Pages: Settings → Pages → 'Deploy from a branch' → /docs"

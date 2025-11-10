@@ -1,0 +1,28 @@
+{
+  "results": [
+    {
+      "capsule": "llm.citation_required_v1",
+      "status": "RED",
+      "witness_results": [
+        {
+          "name": "citations_cover_claims",
+          "status": "FAIL",
+          "returncode": 1,
+          "stdout": "{\"witness\": \"citations_cover_claims\", \"status\": \"FAIL\", \"reason\": \"coverage-too-low\", \"coverage\": 0.3333333333333333, \"min\": 0.6, \"inputs\": {\"answer\": \"/work/artifacts/examples/answer_with_citation_bad.json\"}}\n",
+          "stderr": ""
+        }
+      ]
+    }
+  ],
+  "proof": {
+    "type": "Ed25519",
+    "created": "20251109T231623Z",
+    "keyId": "john@truthcapsules",
+    "canonical": {
+      "algo": "json-c14n-v1",
+      "hash": "sha256",
+      "digest": "78a3c0c310b4a590221093a36b7ce588f8952ee5d02c19b2987b515702cad56e"
+    },
+    "signature": "h4v4v+I+l2w8VuVs1+wLuaZw5sF6djDNrAqRXgeBt4rfaf3NJQTBr0WkM4DInTbfDeFGI549aenQg73AA2KvDg=="
+  }
+}

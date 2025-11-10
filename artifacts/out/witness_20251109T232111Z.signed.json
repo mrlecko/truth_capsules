@@ -1,0 +1,28 @@
+{
+  "results": [
+    {
+      "capsule": "llm.citation_required_v1",
+      "status": "GREEN",
+      "witness_results": [
+        {
+          "name": "citations_cover_claims",
+          "status": "PASS",
+          "returncode": 0,
+          "stdout": "{\n  \"witness\": \"citations_cover_claims\",\n  \"status\": \"PASS\",\n  \"coverage\": 1.0,\n  \"sequential_numbering_warn\": false,\n  \"totals\": {\n    \"sentences\": 2,\n    \"cited\": 2,\n    \"refs\": 2\n  },\n  \"inputs\": {\n    \"answer\": \"/work/artifacts/examples/answer_with_citation.json\"\n  }\n}\n",
+          "stderr": ""
+        }
+      ]
+    }
+  ],
+  "proof": {
+    "type": "Ed25519",
+    "created": "20251109T232111Z",
+    "keyId": "john@truthcapsules",
+    "canonical": {
+      "algo": "json-c14n-v1",
+      "hash": "sha256",
+      "digest": "a29a8c6dedb619ed3ef924c752cfd2aa9955af3c333461cb9a7950db08ac74ba"
+    },
+    "signature": "kAwnIrFHRF/fnTdjcwa3k8EexhNxQ8qpQcwPb2EXNX5Q4iTNO9TOBa5oHx47tmacqPyE6m/pZmZ/dV7ILTJ8AQ=="
+  }
+}
