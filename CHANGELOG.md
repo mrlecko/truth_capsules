@@ -5,7 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.0] - 2025-11-07
+## [0.0.10] - 2025-11-09
+
+### Added
+
+  - Automated test suite with pytest
+  - Witness execution, sandboxing and signing
+  - Added pinned / inline vendor files to SPA
+  - Added quickstarts and makefile conveniences
+
+### Fixed
+  - capsule digests
+  - SPA visuals
+  - github workflows
+
+## [0.0.9] - 2025-11-08
 
 ### Added
 
@@ -45,7 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Web Tools**
   - Interactive SPA for visual composition
-  - Snapshot-based web viewer with drag-and-drop
+  - Snapshot-based web viewer
 
 ### Fixed
 
@@ -64,7 +78,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Planned
 
-- Automated test suite with pytest
 - Pre-commit hooks for code quality
 - Dependency pinning with pip-tools
 - Enhanced SPA with live mode
