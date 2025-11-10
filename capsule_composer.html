@@ -27,7 +27,7 @@
   --muted:         #a6b0c2;
   --accent:        #76a2ff;   /* link/brand */
   --accent-strong: #4b86ff;
-  --ok:            #46d39a;
+  --ok:            #19e184;
   --danger:        #ff6b6b;
   --warn:          #ffae3a;
 
@@ -81,7 +81,7 @@ html[data-theme="light"]{
   --muted:         #5b6680;
   --accent:        #265ff1;
   --accent-strong: #1f55e6;
-  --ok:            #1f9d62;
+  --ok:            #19e184;
   --danger:        #d83a3a;
   --warn:          #d48a14;
 
@@ -89,7 +89,7 @@ html[data-theme="light"]{
   --chip-border:   #d8e1f1;
 
   --input-bg:      #f1f5fb;
-  --btn-bg:        #eef3fb;
+  --btn-bg:        #c5c5c5;
   --btn-fg:        var(--text);
 
   /* Keep terminals dark in light mode for contrast */
@@ -138,7 +138,7 @@ html[data-theme="dark"]{
     --chip-border:   #d8e1f1;
 
     --input-bg:      #f1f5fb;
-    --btn-bg:        #eef3fb;
+    --btn-bg:        #c5c5c5;
     --btn-fg:        var(--text);
 
     --textarea-bg:   #f7f9ff;
@@ -181,7 +181,7 @@ html[data-theme="light"]{
   --chip-border:#e4eaf4;
 
   --input-bg:#f9fbfe;
-  --btn-bg:#f7f9fe;
+  --btn-bg:#ced3df;
   --btn-fg:var(--text);
 
   /* code stays dark in light mode */
@@ -356,9 +356,9 @@ main{ height: calc(100vh - 54px); position:relative; }
   font-size:12px; font-weight:600; letter-spacing:.02em;
   border:1px solid var(--chip-border);
 }
-.badge.ok{ background: color-mix(in oklab, var(--ok), #000 70%); color:#d5ffef; border-color:#1c3b2f; }
+.badge.ok{ background: var(--ok); color: #000;}
 .badge.err{ background: color-mix(in oklab, var(--danger), #000 70%); color:#ffe0e0; border-color:#4a1b1b; }
-.badge.witnessed{ background: color-mix(in oklab, var(--warn), #000 65%); color:#fff4dd; }
+.badge.witnessed{ background: var(--warn); color:#fff4dd; }
 
 /* Cards */
 section{ display:flex; flex-direction:column; gap:14px; padding:14px; }
@@ -537,6 +537,51 @@ details.panel-collapsible > .list{
 .item, .chip, .badge, .btn, .card, pre, textarea{
   border-radius: var(--radius);
 }
+
+
+.label-with-help{display:flex;align-items:center;gap:8px}
+.icon-btn{
+  border:1px solid var(--border);
+  background:var(--btn-bg);
+  color:var(--text);
+  width:28px;height:28px;line-height:26px;
+  border-radius:8px;text-align:center;cursor:pointer;
+}
+.icon-btn:hover{border-color:var(--accent);
+  box-shadow:0 0 0 3px color-mix(in oklab,var(--accent),transparent 85%)}
+#profileHelp .muted{color:var(--muted)}
+#profileDesc{margin-left:.5ch}
+
+.help-box{
+  margin-top:6px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:8px 10px;
+}
+.help-box > summary{
+  list-style:none;
+  cursor:pointer;
+  font-weight:600;
+  color:var(--muted);
+  margin:-2px 0 4px 0;
+}
+.help-box[open] > summary{ margin-bottom:6px; }
+
+.icon-btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:28px; height:28px; border-radius:8px; border:1px solid var(--border);
+  background:var(--btn-bg); color:var(--text); font-weight:700;
+  cursor:pointer; line-height:1; padding:0;
+}
+.icon-btn:hover{ border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in oklab, var(--accent), transparent 85%); }
+
+.help-box{
+  margin-top:8px; background:var(--panel); border:1px solid var(--border);
+  border-radius:var(--radius); padding:10px 12px;
+}
+.help-title{ font-weight:600; margin-bottom:6px; }
+.muted{ color:var(--muted); }
 
 </style>
 
@@ -2516,7 +2561,7 @@ Prism.languages.js = Prism.languages.javascript;
 <body>
   <header class="toolbar">
     <h1>Truth Capsule Prompt Composer</h1>
-    <div class="small" style="font-size:12px; margin-top:5px;">Generated 2025-11-10T15:34:58.670331Z</div>
+    <div class="small" style="font-size:12px; margin-top:5px;">Generated 2025-11-10T16:26:58.432226Z</div>
     <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
       <button style="display:none;" class="btn" id="composeBtn" title="Compose (Ctrl/Cmd+Enter)">🟢 Compose</button>
       <button class="btn" id="copyBtn" title="Copy prompt">📋 Copy Prompt</button>
@@ -2537,28 +2582,44 @@ Prism.languages.js = Prism.languages.javascript;
       <!-- LEFT COLUMN -->
       <aside id="left">
         <div id="leftTop">
-          <input id="search" type="text" placeholder="Filter by id/title/domain/statement…" style="width:100%">
-          <div class="row" style="margin-top:10px">
-            <label>PROFILES</label>
-            <select id="profiles"></select>
-          </div>
-          <div class="row small" id="profileHelp" style="margin-top:4px"></div>
-        </div>
+  <input id="search" type="text" placeholder="Filter by id/title/domain/statement…" style="width:100%">
+
+<div class="row" style="margin-top:10px; align-items:center; gap:8px">
+  <label for="profiles" class="section-title">PROFILES</label>
+  <button id="profileInfo" class="icon-btn" type="button" aria-haspopup="dialog" aria-expanded="false" title="What are Profiles?">?</button>
+  <select id="profiles"></select>
+</div>
+
+<div id="profileDesc" class="small muted" style="margin-top:4px"></div>
+
+<div id="profileHelp" class="help-box" hidden>
+  <div class="help-title">What are Profiles?</div>
+  <p class="small">
+    Profiles are presets for a specific use-case (e.g., CI Judge, Code Patch, PR Review).
+    A profile sets the basic <em>system prompt</em> and which <em>capsule properties/policies</em> are applied (visible).
+    Switching profiles does not modify your capsule library; it only changes the composed rules for this run.
+  </p>
+</div>
+
+</div>
+
+
+
 
         <!-- RESIZABLE HORIZONTAL SPLIT: Bundles ⟷ Capsules -->
         <div id="leftSplit">
           <div id="bundlesWrap" class="section-block">
-  <div id="bundlesPanel" class="collapsible">
-    <div class="collapsible-header">
-      <span class="section-title">BUNDLES (<span id="bundlesCount">0</span>)</span>
-      <span class="domain-spacer"></span>
-      <button id="bundlesToggle" class="btn small" type="button" aria-expanded="true">Hide</button>
-    </div>
-    <div id="bundlesBody" class="collapsible-body">
-      <div id="bundles" class="list"></div>
-    </div>
-  </div>
-</div>
+            <div id="bundlesPanel" class="collapsible">
+              <div class="collapsible-header">
+                <span class="section-title">BUNDLES (<span id="bundlesCount">0</span>)</span>
+                <span class="domain-spacer"></span>
+                <button id="bundlesToggle" class="btn small" type="button" aria-expanded="true">Hide</button>
+              </div>
+              <div id="bundlesBody" class="collapsible-body">
+                <div id="bundles" class="list"></div>
+              </div>
+            </div>
+          </div>
 
 
 
@@ -4762,14 +4823,39 @@ Prism.languages.js = Prism.languages.javascript;
 
       /* ------------ Renderers ------------ */
       function renderProfiles() {
-        const sel = $('profiles'); sel.innerHTML = '';
-        const keys = Object.keys(DATA.profiles || {}).sort();
-        for (const k of keys) { const p = DATA.profiles[k] || {}; const o = document.createElement('option'); o.value = k; o.textContent = (p.title || k) + ' (' + (p.version || '1.0.0') + ')'; sel.appendChild(o); }
-        if (!STATE.profile) STATE.profile = keys[0] || null;
-        sel.value = STATE.profile || '';
-        $('profileHelp').textContent = (DATA.profiles[STATE.profile || ''] || {}).description || '';
-        sel.onchange = () => { STATE.profile = sel.value; $('profileHelp').textContent = (DATA.profiles[STATE.profile] || {}).description || ''; compose(); };
-      }
+  const sel = $('profiles'); 
+  sel.innerHTML = '';
+
+  const pmap = DATA.profiles || {};
+  const keys = Object.keys(pmap).sort();
+
+  // Build <option>s (unchanged behavior)
+  for (const k of keys) {
+    const p = pmap[k] || {};
+    const o = document.createElement('option');
+    o.value = k;
+    o.textContent = (p.title || k) + ' (' + (p.version || '1.0.0') + ')';
+    // stash desc for convenience (optional)
+    o.dataset.desc = p.description || '';
+    sel.appendChild(o);
+  }
+
+  if (!STATE.profile) STATE.profile = keys[0] || null;
+  sel.value = STATE.profile || '';
+
+  // ALWAYS show the selected profile's description
+  const descEl = $('profileDesc');
+  const show = (pmap[STATE.profile || ''] || {}).description || '';
+  if (descEl) descEl.textContent = show ? ('— ' + show) : '';
+
+  sel.onchange = () => {
+    STATE.profile = sel.value;
+    const p = pmap[STATE.profile] || {};
+    if (descEl) descEl.textContent = p.description ? ('— ' + p.description) : '';
+    compose();
+  };
+}
+
 
       function capsuleRow(c, id, opts = {}) {
         const showDomainChip = !!opts.showDomainChip;
@@ -5477,6 +5563,37 @@ IFS=$'\\n\\t'
         $('includePed').checked = localStorage.getItem('tc_inc_ped') !== '0';
         $('markdown').checked = localStorage.getItem('tc_md') === '1';
       });
+
+      (function profileHelp(){
+        const sel   = document.getElementById('profiles');
+        const desc  = document.getElementById('profileDesc');
+        const help  = document.getElementById('profileHelp');
+        const btn   = document.getElementById('profileInfo');
+
+        // Always show the selected profile's description (from <option data-desc="...">)
+        function renderDesc(){
+          if (!sel || !desc) return;
+          const opt = sel.options[sel.selectedIndex];
+          const d   = opt && opt.dataset ? (opt.dataset.desc || '').trim() : '';
+          desc.textContent = d ? `— ${d}` : '';   // always visible, empty if none
+        }
+
+        // Wire events (guarded)
+        if (sel){
+          sel.addEventListener('change', renderDesc);
+          // Schedule initial render after options are populated by your code
+          requestAnimationFrame(renderDesc);
+        }
+
+        // Help button toggles the explanatory panel (general concept of profiles)
+        if (btn && help){
+          btn.addEventListener('click', () => {
+            const hidden = help.hasAttribute('hidden');
+            if (hidden) help.removeAttribute('hidden'); else help.setAttribute('hidden', '');
+            btn.setAttribute('aria-expanded', String(hidden));
+          });
+        }
+      })();
 
 
     </script>
