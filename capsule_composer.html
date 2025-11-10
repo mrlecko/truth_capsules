@@ -583,6 +583,81 @@ details.panel-collapsible > .list{
 .help-title{ font-weight:600; margin-bottom:6px; }
 .muted{ color:var(--muted); }
 
+/* Layout */
+.toolbar {
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.toolbar .title-wrap { display:flex; flex-direction:column; }
+.toolbar-actions {
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+/* Groups = compact button clusters */
+.group {
+  display:flex;
+  align-items:center;
+  gap:4px;
+  padding:2px;
+  border:1px solid var(--border, #3a3f55);
+  border-radius:10px;
+  background:var(--panel, rgba(127,127,127,0.08));
+}
+
+/* Icon-sized buttons */
+.btn.icon { padding:6px 8px; min-width:auto; }
+
+/* Dropdown menu built from <details> */
+.menu { position:relative; }
+.menu > summary { list-style:none; cursor:pointer; }
+.menu > summary::-webkit-details-marker { display:none; }
+.menu[open] .menu-list { display:block; }
+
+.menu-list{
+  display:none;
+  position:absolute;
+  top:100%;
+  right:0;
+  margin-top:6px;
+  padding:6px;
+  background:var(--bgElevated, var(--bg));
+  border:1px solid var(--border, #3a3f55);
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.35);
+  z-index:1000;
+  min-width:220px;
+}
+
+.menu-item{
+  display:block;
+  width:100%;
+  padding:8px 10px;
+  text-align:left;
+  background:none;
+  border:0;
+  font:inherit;
+  color:inherit;
+  cursor:pointer;
+}
+.menu-item:hover{ background:rgba(127,127,127,0.12); border-radius:8px; }
+.menu-item.warn{ color:var(--danger, #e06c75); }
+
+.menu-field{ padding:4px 6px 8px; }
+.menu-row{ display:flex; gap:6px; padding:4px 6px; }
+.menu-sep{
+  border:0; height:1px; margin:6px 0;
+  background:linear-gradient(to right, transparent, var(--border, #3a3f55), transparent);
+}
+
+/* Small muted label */
+.small.muted{ opacity:0.7; font-size:12px; }
+
+
 </style>
 
 
@@ -2559,23 +2634,60 @@ Prism.languages.js = Prism.languages.javascript;
 </head>
 
 <body>
-  <header class="toolbar">
+<header class="toolbar">
+  <div class="title-wrap">
     <h1>Truth Capsule Viewer & Prompt Composer</h1>
-    <div class="small" style="font-size:12px; margin-top:5px;">Generated 2025-11-10T20:27:49.805995Z</div>
-    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-      <button style="display:none;" class="btn" id="composeBtn" title="Compose (Ctrl/Cmd+Enter)">🟢 Compose</button>
-      <button class="btn" id="copyBtn" title="Copy prompt">📋 Copy Prompt</button>
-      <button class="btn" id="copyLlmBtn" title="Copy LLM command">💻 Copy LLM Bash</button>
-      <button class="btn" id="dlBtn" title="Download prompt">⬇️ Download Prompt</button>
-      <button class="btn" id="dlJsonBtn" title="Download manifest JSON">⬇️ Download JSON Manifest</button>
-      <button class="btn" id="loadJsonBtn" title="Load manifest JSON">⬆️ Load JSON Manifest</button>
-      <button class="btn" id="shareLinkBtn" title="Copy shareable link">📋 Share Deeplink</button>
-      <button class="btn" id="validateAllBtn" title="Validate digests for selected">🔐 Validate Digests</button>
-      <button class="btn warn" id="clearBtn" title="Clear selection">🗑️ Clear Selected Capsules</button>
-      <button class="btn" id="themeBtn" title="Toggle theme" aria-label="Toggle color theme">🌙</button>
+    <div class="small" style="font-size:12px;margin-top:4px;">Generated 2025-11-10T21:00:23.265902Z</div>
+  </div>
 
+  <nav class="toolbar-actions">
+
+    <!-- Group 1: Prompt (primary = Copy; extras in dropdown) -->
+    <div class="group">
+      <button style="display:none;" class="btn" id="composeBtn" title="Compose (Ctrl/Cmd+Enter)">🟢 Compose</button>
+      <button class="btn" id="copyBtn" title="Copy prompt">📋 Copy</button>
+      <details class="menu">
+        <summary class="btn icon" title="More prompt actions">▾</summary>
+        <div class="menu-list">
+          <button class="menu-item" id="dlBtn" title="Download prompt">⬇️ Download Prompt</button>
+          <button class="menu-item" id="copyLlmBtn" title="Copy LLM command">💻 Copy LLM Bash</button>
+          <button class="menu-item" id="shareLinkBtn" title="Copy shareable link">🔗 Share Deeplink</button>
+        </div>
+      </details>
     </div>
-  </header>
+
+    <!-- Group 2: Manifests (primary = Save; dropdown holds Select, Load, Delete, JSON I/O) -->
+    <div class="group">
+      <button class="btn" id="manifestSaveBtn" title="Save manifest to this browser">💾 Save</button>
+      <details class="menu">
+        <summary class="btn icon" title="More manifest actions">▾</summary>
+        <div class="menu-list" style="min-width:280px">
+          <div class="menu-field">
+            <label class="small muted" for="manifestSelect" style="display:block;margin-bottom:4px;">Saved manifests</label>
+            <select id="manifestSelect" title="Saved manifests" style="width:100%"></select>
+          </div>
+          <div class="menu-row">
+            <button class="menu-item" id="manifestLoadBtn" title="Load selected manifest">📂 Load</button>
+            <button class="menu-item warn" id="manifestDeleteBtn" title="Delete selected manifest">🗑️ Delete</button>
+          </div>
+          <hr class="menu-sep">
+          <button class="menu-item" id="dlJsonBtn" title="Download manifest JSON">⬇️ Download JSON Manifest</button>
+          <button class="menu-item" id="loadJsonBtn" title="Load manifest JSON">⬆️ Load JSON Manifest</button>
+        </div>
+      </details>
+    </div>
+
+    <!-- Group 3: Tools (quick actions) -->
+    <div class="group">
+      <button class="btn icon" id="validateAllBtn" title="Validate digests for selected">🔐</button>
+      <button class="btn icon warn" id="clearBtn" title="Clear selection">🧹</button>
+    </div>
+
+    <!-- Theme -->
+    <button class="btn icon" id="themeBtn" title="Toggle theme" aria-label="Toggle color theme">🌙</button>
+  </nav>
+</header>
+
 
   <main>
     <div id="split">
@@ -5777,7 +5889,7 @@ Prism.languages.js = Prism.languages.javascript;
     },
     "support.pii_redaction_smoke_v1": {
       "id": "support.pii_redaction_smoke_v1",
-      "version": "1.1.0",
+      "version": "1.0.0",
       "domain": "support",
       "title": "PII Redaction Smoke Test",
       "statement": "Ensure bundled examples contain no plaintext PII. This check scans example transcripts\n(default: artifacts/examples/support_agent/examples.txt) for emails, phone numbers,\ncredit card patterns, government ID keywords, street addresses, and IP addresses.",
@@ -5785,18 +5897,13 @@ Prism.languages.js = Prism.languages.javascript;
         {
           "name": "no_plaintext_pii_in_examples",
           "language": "python",
-          "entrypoint": "python3",
-          "args": [
-            "scripts/support/pii_smoke_check.py"
-          ],
+          "code": "import os, sys, re, json, glob\n\ndef find_files(path):\n    if os.path.isdir(path):\n        for ext in (\"*.txt\", \"*.md\", \"*.log\"):\n            for p in glob.glob(os.path.join(path, ext)):\n                yield p\n    else:\n        if os.path.exists(path):\n            yield path\n\nEMAIL = re.compile(r\"[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\", re.I)\nPHONE = re.compile(r\"(?:\\+?\\d{1,3}[\\s\\-\\.]?)?(?:\\(?\\d{3}\\)?[\\s\\-\\.]?\\d{3}[\\s\\-\\.]?\\d{4})\")\nCCARD = re.compile(r\"\\b(?:\\d[ -]*?){13,19}\\b\")\nGOVID = re.compile(r\"\\b(?:SSN|NIN|SIN|CPF|DNI|Aadhar)\\b\", re.I)\nADDRESS = re.compile(r\"\\b\\d{1,5}\\s+\\w+\\s+(?:St|Street|Ave|Avenue|Rd|Road|Blvd|Lane|Ln|Dr|Drive)\\b\", re.I)\nIPADDR = re.compile(r\"\\b(?:(?:\\d{1,3}\\.){3}\\d{1,3})\\b\")\n\nMASKED_TOKENS = re.compile(r\"\\*\\*\\*|\\[redacted\\]|\\[masked\\]\", re.I)\n\ndef main():\n    examples_path = os.environ.get(\"EXAMPLES_PATH\", \"\").strip()\n    fail_on_any = os.environ.get(\"FAIL_ON_ANY\", \"true\").lower() == \"true\"\n\n    if not examples_path:\n        print(json.dumps({\"ok\": False, \"error\": \"EXAMPLES_PATH not set\"}))\n        sys.exit(2)\n\n    patterns = {\n        \"email\": EMAIL,\n        \"phone\": PHONE,\n        \"credit_card\": CCARD,\n        \"government_id\": GOVID,\n        \"street_address\": ADDRESS,\n        \"ip_address\": IPADDR,\n    }\n\n    findings = []\n    total_lines = 0\n\n    for fp in find_files(examples_path):\n        with open(fp, \"r\", errors=\"ignore\") as f:\n            for ln, line in enumerate(f, 1):\n                total_lines += 1\n                if MASKED_TOKENS.search(line):\n                    continue\n                for tag, rx in patterns.items():\n                    for m in rx.finditer(line):\n                        findings.append({\"file\": fp, \"line\": ln, \"tag\": tag, \"match\": m.group(0)[:64]})\n\n    ok = len(findings) == 0\n    result = {\"ok\": ok, \"total_lines\": total_lines, \"violations\": findings}\n\n    print(json.dumps(result, indent=2))\n    sys.exit(0 if (ok or not fail_on_any) else 1)\n\nif __name__ == \"__main__\":\n    main()",
           "env": {
             "EXAMPLES_PATH": "artifacts/examples/support_agent/examples.txt",
             "FAIL_ON_ANY": "true"
           },
-          "timeout_ms": 5000,
-          "memory_mb": 128,
-          "net": false,
-          "fs_mode": "ro"
+          "success_message": "No PII found in examples.",
+          "failure_message": "PII detected in examples. Redact or mask before shipping."
         }
       ],
       "provenance": {
@@ -5805,8 +5912,8 @@ Prism.languages.js = Prism.languages.javascript;
         "org": "Truth Capsules Demo",
         "license": "MIT",
         "source_url": "https://example.com/truth-capsules/support",
-        "created": "2025-11-10T19:05:00Z",
-        "updated": "2025-11-10T19:05:00Z",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
         "review": {
           "status": "draft",
           "reviewers": [],
@@ -5824,12 +5931,14 @@ Prism.languages.js = Prism.languages.javascript;
         "conversation",
         "support"
       ],
+      "dependencies": [],
+      "incompatible_with": [],
       "security": {
         "sensitivity": "medium",
         "notes": ""
       },
       "_file": "./capsules/support/support.pii_redaction_smoke_v1.yaml",
-      "_raw": "id: support.pii_redaction_smoke_v1\nversion: 1.1.0\ndomain: support\ntitle: PII Redaction Smoke Test\nstatement: |-\n  Ensure bundled examples contain no plaintext PII. This check scans example transcripts\n  (default: artifacts/examples/support_agent/examples.txt) for emails, phone numbers,\n  credit card patterns, government ID keywords, street addresses, and IP addresses.\nwitnesses:\n  - name: no_plaintext_pii_in_examples\n    language: python\n    entrypoint: python3\n    args:\n      - scripts/support/pii_smoke_check.py\n    env:\n      EXAMPLES_PATH: artifacts/examples/support_agent/examples.txt\n      FAIL_ON_ANY: \"true\"\n    timeout_ms: 5000\n    memory_mb: 128\n    net: false\n    fs_mode: ro\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T19:05:00Z'\n  updated: '2025-11-10T19:05:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\nsecurity:\n  sensitivity: medium\n  notes: \"\"\n",
+      "_raw": "id: support.pii_redaction_smoke_v1\nversion: 1.0.0\ndomain: support\ntitle: PII Redaction Smoke Test\nstatement: |-\n  Ensure bundled examples contain no plaintext PII. This check scans example transcripts\n  (default: artifacts/examples/support_agent/examples.txt) for emails, phone numbers,\n  credit card patterns, government ID keywords, street addresses, and IP addresses.\nwitnesses:\n  - name: no_plaintext_pii_in_examples\n    language: python\n    code: |-\n      import os, sys, re, json, glob\n\n      def find_files(path):\n          if os.path.isdir(path):\n              for ext in (\"*.txt\", \"*.md\", \"*.log\"):\n                  for p in glob.glob(os.path.join(path, ext)):\n                      yield p\n          else:\n              if os.path.exists(path):\n                  yield path\n\n      EMAIL = re.compile(r\"[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\", re.I)\n      PHONE = re.compile(r\"(?:\\+?\\d{1,3}[\\s\\-\\.]?)?(?:\\(?\\d{3}\\)?[\\s\\-\\.]?\\d{3}[\\s\\-\\.]?\\d{4})\")\n      CCARD = re.compile(r\"\\b(?:\\d[ -]*?){13,19}\\b\")\n      GOVID = re.compile(r\"\\b(?:SSN|NIN|SIN|CPF|DNI|Aadhar)\\b\", re.I)\n      ADDRESS = re.compile(r\"\\b\\d{1,5}\\s+\\w+\\s+(?:St|Street|Ave|Avenue|Rd|Road|Blvd|Lane|Ln|Dr|Drive)\\b\", re.I)\n      IPADDR = re.compile(r\"\\b(?:(?:\\d{1,3}\\.){3}\\d{1,3})\\b\")\n\n      MASKED_TOKENS = re.compile(r\"\\*\\*\\*|\\[redacted\\]|\\[masked\\]\", re.I)\n\n      def main():\n          examples_path = os.environ.get(\"EXAMPLES_PATH\", \"\").strip()\n          fail_on_any = os.environ.get(\"FAIL_ON_ANY\", \"true\").lower() == \"true\"\n\n          if not examples_path:\n              print(json.dumps({\"ok\": False, \"error\": \"EXAMPLES_PATH not set\"}))\n              sys.exit(2)\n\n          patterns = {\n              \"email\": EMAIL,\n              \"phone\": PHONE,\n              \"credit_card\": CCARD,\n              \"government_id\": GOVID,\n              \"street_address\": ADDRESS,\n              \"ip_address\": IPADDR,\n          }\n\n          findings = []\n          total_lines = 0\n\n          for fp in find_files(examples_path):\n              with open(fp, \"r\", errors=\"ignore\") as f:\n                  for ln, line in enumerate(f, 1):\n                      total_lines += 1\n                      if MASKED_TOKENS.search(line):\n                          continue\n                      for tag, rx in patterns.items():\n                          for m in rx.finditer(line):\n                              findings.append({\"file\": fp, \"line\": ln, \"tag\": tag, \"match\": m.group(0)[:64]})\n\n          ok = len(findings) == 0\n          result = {\"ok\": ok, \"total_lines\": total_lines, \"violations\": findings}\n\n          print(json.dumps(result, indent=2))\n          sys.exit(0 if (ok or not fail_on_any) else 1)\n\n      if __name__ == \"__main__\":\n          main()\n    env:\n      EXAMPLES_PATH: artifacts/examples/support_agent/examples.txt\n      FAIL_ON_ANY: \"true\"\n    success_message: \"No PII found in examples.\"\n    failure_message: \"PII detected in examples. Redact or mask before shipping.\"\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: medium\n  notes: ''\n",
       "posture": "witnessed",
       "_witness_count": 1
     },
@@ -5955,27 +6064,24 @@ Prism.languages.js = Prism.languages.javascript;
     },
     "support.intent_router_sanity_v1": {
       "id": "support.intent_router_sanity_v1",
-      "version": "1.1.0",
+      "version": "1.0.0",
       "domain": "support",
       "title": "Intent Router Sanity Check",
       "statement": "Validate that baseline rules classify common support intents correctly. Defaults read\nfixtures under artifacts/examples/support_agent/. Accuracy must meet or exceed 0.8.",
+      "assumptions": null,
+      "pedagogy": null,
       "witnesses": [
         {
           "name": "routes_top_intents_correctly",
           "language": "python",
-          "entrypoint": "python3",
-          "args": [
-            "scripts/support/intent_router_check.py"
-          ],
+          "code": "import os, sys, json, re\n\ndef load_json(path):\n    with open(path, \"r\") as f:\n        return json.load(f)\n\ndef classify(text, rules):\n    text_l = text.lower()\n    for intent, pats in rules.items():\n        for pat in pats:\n            if re.search(pat, text_l):\n                return intent\n    return \"unknown\"\n\ndef main():\n    intents_path = os.environ.get(\"INTENTS_JSON\", \"\").strip()\n    rules_path = os.environ.get(\"RULES_JSON\", \"\").strip()\n    acc_threshold = float(os.environ.get(\"ACC_THRESHOLD\", \"0.8\"))\n\n    if not intents_path or not rules_path:\n        print(json.dumps({\"ok\": False, \"error\": \"INTENTS_JSON or RULES_JSON not set\"}))\n        sys.exit(2)\n\n    intents = load_json(intents_path)  # list of {text, expected}\n    rules = load_json(rules_path)      # {intent: [regex,...]}\n\n    total = len(intents)\n    correct = 0\n    details = []\n\n    for item in intents:\n        text = item[\"text\"]\n        expected = item[\"expected\"]\n        pred = classify(text, rules)\n        correct += 1 if pred == expected else 0\n        details.append({\"text\": text, \"expected\": expected, \"pred\": pred})\n\n    acc = (correct / total) if total else 0.0\n    ok = acc >= acc_threshold\n\n    print(json.dumps({\"ok\": ok, \"accuracy\": acc, \"threshold\": acc_threshold, \"total\": total, \"correct\": correct, \"details\": details}, indent=2))\n    sys.exit(0 if ok else 1)\n\nif __name__ == \"__main__\":\n    main()",
           "env": {
             "INTENTS_JSON": "artifacts/examples/support_agent/intents.json",
             "RULES_JSON": "artifacts/examples/support_agent/router_rules.json",
             "ACC_THRESHOLD": "0.8"
           },
-          "timeout_ms": 5000,
-          "memory_mb": 128,
-          "net": false,
-          "fs_mode": "ro"
+          "success_message": "Intent router accuracy meets threshold.",
+          "failure_message": "Intent router below threshold — refine rules or examples."
         }
       ],
       "provenance": {
@@ -5984,8 +6090,8 @@ Prism.languages.js = Prism.languages.javascript;
         "org": "Truth Capsules Demo",
         "license": "MIT",
         "source_url": "https://example.com/truth-capsules/support",
-        "created": "2025-11-10T19:05:00Z",
-        "updated": "2025-11-10T19:05:00Z",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
         "review": {
           "status": "draft",
           "reviewers": [],
@@ -6003,12 +6109,14 @@ Prism.languages.js = Prism.languages.javascript;
         "conversation",
         "support"
       ],
+      "dependencies": [],
+      "incompatible_with": [],
       "security": {
         "sensitivity": "medium",
         "notes": ""
       },
       "_file": "./capsules/support/support.intent_router_sanity_v1.yaml",
-      "_raw": "id: support.intent_router_sanity_v1\nversion: 1.1.0\ndomain: support\ntitle: Intent Router Sanity Check\nstatement: |-\n  Validate that baseline rules classify common support intents correctly. Defaults read\n  fixtures under artifacts/examples/support_agent/. Accuracy must meet or exceed 0.8.\nwitnesses:\n  - name: routes_top_intents_correctly\n    language: python\n    entrypoint: python3\n    args:\n      - scripts/support/intent_router_check.py\n    env:\n      INTENTS_JSON: artifacts/examples/support_agent/intents.json\n      RULES_JSON: artifacts/examples/support_agent/router_rules.json\n      ACC_THRESHOLD: \"0.8\"\n    timeout_ms: 5000\n    memory_mb: 128\n    net: false\n    fs_mode: ro\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T19:05:00Z'\n  updated: '2025-11-10T19:05:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\nsecurity:\n  sensitivity: medium\n  notes: \"\"\n",
+      "_raw": "id: support.intent_router_sanity_v1\nversion: 1.0.0\ndomain: support\ntitle: Intent Router Sanity Check\nstatement: |-\n  Validate that baseline rules classify common support intents correctly. Defaults read\n  fixtures under artifacts/examples/support_agent/. Accuracy must meet or exceed 0.8.\nassumptions:\npedagogy:\nwitnesses:\n  - name: routes_top_intents_correctly\n    language: python\n    code: |-\n      import os, sys, json, re\n\n      def load_json(path):\n          with open(path, \"r\") as f:\n              return json.load(f)\n\n      def classify(text, rules):\n          text_l = text.lower()\n          for intent, pats in rules.items():\n              for pat in pats:\n                  if re.search(pat, text_l):\n                      return intent\n          return \"unknown\"\n\n      def main():\n          intents_path = os.environ.get(\"INTENTS_JSON\", \"\").strip()\n          rules_path = os.environ.get(\"RULES_JSON\", \"\").strip()\n          acc_threshold = float(os.environ.get(\"ACC_THRESHOLD\", \"0.8\"))\n\n          if not intents_path or not rules_path:\n              print(json.dumps({\"ok\": False, \"error\": \"INTENTS_JSON or RULES_JSON not set\"}))\n              sys.exit(2)\n\n          intents = load_json(intents_path)  # list of {text, expected}\n          rules = load_json(rules_path)      # {intent: [regex,...]}\n\n          total = len(intents)\n          correct = 0\n          details = []\n\n          for item in intents:\n              text = item[\"text\"]\n              expected = item[\"expected\"]\n              pred = classify(text, rules)\n              correct += 1 if pred == expected else 0\n              details.append({\"text\": text, \"expected\": expected, \"pred\": pred})\n\n          acc = (correct / total) if total else 0.0\n          ok = acc >= acc_threshold\n\n          print(json.dumps({\"ok\": ok, \"accuracy\": acc, \"threshold\": acc_threshold, \"total\": total, \"correct\": correct, \"details\": details}, indent=2))\n          sys.exit(0 if ok else 1)\n\n      if __name__ == \"__main__\":\n          main()\n\n    env:\n      INTENTS_JSON: artifacts/examples/support_agent/intents.json\n      RULES_JSON: artifacts/examples/support_agent/router_rules.json\n      ACC_THRESHOLD: \"0.8\"\n    success_message: \"Intent router accuracy meets threshold.\"\n    failure_message: \"Intent router below threshold — refine rules or examples.\"\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: medium\n  notes: ''\n",
       "posture": "witnessed",
       "_witness_count": 1
     },
@@ -7019,65 +7127,51 @@ Prism.languages.js = Prism.languages.javascript;
 
       /* ------------ Renderers ------------ */
       function renderProfiles() {
-        const sel    = $('profiles');
-        const descEl = $('profileDesc');
-        const pmap   = DATA.profiles || {};
-        const keys   = Object.keys(pmap).sort();
+  const sel    = $('profiles');
+  const descEl = $('profileDesc');
+  const pmap   = DATA.profiles || {};
+  const keys   = Object.keys(pmap).sort();
 
-        // rebuild options
-        sel.textContent = '';
-        for (const k of keys) {
-          const p = pmap[k] || {};
-          const o = document.createElement('option');
-          o.value = k;
-          o.textContent = (p.title || k) + ' (' + (p.version || '1.0.0') + ')';
-          o.dataset.desc = p.description || '';
-          sel.appendChild(o);
-        }
+  // rebuild options
+  sel.textContent = '';
+  for (const k of keys) {
+    const p = pmap[k] || {};
+    const o = document.createElement('option');
+    o.value = k;
+    o.textContent = (p.title || k) + ' (' + (p.version || '1.0.0') + ')';
+    o.dataset.desc = p.description || '';
+    sel.appendChild(o);
+  }
 
-        // prefer browser-remembered; else STATE; else first
-        const remembered = sel.value;
-        let target =
-          (remembered && pmap[remembered]) ? remembered :
-          (STATE.profile && pmap[STATE.profile]) ? STATE.profile :
-          (keys[0] || '');
+  // Choose target — IMPORTANT: prefer STATE.profile (e.g., set by importState)
+  const saved = localStorage.getItem('tc_profile');
+  let target =
+    (STATE.profile && pmap[STATE.profile]) ? STATE.profile :
+    (saved && pmap[saved]) ? saved :
+    (sel.value && pmap[sel.value]) ? sel.value :
+    (keys[0] || '');
 
-        sel.value = target;
-        STATE.profile = target;
+  sel.value = target;
+  STATE.profile = target;
 
-        // startup description
-        if (descEl) {
-          const p0 = pmap[target] || {};
-          descEl.textContent = p0.description ? ('— ' + p0.description) : '';
-        }
+  // description
+  if (descEl) {
+    const p0 = pmap[target] || {};
+    descEl.textContent = p0.description ? ('— ' + p0.description) : '';
+  }
 
-        // keep your existing change handler
-        sel.onchange = () => {
-          STATE.profile = sel.value;
-          const p = pmap[STATE.profile] || {};
-          if (descEl) descEl.textContent = p.description ? ('— ' + p.description) : '';
-          if (typeof compose === 'function') compose();
-        };
+  // change handler (unchanged)
+  sel.onchange = () => {
+    STATE.profile = sel.value;
+    const p = pmap[STATE.profile] || {};
+    if (descEl) descEl.textContent = p.description ? ('— ' + p.description) : '';
+    if (typeof compose === 'function') compose();
+  };
 
-        // --- FAKE TOGGLE TO FORCE ACTIVATION ON LOAD ---
-        // If there’s more than one profile, switch to a different one and back.
-        if (keys.length > 1) {
-          const alt = (keys[0] === target) ? keys[1] : keys[0];
+  // Fire one change event to initialize downstream (no fake toggle)
+  sel.dispatchEvent(new Event('change', { bubbles: true }));
+}
 
-          // 1) flip to alt (fires any listeners)
-          sel.value = alt;
-          sel.dispatchEvent(new Event('change', { bubbles: true }));
-
-          // 2) next tick, flip back to target (final state correct)
-          setTimeout(() => {
-            sel.value = target;
-            sel.dispatchEvent(new Event('change', { bubbles: true }));
-          }, 0);
-        } else {
-          // only one option: just fire a change to run downstream logic
-          sel.dispatchEvent(new Event('change', { bubbles: true }));
-        }
-      }
 
       function capsuleRow(c, id, opts = {}) {
         const showDomainChip = !!opts.showDomainChip;
@@ -7447,28 +7541,253 @@ Prism.languages.js = Prism.languages.javascript;
 
 
       /* ------------ Manifest + share ------------ */
-      function buildManifest() { return { profile: STATE.profile, order: STATE.order.filter(id => STATE.selectedCaps.has(id)), bundles: [...STATE.selectedBundles], ts: new Date().toISOString() }; }
-      function exportState() { return { profile: STATE.profile, bundles: [...STATE.selectedBundles], order: STATE.order.filter(id => STATE.selectedCaps.has(id)) }; }
-      function encodeStateToUrl() {
-        const s = btoa(unescape(encodeURIComponent(JSON.stringify(exportState()))));
-        const url = new URL(window.location.href); url.searchParams.set('s', s); return url.toString();
+      /* ------------ Manifest + share ------------ */
+
+/* Namespace for LocalStorage manifests */
+const MANIFEST_NS = 'tc_manifests_v1'; // value: { [name: string]: Manifest }
+
+/* Helpers */
+function readAllManifests() {
+  try { return JSON.parse(localStorage.getItem(MANIFEST_NS) || '{}'); }
+  catch { return {}; }
+}
+function writeAllManifests(obj) {
+  localStorage.setItem(MANIFEST_NS, JSON.stringify(obj || {}));
+}
+function listManifestNames() {
+  return Object.keys(readAllManifests()).sort((a, b) => a.localeCompare(b));
+}
+
+/* Filename-ish, human friendly */
+function tsCompact(d = new Date()) {
+  const p2 = n => String(n).padStart(2, '0');
+  return [
+    d.getFullYear(),
+    p2(d.getMonth() + 1),
+    p2(d.getDate()),
+    '_',
+    p2(d.getHours()),
+    p2(d.getMinutes()),
+    p2(d.getSeconds())
+  ].join('');
+}
+function suggestedManifestName() {
+  const prof = STATE.profile || 'default';
+  const nCaps = STATE.order.filter(id => STATE.selectedCaps.has(id)).length;
+  return `${tsCompact()}__${prof}__n${nCaps}`;
+}
+
+/* Build a complete, safe-to-JSON manifest (includes the composed system prompt) */
+function buildManifest() {
+  return {
+    schema: 'tc.manifest.v1',
+    ts: new Date().toISOString(),
+    profile: STATE.profile,
+    bundles: [...STATE.selectedBundles],
+    order: STATE.order.filter(id => STATE.selectedCaps.has(id)),
+    includePed: $('includePed').checked ? 1 : 0,
+    markdown: $('markdown').checked ? 1 : 0,
+    // Save the current composed system prompt WITHOUT markdown fences
+    prompt: getCurrentSystemPrompt()
+  };
+}
+
+/* Export-only (for URL deeplinks) */
+function exportState() {
+  return {
+    profile: STATE.profile,
+    bundles: [...STATE.selectedBundles],
+    order: STATE.order.filter(id => STATE.selectedCaps.has(id))
+  };
+}
+
+/* Share-link (does not include prompt; keeps links light) */
+function encodeStateToUrl() {
+  const s = btoa(unescape(encodeURIComponent(JSON.stringify(exportState()))));
+  const url = new URL(window.location.href);
+  url.searchParams.set('s', s);
+  return url.toString();
+}
+
+/* Import state/manifest (from file or LocalStorage). Also applies prompt after render. */
+function importState(obj) {
+  if (!obj) return;
+
+  // Choose a valid profile (fallback to first available)
+  const prof = (obj.profile && DATA.profiles[obj.profile]) ? obj.profile
+               : (Object.keys(DATA.profiles || {})[0] || null);
+
+  STATE.profile = prof;
+  STATE.selectedBundles = new Set();
+  STATE.selectedCaps = new Set();
+  STATE.manualCaps = new Set();
+  STATE.order = [];
+
+  // Bundles → selectedCaps/ORDER
+  (obj.bundles || []).forEach(b => { if (DATA.bundles[b]) STATE.selectedBundles.add(b); });
+  STATE.selectedBundles.forEach(b => {
+    const caps = (DATA.bundles[b] && DATA.bundles[b].capsules) || [];
+    caps.forEach(cid => {
+      if (DATA.capsules[cid]) {
+        STATE.selectedCaps.add(cid);
+        if (!STATE.order.includes(cid)) STATE.order.push(cid);
       }
-      function importState(obj) {
-        if (!obj) return;
-        const prof = obj.profile && DATA.profiles[obj.profile] ? obj.profile : (Object.keys(DATA.profiles || {})[0] || null);
-        STATE.profile = prof; STATE.selectedBundles = new Set(); STATE.selectedCaps = new Set(); STATE.manualCaps = new Set(); STATE.order = [];
-        (obj.bundles || []).forEach(b => { if (DATA.bundles[b]) STATE.selectedBundles.add(b); });
-        STATE.selectedBundles.forEach(b => {
-          const caps = (DATA.bundles[b] && DATA.bundles[b].capsules) || [];
-          caps.forEach(cid => { if (DATA.capsules[cid]) { STATE.selectedCaps.add(cid); if (!STATE.order.includes(cid)) STATE.order.push(cid); } });
-        });
-        (obj.order || []).forEach(cid => { if (DATA.capsules[cid]) { if (!STATE.order.includes(cid)) STATE.order.push(cid); STATE.selectedCaps.add(cid); } });
-        render();
-      }
-      function tryHydrateFromUrl() {
-        const url = new URL(window.location.href); const s = url.searchParams.get('s'); if (!s) return;
-        try { const json = decodeURIComponent(escape(atob(s))); importState(JSON.parse(json)); } catch (e) { console.error('bad s param', e); }
-      }
+    });
+  });
+
+  // Manual order/caps (explicit)
+  (obj.order || []).forEach(cid => {
+    if (DATA.capsules[cid]) {
+      if (!STATE.order.includes(cid)) STATE.order.push(cid);
+      STATE.selectedCaps.add(cid);
+    }
+  });
+
+  // Render everything (this will call compose(), which would normally overwrite #out)
+  render();
+
+  // Restore checkboxes from the manifest (optional, but nice to have)
+  if (Object.prototype.hasOwnProperty.call(obj, 'includePed')) {
+    $('includePed').checked = !!obj.includePed;
+  }
+  if (Object.prototype.hasOwnProperty.call(obj, 'markdown')) {
+    $('markdown').checked = !!obj.markdown;
+  }
+
+  // Apply prompt AFTER render/compose so the loaded prompt wins on load
+  if (typeof obj.prompt === 'string') {
+    $('out').value = obj.prompt;
+  }
+
+  // Update the profile select’s remembered value for future sessions
+  if (STATE.profile) localStorage.setItem('tc_profile', STATE.profile);
+}
+
+/* Hydrate state from ?s=... link */
+function tryHydrateFromUrl() {
+  const url = new URL(window.location.href);
+  const s = url.searchParams.get('s');
+  if (!s) return;
+  try {
+    const json = decodeURIComponent(escape(atob(s)));
+    importState(JSON.parse(json));
+  } catch (e) {
+    console.error('bad s param', e);
+  }
+}
+
+/* LocalStorage manifests – UI binding */
+function refreshManifestSelect() {
+  const sel = $('manifestSelect');
+  if (!sel) return;
+  sel.innerHTML = '';
+  const names = listManifestNames();
+  if (names.length === 0) {
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.textContent = '(no saved manifests)';
+    sel.appendChild(opt);
+    sel.disabled = true;
+  } else {
+    sel.disabled = false;
+    names.forEach(n => {
+      const opt = document.createElement('option');
+      opt.value = n;
+      opt.textContent = n;
+      sel.appendChild(opt);
+    });
+  }
+}
+
+function saveManifestToLocalStorage() {
+  const manifest = buildManifest();
+  const defaultName = suggestedManifestName();
+  const name = prompt('Save manifest as:', defaultName);
+  if (!name) return;
+
+  const all = readAllManifests();
+  const exists = Object.prototype.hasOwnProperty.call(all, name);
+  if (exists) {
+    const ok = confirm(`A manifest named "${name}" already exists. Overwrite?`);
+    if (!ok) return;
+  }
+
+  all[name] = manifest;
+  writeAllManifests(all);
+  refreshManifestSelect();
+  // Preselect the saved item
+  const sel = $('manifestSelect');
+  if (sel && !sel.disabled) sel.value = name;
+  toast(`Saved manifest "${name}"`);
+}
+
+function loadSelectedManifestFromLocalStorage() {
+  const sel = $('manifestSelect');
+  if (!sel || sel.disabled || !sel.value) {
+    toast('No saved manifest selected'); 
+    return;
+  }
+  const all = readAllManifests();
+  const m = all[sel.value];
+  if (!m) { toast('Manifest not found'); return; }
+  importState(m);
+  toast(`Loaded "${sel.value}"`);
+}
+
+function deleteSelectedManifestFromLocalStorage() {
+  const sel = $('manifestSelect');
+  if (!sel || sel.disabled || !sel.value) {
+    toast('No saved manifest selected');
+    return;
+  }
+  const name = sel.value;
+  const ok = confirm(`Delete saved manifest "${name}"? This cannot be undone.`);
+  if (!ok) return;
+
+  const all = readAllManifests();
+  delete all[name];
+  writeAllManifests(all);
+  refreshManifestSelect();
+  toast(`Deleted "${name}"`);
+}
+
+/* Wire buttons (file import already exists, we keep it) */
+$('dlJsonBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(buildManifest(), null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'system_prompt.manifest.json';
+  a.click();
+});
+
+$('loadJsonBtn').addEventListener('click', () => {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'application/json';
+  inp.onchange = async () => {
+    const f = inp.files[0];
+    if (!f) return;
+    try {
+      const txt = await f.text();
+      const obj = JSON.parse(txt);
+      importState(obj);
+      toast('Manifest loaded from file');
+    } catch (e) {
+      console.error(e);
+      toast('Invalid JSON manifest');
+    }
+  };
+  inp.click();
+});
+
+/* New LS controls */
+$('manifestSaveBtn').addEventListener('click', saveManifestToLocalStorage);
+$('manifestLoadBtn').addEventListener('click', loadSelectedManifestFromLocalStorage);
+$('manifestDeleteBtn').addEventListener('click', deleteSelectedManifestFromLocalStorage);
+
+/* Populate the manifest list on load */
+window.addEventListener('load', refreshManifestSelect);
+
 
       /* ------------ LLM Command Composition ------------ */
       function shQuoteLiteral(s) {
@@ -7815,6 +8134,43 @@ IFS=$'\\n\\t'
             btn.setAttribute('aria-expanded', String(hidden));
           });
         }
+      })();
+
+      /* Close <details.menu> when clicking elsewhere, Esc, or when another opens */
+      (function menuCloser(){
+        const menus = () => Array.from(document.querySelectorAll('details.menu'));
+
+        function closeAll(except = null){
+          menus().forEach(d => { if (d !== except) d.removeAttribute('open'); });
+        }
+
+        // 1) Click anywhere: keep the menu under the click, close the rest
+        document.addEventListener('click', (e) => {
+          const keep = e.target.closest('details.menu');
+          closeAll(keep || null);
+        });
+
+        // 2) When a menu toggles open, close the others
+        // Use capture to be safe across browsers.
+        document.addEventListener('toggle', (e) => {
+          const el = e.target;
+          if (el instanceof HTMLDetailsElement && el.classList.contains('menu') && el.open) {
+            closeAll(el);
+          }
+        }, true);
+
+        // 3) Esc closes all menus
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') closeAll();
+        });
+
+        // 4) After a menu-item is activated, close its menu (let handler run first)
+        document.addEventListener('click', (e) => {
+          const item = e.target.closest('.menu-item');
+          if (!item) return;
+          const d = item.closest('details.menu');
+          if (d) setTimeout(() => d.removeAttribute('open'), 0);
+        });
       })();
 
 

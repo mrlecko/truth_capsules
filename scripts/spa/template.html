@@ -583,6 +583,81 @@ details.panel-collapsible > .list{
 .help-title{ font-weight:600; margin-bottom:6px; }
 .muted{ color:var(--muted); }
 
+/* Layout */
+.toolbar {
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.toolbar .title-wrap { display:flex; flex-direction:column; }
+.toolbar-actions {
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+/* Groups = compact button clusters */
+.group {
+  display:flex;
+  align-items:center;
+  gap:4px;
+  padding:2px;
+  border:1px solid var(--border, #3a3f55);
+  border-radius:10px;
+  background:var(--panel, rgba(127,127,127,0.08));
+}
+
+/* Icon-sized buttons */
+.btn.icon { padding:6px 8px; min-width:auto; }
+
+/* Dropdown menu built from <details> */
+.menu { position:relative; }
+.menu > summary { list-style:none; cursor:pointer; }
+.menu > summary::-webkit-details-marker { display:none; }
+.menu[open] .menu-list { display:block; }
+
+.menu-list{
+  display:none;
+  position:absolute;
+  top:100%;
+  right:0;
+  margin-top:6px;
+  padding:6px;
+  background:var(--bgElevated, var(--bg));
+  border:1px solid var(--border, #3a3f55);
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.35);
+  z-index:1000;
+  min-width:220px;
+}
+
+.menu-item{
+  display:block;
+  width:100%;
+  padding:8px 10px;
+  text-align:left;
+  background:none;
+  border:0;
+  font:inherit;
+  color:inherit;
+  cursor:pointer;
+}
+.menu-item:hover{ background:rgba(127,127,127,0.12); border-radius:8px; }
+.menu-item.warn{ color:var(--danger, #e06c75); }
+
+.menu-field{ padding:4px 6px 8px; }
+.menu-row{ display:flex; gap:6px; padding:4px 6px; }
+.menu-sep{
+  border:0; height:1px; margin:6px 0;
+  background:linear-gradient(to right, transparent, var(--border, #3a3f55), transparent);
+}
+
+/* Small muted label */
+.small.muted{ opacity:0.7; font-size:12px; }
+
+
 </style>
 
 
@@ -617,23 +692,60 @@ details.panel-collapsible > .list{
 </head>
 
 <body>
-  <header class="toolbar">
+<header class="toolbar">
+  <div class="title-wrap">
     <h1>Truth Capsule Viewer & Prompt Composer</h1>
-    <div class="small" style="font-size:12px; margin-top:5px;">Generated {{ generated_at }}</div>
-    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-      <button style="display:none;" class="btn" id="composeBtn" title="Compose (Ctrl/Cmd+Enter)">🟢 Compose</button>
-      <button class="btn" id="copyBtn" title="Copy prompt">📋 Copy Prompt</button>
-      <button class="btn" id="copyLlmBtn" title="Copy LLM command">💻 Copy LLM Bash</button>
-      <button class="btn" id="dlBtn" title="Download prompt">⬇️ Download Prompt</button>
-      <button class="btn" id="dlJsonBtn" title="Download manifest JSON">⬇️ Download JSON Manifest</button>
-      <button class="btn" id="loadJsonBtn" title="Load manifest JSON">⬆️ Load JSON Manifest</button>
-      <button class="btn" id="shareLinkBtn" title="Copy shareable link">📋 Share Deeplink</button>
-      <button class="btn" id="validateAllBtn" title="Validate digests for selected">🔐 Validate Digests</button>
-      <button class="btn warn" id="clearBtn" title="Clear selection">🗑️ Clear Selected Capsules</button>
-      <button class="btn" id="themeBtn" title="Toggle theme" aria-label="Toggle color theme">🌙</button>
+    <div class="small" style="font-size:12px;margin-top:4px;">Generated {{ generated_at }}</div>
+  </div>
 
+  <nav class="toolbar-actions">
+
+    <!-- Group 1: Prompt (primary = Copy; extras in dropdown) -->
+    <div class="group">
+      <button style="display:none;" class="btn" id="composeBtn" title="Compose (Ctrl/Cmd+Enter)">🟢 Compose</button>
+      <button class="btn" id="copyBtn" title="Copy prompt">📋 Copy</button>
+      <details class="menu">
+        <summary class="btn icon" title="More prompt actions">▾</summary>
+        <div class="menu-list">
+          <button class="menu-item" id="dlBtn" title="Download prompt">⬇️ Download Prompt</button>
+          <button class="menu-item" id="copyLlmBtn" title="Copy LLM command">💻 Copy LLM Bash</button>
+          <button class="menu-item" id="shareLinkBtn" title="Copy shareable link">🔗 Share Deeplink</button>
+        </div>
+      </details>
     </div>
-  </header>
+
+    <!-- Group 2: Manifests (primary = Save; dropdown holds Select, Load, Delete, JSON I/O) -->
+    <div class="group">
+      <button class="btn" id="manifestSaveBtn" title="Save manifest to this browser">💾 Save</button>
+      <details class="menu">
+        <summary class="btn icon" title="More manifest actions">▾</summary>
+        <div class="menu-list" style="min-width:280px">
+          <div class="menu-field">
+            <label class="small muted" for="manifestSelect" style="display:block;margin-bottom:4px;">Saved manifests</label>
+            <select id="manifestSelect" title="Saved manifests" style="width:100%"></select>
+          </div>
+          <div class="menu-row">
+            <button class="menu-item" id="manifestLoadBtn" title="Load selected manifest">📂 Load</button>
+            <button class="menu-item warn" id="manifestDeleteBtn" title="Delete selected manifest">🗑️ Delete</button>
+          </div>
+          <hr class="menu-sep">
+          <button class="menu-item" id="dlJsonBtn" title="Download manifest JSON">⬇️ Download JSON Manifest</button>
+          <button class="menu-item" id="loadJsonBtn" title="Load manifest JSON">⬆️ Load JSON Manifest</button>
+        </div>
+      </details>
+    </div>
+
+    <!-- Group 3: Tools (quick actions) -->
+    <div class="group">
+      <button class="btn icon" id="validateAllBtn" title="Validate digests for selected">🔐</button>
+      <button class="btn icon warn" id="clearBtn" title="Clear selection">🧹</button>
+    </div>
+
+    <!-- Theme -->
+    <button class="btn icon" id="themeBtn" title="Toggle theme" aria-label="Toggle color theme">🌙</button>
+  </nav>
+</header>
+
 
   <main>
     <div id="split">
@@ -1002,65 +1114,51 @@ details.panel-collapsible > .list{
 
       /* ------------ Renderers ------------ */
       function renderProfiles() {
-        const sel    = $('profiles');
-        const descEl = $('profileDesc');
-        const pmap   = DATA.profiles || {};
-        const keys   = Object.keys(pmap).sort();
+  const sel    = $('profiles');
+  const descEl = $('profileDesc');
+  const pmap   = DATA.profiles || {};
+  const keys   = Object.keys(pmap).sort();
 
-        // rebuild options
-        sel.textContent = '';
-        for (const k of keys) {
-          const p = pmap[k] || {};
-          const o = document.createElement('option');
-          o.value = k;
-          o.textContent = (p.title || k) + ' (' + (p.version || '1.0.0') + ')';
-          o.dataset.desc = p.description || '';
-          sel.appendChild(o);
-        }
+  // rebuild options
+  sel.textContent = '';
+  for (const k of keys) {
+    const p = pmap[k] || {};
+    const o = document.createElement('option');
+    o.value = k;
+    o.textContent = (p.title || k) + ' (' + (p.version || '1.0.0') + ')';
+    o.dataset.desc = p.description || '';
+    sel.appendChild(o);
+  }
 
-        // prefer browser-remembered; else STATE; else first
-        const remembered = sel.value;
-        let target =
-          (remembered && pmap[remembered]) ? remembered :
-          (STATE.profile && pmap[STATE.profile]) ? STATE.profile :
-          (keys[0] || '');
+  // Choose target — IMPORTANT: prefer STATE.profile (e.g., set by importState)
+  const saved = localStorage.getItem('tc_profile');
+  let target =
+    (STATE.profile && pmap[STATE.profile]) ? STATE.profile :
+    (saved && pmap[saved]) ? saved :
+    (sel.value && pmap[sel.value]) ? sel.value :
+    (keys[0] || '');
 
-        sel.value = target;
-        STATE.profile = target;
+  sel.value = target;
+  STATE.profile = target;
 
-        // startup description
-        if (descEl) {
-          const p0 = pmap[target] || {};
-          descEl.textContent = p0.description ? ('— ' + p0.description) : '';
-        }
+  // description
+  if (descEl) {
+    const p0 = pmap[target] || {};
+    descEl.textContent = p0.description ? ('— ' + p0.description) : '';
+  }
 
-        // keep your existing change handler
-        sel.onchange = () => {
-          STATE.profile = sel.value;
-          const p = pmap[STATE.profile] || {};
-          if (descEl) descEl.textContent = p.description ? ('— ' + p.description) : '';
-          if (typeof compose === 'function') compose();
-        };
+  // change handler (unchanged)
+  sel.onchange = () => {
+    STATE.profile = sel.value;
+    const p = pmap[STATE.profile] || {};
+    if (descEl) descEl.textContent = p.description ? ('— ' + p.description) : '';
+    if (typeof compose === 'function') compose();
+  };
 
-        // --- FAKE TOGGLE TO FORCE ACTIVATION ON LOAD ---
-        // If there’s more than one profile, switch to a different one and back.
-        if (keys.length > 1) {
-          const alt = (keys[0] === target) ? keys[1] : keys[0];
+  // Fire one change event to initialize downstream (no fake toggle)
+  sel.dispatchEvent(new Event('change', { bubbles: true }));
+}
 
-          // 1) flip to alt (fires any listeners)
-          sel.value = alt;
-          sel.dispatchEvent(new Event('change', { bubbles: true }));
-
-          // 2) next tick, flip back to target (final state correct)
-          setTimeout(() => {
-            sel.value = target;
-            sel.dispatchEvent(new Event('change', { bubbles: true }));
-          }, 0);
-        } else {
-          // only one option: just fire a change to run downstream logic
-          sel.dispatchEvent(new Event('change', { bubbles: true }));
-        }
-      }
 
       function capsuleRow(c, id, opts = {}) {
         const showDomainChip = !!opts.showDomainChip;
@@ -1430,28 +1528,253 @@ details.panel-collapsible > .list{
 
 
       /* ------------ Manifest + share ------------ */
-      function buildManifest() { return { profile: STATE.profile, order: STATE.order.filter(id => STATE.selectedCaps.has(id)), bundles: [...STATE.selectedBundles], ts: new Date().toISOString() }; }
-      function exportState() { return { profile: STATE.profile, bundles: [...STATE.selectedBundles], order: STATE.order.filter(id => STATE.selectedCaps.has(id)) }; }
-      function encodeStateToUrl() {
-        const s = btoa(unescape(encodeURIComponent(JSON.stringify(exportState()))));
-        const url = new URL(window.location.href); url.searchParams.set('s', s); return url.toString();
+      /* ------------ Manifest + share ------------ */
+
+/* Namespace for LocalStorage manifests */
+const MANIFEST_NS = 'tc_manifests_v1'; // value: { [name: string]: Manifest }
+
+/* Helpers */
+function readAllManifests() {
+  try { return JSON.parse(localStorage.getItem(MANIFEST_NS) || '{}'); }
+  catch { return {}; }
+}
+function writeAllManifests(obj) {
+  localStorage.setItem(MANIFEST_NS, JSON.stringify(obj || {}));
+}
+function listManifestNames() {
+  return Object.keys(readAllManifests()).sort((a, b) => a.localeCompare(b));
+}
+
+/* Filename-ish, human friendly */
+function tsCompact(d = new Date()) {
+  const p2 = n => String(n).padStart(2, '0');
+  return [
+    d.getFullYear(),
+    p2(d.getMonth() + 1),
+    p2(d.getDate()),
+    '_',
+    p2(d.getHours()),
+    p2(d.getMinutes()),
+    p2(d.getSeconds())
+  ].join('');
+}
+function suggestedManifestName() {
+  const prof = STATE.profile || 'default';
+  const nCaps = STATE.order.filter(id => STATE.selectedCaps.has(id)).length;
+  return `${tsCompact()}__${prof}__n${nCaps}`;
+}
+
+/* Build a complete, safe-to-JSON manifest (includes the composed system prompt) */
+function buildManifest() {
+  return {
+    schema: 'tc.manifest.v1',
+    ts: new Date().toISOString(),
+    profile: STATE.profile,
+    bundles: [...STATE.selectedBundles],
+    order: STATE.order.filter(id => STATE.selectedCaps.has(id)),
+    includePed: $('includePed').checked ? 1 : 0,
+    markdown: $('markdown').checked ? 1 : 0,
+    // Save the current composed system prompt WITHOUT markdown fences
+    prompt: getCurrentSystemPrompt()
+  };
+}
+
+/* Export-only (for URL deeplinks) */
+function exportState() {
+  return {
+    profile: STATE.profile,
+    bundles: [...STATE.selectedBundles],
+    order: STATE.order.filter(id => STATE.selectedCaps.has(id))
+  };
+}
+
+/* Share-link (does not include prompt; keeps links light) */
+function encodeStateToUrl() {
+  const s = btoa(unescape(encodeURIComponent(JSON.stringify(exportState()))));
+  const url = new URL(window.location.href);
+  url.searchParams.set('s', s);
+  return url.toString();
+}
+
+/* Import state/manifest (from file or LocalStorage). Also applies prompt after render. */
+function importState(obj) {
+  if (!obj) return;
+
+  // Choose a valid profile (fallback to first available)
+  const prof = (obj.profile && DATA.profiles[obj.profile]) ? obj.profile
+               : (Object.keys(DATA.profiles || {})[0] || null);
+
+  STATE.profile = prof;
+  STATE.selectedBundles = new Set();
+  STATE.selectedCaps = new Set();
+  STATE.manualCaps = new Set();
+  STATE.order = [];
+
+  // Bundles → selectedCaps/ORDER
+  (obj.bundles || []).forEach(b => { if (DATA.bundles[b]) STATE.selectedBundles.add(b); });
+  STATE.selectedBundles.forEach(b => {
+    const caps = (DATA.bundles[b] && DATA.bundles[b].capsules) || [];
+    caps.forEach(cid => {
+      if (DATA.capsules[cid]) {
+        STATE.selectedCaps.add(cid);
+        if (!STATE.order.includes(cid)) STATE.order.push(cid);
       }
-      function importState(obj) {
-        if (!obj) return;
-        const prof = obj.profile && DATA.profiles[obj.profile] ? obj.profile : (Object.keys(DATA.profiles || {})[0] || null);
-        STATE.profile = prof; STATE.selectedBundles = new Set(); STATE.selectedCaps = new Set(); STATE.manualCaps = new Set(); STATE.order = [];
-        (obj.bundles || []).forEach(b => { if (DATA.bundles[b]) STATE.selectedBundles.add(b); });
-        STATE.selectedBundles.forEach(b => {
-          const caps = (DATA.bundles[b] && DATA.bundles[b].capsules) || [];
-          caps.forEach(cid => { if (DATA.capsules[cid]) { STATE.selectedCaps.add(cid); if (!STATE.order.includes(cid)) STATE.order.push(cid); } });
-        });
-        (obj.order || []).forEach(cid => { if (DATA.capsules[cid]) { if (!STATE.order.includes(cid)) STATE.order.push(cid); STATE.selectedCaps.add(cid); } });
-        render();
-      }
-      function tryHydrateFromUrl() {
-        const url = new URL(window.location.href); const s = url.searchParams.get('s'); if (!s) return;
-        try { const json = decodeURIComponent(escape(atob(s))); importState(JSON.parse(json)); } catch (e) { console.error('bad s param', e); }
-      }
+    });
+  });
+
+  // Manual order/caps (explicit)
+  (obj.order || []).forEach(cid => {
+    if (DATA.capsules[cid]) {
+      if (!STATE.order.includes(cid)) STATE.order.push(cid);
+      STATE.selectedCaps.add(cid);
+    }
+  });
+
+  // Render everything (this will call compose(), which would normally overwrite #out)
+  render();
+
+  // Restore checkboxes from the manifest (optional, but nice to have)
+  if (Object.prototype.hasOwnProperty.call(obj, 'includePed')) {
+    $('includePed').checked = !!obj.includePed;
+  }
+  if (Object.prototype.hasOwnProperty.call(obj, 'markdown')) {
+    $('markdown').checked = !!obj.markdown;
+  }
+
+  // Apply prompt AFTER render/compose so the loaded prompt wins on load
+  if (typeof obj.prompt === 'string') {
+    $('out').value = obj.prompt;
+  }
+
+  // Update the profile select’s remembered value for future sessions
+  if (STATE.profile) localStorage.setItem('tc_profile', STATE.profile);
+}
+
+/* Hydrate state from ?s=... link */
+function tryHydrateFromUrl() {
+  const url = new URL(window.location.href);
+  const s = url.searchParams.get('s');
+  if (!s) return;
+  try {
+    const json = decodeURIComponent(escape(atob(s)));
+    importState(JSON.parse(json));
+  } catch (e) {
+    console.error('bad s param', e);
+  }
+}
+
+/* LocalStorage manifests – UI binding */
+function refreshManifestSelect() {
+  const sel = $('manifestSelect');
+  if (!sel) return;
+  sel.innerHTML = '';
+  const names = listManifestNames();
+  if (names.length === 0) {
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.textContent = '(no saved manifests)';
+    sel.appendChild(opt);
+    sel.disabled = true;
+  } else {
+    sel.disabled = false;
+    names.forEach(n => {
+      const opt = document.createElement('option');
+      opt.value = n;
+      opt.textContent = n;
+      sel.appendChild(opt);
+    });
+  }
+}
+
+function saveManifestToLocalStorage() {
+  const manifest = buildManifest();
+  const defaultName = suggestedManifestName();
+  const name = prompt('Save manifest as:', defaultName);
+  if (!name) return;
+
+  const all = readAllManifests();
+  const exists = Object.prototype.hasOwnProperty.call(all, name);
+  if (exists) {
+    const ok = confirm(`A manifest named "${name}" already exists. Overwrite?`);
+    if (!ok) return;
+  }
+
+  all[name] = manifest;
+  writeAllManifests(all);
+  refreshManifestSelect();
+  // Preselect the saved item
+  const sel = $('manifestSelect');
+  if (sel && !sel.disabled) sel.value = name;
+  toast(`Saved manifest "${name}"`);
+}
+
+function loadSelectedManifestFromLocalStorage() {
+  const sel = $('manifestSelect');
+  if (!sel || sel.disabled || !sel.value) {
+    toast('No saved manifest selected'); 
+    return;
+  }
+  const all = readAllManifests();
+  const m = all[sel.value];
+  if (!m) { toast('Manifest not found'); return; }
+  importState(m);
+  toast(`Loaded "${sel.value}"`);
+}
+
+function deleteSelectedManifestFromLocalStorage() {
+  const sel = $('manifestSelect');
+  if (!sel || sel.disabled || !sel.value) {
+    toast('No saved manifest selected');
+    return;
+  }
+  const name = sel.value;
+  const ok = confirm(`Delete saved manifest "${name}"? This cannot be undone.`);
+  if (!ok) return;
+
+  const all = readAllManifests();
+  delete all[name];
+  writeAllManifests(all);
+  refreshManifestSelect();
+  toast(`Deleted "${name}"`);
+}
+
+/* Wire buttons (file import already exists, we keep it) */
+$('dlJsonBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(buildManifest(), null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'system_prompt.manifest.json';
+  a.click();
+});
+
+$('loadJsonBtn').addEventListener('click', () => {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'application/json';
+  inp.onchange = async () => {
+    const f = inp.files[0];
+    if (!f) return;
+    try {
+      const txt = await f.text();
+      const obj = JSON.parse(txt);
+      importState(obj);
+      toast('Manifest loaded from file');
+    } catch (e) {
+      console.error(e);
+      toast('Invalid JSON manifest');
+    }
+  };
+  inp.click();
+});
+
+/* New LS controls */
+$('manifestSaveBtn').addEventListener('click', saveManifestToLocalStorage);
+$('manifestLoadBtn').addEventListener('click', loadSelectedManifestFromLocalStorage);
+$('manifestDeleteBtn').addEventListener('click', deleteSelectedManifestFromLocalStorage);
+
+/* Populate the manifest list on load */
+window.addEventListener('load', refreshManifestSelect);
+
 
       /* ------------ LLM Command Composition ------------ */
       function shQuoteLiteral(s) {
@@ -1798,6 +2121,43 @@ IFS=$'\\n\\t'
             btn.setAttribute('aria-expanded', String(hidden));
           });
         }
+      })();
+
+      /* Close <details.menu> when clicking elsewhere, Esc, or when another opens */
+      (function menuCloser(){
+        const menus = () => Array.from(document.querySelectorAll('details.menu'));
+
+        function closeAll(except = null){
+          menus().forEach(d => { if (d !== except) d.removeAttribute('open'); });
+        }
+
+        // 1) Click anywhere: keep the menu under the click, close the rest
+        document.addEventListener('click', (e) => {
+          const keep = e.target.closest('details.menu');
+          closeAll(keep || null);
+        });
+
+        // 2) When a menu toggles open, close the others
+        // Use capture to be safe across browsers.
+        document.addEventListener('toggle', (e) => {
+          const el = e.target;
+          if (el instanceof HTMLDetailsElement && el.classList.contains('menu') && el.open) {
+            closeAll(el);
+          }
+        }, true);
+
+        // 3) Esc closes all menus
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') closeAll();
+        });
+
+        // 4) After a menu-item is activated, close its menu (let handler run first)
+        document.addEventListener('click', (e) => {
+          const item = e.target.closest('.menu-item');
+          if (!item) return;
+          const d = item.closest('details.menu');
+          if (d) setTimeout(() => d.removeAttribute('open'), 0);
+        });
       })();
 
 
