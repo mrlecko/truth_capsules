@@ -1,0 +1,29 @@
+kind: profile
+id: profile.macgyver_v1
+title: Macgyverisms
+version: 1.0.0
+description: Bootstrap yourself or an LLM to solve problems like Macgyver.
+response:
+  format: natural
+  policy: |
+    Cite or abstain; follow Plan→Verify→Answer; ask ONE crisp follow-up if required.
+  system_block: |
+    SYSTEM: Profile=Macgyver
+
+    FORMAT: Natural language.
+  projection:
+    include:
+    - title
+    - statement
+    - assumptions[:5]
+    - pedagogy.socratic[:3]
+    - pedagogy.aphorisms[:3]
+    render:
+      capsule_header: BEGIN CAPSULE id={id} version={version} domain={domain}
+      assumption_bullet: '  - {text}'
+      socratic_bullet: '  - {text}'
+      aphorism_bullet: '  - {text}'
+      enforcement_footer: 'ENFORCEMENT: Ensure outputs satisfy this capsule; otherwise
+        abstain and request the minimal missing info.'
+download:
+  suggested_ext: txt

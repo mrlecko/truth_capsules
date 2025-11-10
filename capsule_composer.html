@@ -2561,9 +2561,9 @@ Prism.languages.js = Prism.languages.javascript;
 <body>
   <header class="toolbar">
     <h1>Truth Capsule Prompt Composer</h1>
-    <div class="small" style="font-size:12px; margin-top:5px;">Generated 2025-11-10T17:00:46.011957Z</div>
+    <div class="small" style="font-size:12px; margin-top:5px;">Generated 2025-11-10T19:12:35.252828Z</div>
     <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-      <button style="display:none;" class="btn" id="composeBtn" title="Compose (Ctrl/Cmd+Enter)">🟢 Compose</button>
+      <button class="btn" id="composeBtn" title="Compose (Ctrl/Cmd+Enter)">🟢 Compose</button>
       <button class="btn" id="copyBtn" title="Copy prompt">📋 Copy Prompt</button>
       <button class="btn" id="copyLlmBtn" title="Copy LLM command">💻 Copy LLM Bash</button>
       <button class="btn" id="dlBtn" title="Download prompt">⬇️ Download Prompt</button>
@@ -2795,8 +2795,68 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/llm.citation_required_v1.yaml",
+      "_file": "./capsules/llm/llm.citation_required_v1.yaml",
       "_raw": "id: llm.citation_required_v1\nversion: 1.0.0\ndomain: llm\ntitle: Citations required\nstatement: Answers must include at least one citation or abstain.\nassumptions:\n- Operating in a general context\npedagogy:\n- kind: Socratic\n  text: What evidence supports this claim?\n- kind: Aphorism\n  text: Cite or abstain.\nwitnesses:\n  - name: citations_cover_claims\n    language: python\n    env:\n      ANSWER_PATH: artifacts/examples/answer_with_citation.json\n      COVERAGE_MIN: \"0.6\"         # ≥60% declarative sentences must be cited\n      DIVERSITY_MAX: \"0.7\"         # ≤70% of refs may come from one domain\n      ALLOWLIST: \"doi.org,arxiv.org,acm.org,ieee.org,nature.com,sciencemag.org,gov,edu\"\n      DOC_CLASS: \"\"                # set to \"opinion\" to SKIP\n    code: |-\n      import os, re, json, sys, pathlib\n      from urllib.parse import urlparse\n\n      ap = pathlib.Path(os.getenv(\"ANSWER_PATH\",\"\")).resolve()\n      if not ap.exists():\n          print(json.dumps({\"witness\":\"citations_cover_claims\",\"status\":\"FAIL\",\"reason\":\"file-not-found\",\"inputs\":{\"answer\":str(ap)}}))\n          sys.exit(1)\n\n      # Opinion content can SKIP (policy-controlled)\n      if os.getenv(\"DOC_CLASS\",\"\").lower() == \"opinion\":\n          print(json.dumps({\"witness\":\"citations_cover_claims\",\"status\":\"SKIP\",\"reason\":\"opinion-doc\",\"inputs\":{\"answer\":str(ap)}}))\n          sys.exit(0)\n\n      data = json.loads(ap.read_text(encoding=\"utf-8\"))\n      answer = (data.get(\"answer\") or \"\").strip()\n      refs = data.get(\"references\") or []\n\n      # Very light sentence segmentation (declarative-ish)\n      sentences = [s.strip() for s in re.split(r'(?<=[.!?])\\s+', answer) if s.strip()]\n      # Extract [n] citations\n      cite_pat = re.compile(r'\\[(\\d+)\\]')\n      cited_flags = [bool(cite_pat.search(s)) for s in sentences]\n      total = len(sentences)\n      cited = sum(cited_flags)\n\n      # Build ref index and domains\n      ref_by_id = {int(r.get(\"id\")): r for r in refs if isinstance(r.get(\"id\"), int) and r.get(\"url\")}\n      domains = []\n      for r in refs:\n          try:\n              host = urlparse(r.get(\"url\",\"\")).netloc.lower()\n              if host: domains.append(host)\n          except Exception:\n              pass\n\n      # Policies\n      COVERAGE_MIN = float(os.getenv(\"COVERAGE_MIN\",\"0.6\"))\n      DIVERSITY_MAX = float(os.getenv(\"DIVERSITY_MAX\",\"0.7\"))\n      ALLOWLIST = [d.strip().lower() for d in os.getenv(\"ALLOWLIST\",\"\").split(\",\") if d.strip()]\n\n      def domain_class(host):\n          if host.endswith(\".gov\") or host.endswith(\".edu\") or host in ALLOWLIST or any(host.endswith(d) for d in ALLOWLIST):\n              return \"preferred\"\n          return \"other\"\n\n      # Reference integrity checks\n      # 1) No citations at all → FAIL (unless no declaratives → SKIP)\n      if total == 0:\n          print(json.dumps({\"witness\":\"citations_cover_claims\",\"status\":\"SKIP\",\"reason\":\"no-declaratives\",\"inputs\":{\"answer\":str(ap)}}))\n          sys.exit(0)\n\n      found_cites = [int(n) for n in cite_pat.findall(answer)]\n      if not found_cites:\n          print(json.dumps({\"witness\":\"citations_cover_claims\",\"status\":\"FAIL\",\"reason\":\"no-citations\",\"inputs\":{\"answer\":str(ap)}}))\n          sys.exit(1)\n\n      # 2) Every [n] must exist in references\n      missing_map = sorted({n for n in set(found_cites) if n not in ref_by_id})\n      if missing_map:\n          print(json.dumps({\"witness\":\"citations_cover_claims\",\"status\":\"FAIL\",\"reason\":\"missing-refs\",\"missing_ids\":missing_map,\"inputs\":{\"answer\":str(ap)}}))\n          sys.exit(1)\n\n      # 3) Sequential numbering starting at 1 (soft check)\n      if ref_by_id and (min(ref_by_id) != 1 or max(ref_by_id) != len(ref_by_id)):\n          # Not fatal, but record as warning in output payload\n          numbering_warn = True\n      else:\n          numbering_warn = False\n\n      # 4) Coverage threshold\n      coverage = cited/total if total else 0.0\n      if coverage < COVERAGE_MIN:\n          print(json.dumps({\"witness\":\"citations_cover_claims\",\"status\":\"FAIL\",\"reason\":\"coverage-too-low\",\"coverage\":coverage,\"min\":COVERAGE_MIN,\"inputs\":{\"answer\":str(ap)}}))\n          sys.exit(1)\n\n      # 5) Diversity (prevent single-domain echo chamber)\n      from collections import Counter\n      dom_counts = Counter(domains)\n      if dom_counts:\n          top_dom, top_cnt = dom_counts.most_common(1)[0]\n          if top_cnt/len(domains) > DIVERSITY_MAX:\n              print(json.dumps({\"witness\":\"citations_cover_claims\",\"status\":\"FAIL\",\"reason\":\"source-too-concentrated\",\"top_domain\":top_dom,\"share\":top_cnt/len(domains),\"max\":DIVERSITY_MAX,\"inputs\":{\"answer\":str(ap)}}))\n              sys.exit(1)\n\n          # Disallow all-wikipedia (or single non-preferred domain) cases\n          if len(dom_counts) == 1 and (\"wikipedia.org\" in dom_counts):\n              print(json.dumps({\"witness\":\"citations_cover_claims\",\"status\":\"FAIL\",\"reason\":\"all-wikipedia\",\"inputs\":{\"answer\":str(ap)}}))\n              sys.exit(1)\n\n      # 6) Allowlist presence (at least one preferred or academic/governmental source)\n      has_pref = any(domain_class(h)==\"preferred\" for h in domains)\n      if not has_pref and refs:\n          print(json.dumps({\"witness\":\"citations_cover_claims\",\"status\":\"FAIL\",\"reason\":\"no-preferred-sources\",\"inputs\":{\"answer\":str(ap)}}))\n          sys.exit(1)\n\n      out = {\n          \"witness\":\"citations_cover_claims\",\n          \"status\":\"PASS\",\n          \"coverage\": coverage,\n          \"sequential_numbering_warn\": numbering_warn,\n          \"totals\":{\"sentences\": total, \"cited\": cited, \"refs\": len(refs)},\n          \"inputs\":{\"answer\": str(ap)}\n      }\n      print(json.dumps(out, indent=2))\n      sys.exit(0)\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:53:50.511776Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 0a51607ced8bd646d4a3bcaf8fa3c8ef4c5519afe87615669c6ad389d725cb39\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "witnessed",
+      "_witness_count": 1
+    },
+    "pedagogy.problem_solving_v1": {
+      "id": "pedagogy.problem_solving_v1",
+      "version": "1.0.0",
+      "title": "Five-step problem-solving discipline",
+      "domain": "pedagogy",
+      "statement": "A valid solution includes: (1) objective, (2) assumptions, (3) plan, (4) evidence, (5) summary with trade-offs and next step.",
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "What is the concrete objective and success criteria?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "One small experiment beats a thousand meetings."
+        }
+      ],
+      "witnesses": [
+        {
+          "name": "five_step_gate",
+          "language": "python",
+          "code": "import json, os\n\np = os.getenv(\"PS_REPORT\", \"artifacts/examples/problem_solving_ok.json\")\n\nr = json.load(open(p))\n\nneed = [\"objective\",\"assumptions\",\"plan\",\"evidence\",\"summary\"]\n\nmissing = [k for k in need if not r.get(k)]\n\nassert not missing, f\"Missing fields: {missing}\"\n\nassert isinstance(r[\"assumptions\"], list) and len(r[\"assumptions\"])>=1\n\nassert isinstance(r[\"evidence\"], list) and any(len(str(e))>=10 for e in r[\"evidence\"])"
+        }
+      ],
+      "provenance": {
+        "author": "Truth Capsules",
+        "license": "MIT",
+        "schema": "provenance.v1",
+        "org": "Truth Capsules Demo",
+        "source_url": "https://example.com/truth-capsules",
+        "created": "2025-11-07T03:53:50.511776Z",
+        "updated": "2025-11-07T03:56:05.351404Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": "b797a413841b047de9564e761934526f7b6b22d98b284aa418d4f2775e099a8a",
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "code_assistant",
+        "ci"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/pedagogy.problem_solving_v1.yaml",
+      "_raw": "id: pedagogy.problem_solving_v1\nversion: 1.0.0\ntitle: Five-step problem-solving discipline\ndomain: pedagogy\nstatement: 'A valid solution includes: (1) objective, (2) assumptions, (3) plan, (4)\n  evidence, (5) summary with trade-offs and next step.'\npedagogy:\n- kind: Socratic\n  text: What is the concrete objective and success criteria?\n- kind: Aphorism\n  text: One small experiment beats a thousand meetings.\nwitnesses:\n- name: five_step_gate\n  language: python\n  code: 'import json, os\n\n\n    p = os.getenv(\"PS_REPORT\", \"artifacts/examples/problem_solving_ok.json\")\n\n\n    r = json.load(open(p))\n\n\n    need = [\"objective\",\"assumptions\",\"plan\",\"evidence\",\"summary\"]\n\n\n    missing = [k for k in need if not r.get(k)]\n\n\n    assert not missing, f\"Missing fields: {missing}\"\n\n\n    assert isinstance(r[\"assumptions\"], list) and len(r[\"assumptions\"])>=1\n\n\n    assert isinstance(r[\"evidence\"], list) and any(len(str(e))>=10 for e in r[\"evidence\"])'\nprovenance:\n  author: Truth Capsules\n  license: MIT\n  schema: provenance.v1\n  org: Truth Capsules Demo\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:53:50.511776Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: b797a413841b047de9564e761934526f7b6b22d98b284aa418d4f2775e099a8a\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "witnessed",
       "_witness_count": 1
     },
@@ -2845,7 +2905,7 @@ Prism.languages.js = Prism.languages.javascript;
           "status": "approved"
         }
       },
-      "_file": "./capsules/llm.citation_required_v1_signed.yaml",
+      "_file": "./capsules/llm/llm.citation_required_v1_signed.yaml",
       "_raw": "id: llm.citation_required_v1_signed\nversion: 1.0.0\ndomain: llm\ntitle: Citations required (signed demo)\nstatement: Answers must include at least one citation or abstain.\nassumptions: []\npedagogy:\n- kind: Socratic\n  text: What source supports your key claim?\n- kind: Aphorism\n  text: Cite or abstain.\nwitnesses:\n  - name: citations_cover_claims\n    language: python\n    env:\n      ANSWER_PATH: artifacts/examples/answer_with_citation.json\n      COVERAGE_MIN: \"0.6\"         # ≥60% declarative sentences must be cited\n      DIVERSITY_MAX: \"0.7\"         # ≤70% of refs may come from one domain\n      ALLOWLIST: \"doi.org,arxiv.org,acm.org,ieee.org,nature.com,sciencemag.org,gov,edu\"\n      DOC_CLASS: \"\"                # set to \"opinion\" to SKIP\n    code: |-\n      import os, re, json, sys, pathlib\n      from urllib.parse import urlparse\n\n      ap = pathlib.Path(os.getenv(\"ANSWER_PATH\",\"\")).resolve()\n      if not ap.exists():\n          print(json.dumps({\"witness\":\"citations_cover_claims\",\"status\":\"FAIL\",\"reason\":\"file-not-found\",\"inputs\":{\"answer\":str(ap)}}))\n          sys.exit(1)\n\n      # Opinion content can SKIP (policy-controlled)\n      if os.getenv(\"DOC_CLASS\",\"\").lower() == \"opinion\":\n          print(json.dumps({\"witness\":\"citations_cover_claims\",\"status\":\"SKIP\",\"reason\":\"opinion-doc\",\"inputs\":{\"answer\":str(ap)}}))\n          sys.exit(0)\n\n      data = json.loads(ap.read_text(encoding=\"utf-8\"))\n      answer = (data.get(\"answer\") or \"\").strip()\n      refs = data.get(\"references\") or []\n\n      # Very light sentence segmentation (declarative-ish)\n      sentences = [s.strip() for s in re.split(r'(?<=[.!?])\\s+', answer) if s.strip()]\n      # Extract [n] citations\n      cite_pat = re.compile(r'\\[(\\d+)\\]')\n      cited_flags = [bool(cite_pat.search(s)) for s in sentences]\n      total = len(sentences)\n      cited = sum(cited_flags)\n\n      # Build ref index and domains\n      ref_by_id = {int(r.get(\"id\")): r for r in refs if isinstance(r.get(\"id\"), int) and r.get(\"url\")}\n      domains = []\n      for r in refs:\n          try:\n              host = urlparse(r.get(\"url\",\"\")).netloc.lower()\n              if host: domains.append(host)\n          except Exception:\n              pass\n\n      # Policies\n      COVERAGE_MIN = float(os.getenv(\"COVERAGE_MIN\",\"0.6\"))\n      DIVERSITY_MAX = float(os.getenv(\"DIVERSITY_MAX\",\"0.7\"))\n      ALLOWLIST = [d.strip().lower() for d in os.getenv(\"ALLOWLIST\",\"\").split(\",\") if d.strip()]\n\n      def domain_class(host):\n          if host.endswith(\".gov\") or host.endswith(\".edu\") or host in ALLOWLIST or any(host.endswith(d) for d in ALLOWLIST):\n              return \"preferred\"\n          return \"other\"\n\n      # Reference integrity checks\n      # 1) No citations at all → FAIL (unless no declaratives → SKIP)\n      if total == 0:\n          print(json.dumps({\"witness\":\"citations_cover_claims\",\"status\":\"SKIP\",\"reason\":\"no-declaratives\",\"inputs\":{\"answer\":str(ap)}}))\n          sys.exit(0)\n\n      found_cites = [int(n) for n in cite_pat.findall(answer)]\n      if not found_cites:\n          print(json.dumps({\"witness\":\"citations_cover_claims\",\"status\":\"FAIL\",\"reason\":\"no-citations\",\"inputs\":{\"answer\":str(ap)}}))\n          sys.exit(1)\n\n      # 2) Every [n] must exist in references\n      missing_map = sorted({n for n in set(found_cites) if n not in ref_by_id})\n      if missing_map:\n          print(json.dumps({\"witness\":\"citations_cover_claims\",\"status\":\"FAIL\",\"reason\":\"missing-refs\",\"missing_ids\":missing_map,\"inputs\":{\"answer\":str(ap)}}))\n          sys.exit(1)\n\n      # 3) Sequential numbering starting at 1 (soft check)\n      if ref_by_id and (min(ref_by_id) != 1 or max(ref_by_id) != len(ref_by_id)):\n          # Not fatal, but record as warning in output payload\n          numbering_warn = True\n      else:\n          numbering_warn = False\n\n      # 4) Coverage threshold\n      coverage = cited/total if total else 0.0\n      if coverage < COVERAGE_MIN:\n          print(json.dumps({\"witness\":\"citations_cover_claims\",\"status\":\"FAIL\",\"reason\":\"coverage-too-low\",\"coverage\":coverage,\"min\":COVERAGE_MIN,\"inputs\":{\"answer\":str(ap)}}))\n          sys.exit(1)\n\n      # 5) Diversity (prevent single-domain echo chamber)\n      from collections import Counter\n      dom_counts = Counter(domains)\n      if dom_counts:\n          top_dom, top_cnt = dom_counts.most_common(1)[0]\n          if top_cnt/len(domains) > DIVERSITY_MAX:\n              print(json.dumps({\"witness\":\"citations_cover_claims\",\"status\":\"FAIL\",\"reason\":\"source-too-concentrated\",\"top_domain\":top_dom,\"share\":top_cnt/len(domains),\"max\":DIVERSITY_MAX,\"inputs\":{\"answer\":str(ap)}}))\n              sys.exit(1)\n\n          # Disallow all-wikipedia (or single non-preferred domain) cases\n          if len(dom_counts) == 1 and (\"wikipedia.org\" in dom_counts):\n              print(json.dumps({\"witness\":\"citations_cover_claims\",\"status\":\"FAIL\",\"reason\":\"all-wikipedia\",\"inputs\":{\"answer\":str(ap)}}))\n              sys.exit(1)\n\n      # 6) Allowlist presence (at least one preferred or academic/governmental source)\n      has_pref = any(domain_class(h)==\"preferred\" for h in domains)\n      if not has_pref and refs:\n          print(json.dumps({\"witness\":\"citations_cover_claims\",\"status\":\"FAIL\",\"reason\":\"no-preferred-sources\",\"inputs\":{\"answer\":str(ap)}}))\n          sys.exit(1)\n\n      out = {\n          \"witness\":\"citations_cover_claims\",\n          \"status\":\"PASS\",\n          \"coverage\": coverage,\n          \"sequential_numbering_warn\": numbering_warn,\n          \"totals\":{\"sentences\": total, \"cited\": cited, \"refs\": len(refs)},\n          \"inputs\":{\"answer\": str(ap)}\n      }\n      print(json.dumps(out, indent=2))\n      sys.exit(0)\nprovenance:\n  author: Truth Capsules Demo\n  license: MIT\n  schema: provenance.v1\n  org: Truth Capsules\n  created: '2025-11-07T04:51:20.658919Z'\n  signing:\n    algorithm: ed25519\n    public_key_pem: '-----BEGIN PUBLIC KEY-----\n\n      MCowBQYDK2VwAyEAdkKe+ZblRkk/8oGtvid7tisLS8L3j12LjGHLC05vnDs=\n\n      -----END PUBLIC KEY-----\n\n      '\n    digest: b7862aabe696451c37f4e870ece9ae18b37344ef14cf48561dbadf40a5bd5d42\n    signature_b64: VJ8i2ZLMIER3ITahlPQZ435w/ZxRAwyGRnPqboVQG78+GUe2alcBd5BS/1KzjtzMxi+B32TvaSbu7tYf3rNSBg==\n    status: approved\n",
       "posture": "witnessed",
       "_witness_count": 1
@@ -2902,7 +2962,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/llm.plan_backtest_v1.yaml",
+      "_file": "./capsules/llm/llm.plan_backtest_v1.yaml",
       "_raw": "id: llm.plan_backtest_v1\nversion: 1.0.0\ndomain: llm\ntitle: Plan Backtest\nstatement: Backtest the plan on a prior similar case; report differences and whether\n  the plan would have succeeded.\nassumptions:\n- We can reference at least one analogous case (internal or public).\npedagogy:\n- kind: Socratic\n  text: What happened last time we tried something like this?\n- kind: Aphorism\n  text: Yesterday is a cheap simulator.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: ca48eef684d2815426664bd7beb2a8a785586c1c169f991a4e64252a99c4155b\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -2959,7 +3019,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/llm.pr_deploy_checklist_v1.yaml",
+      "_file": "./capsules/llm/llm.pr_deploy_checklist_v1.yaml",
       "_raw": "id: llm.pr_deploy_checklist_v1\nversion: 1.0.0\ndomain: pr_review\ntitle: PR Review - Deploy Checklist\nstatement: 'Gate deploy on: feature flag (if risky), migration plan + rollback, observability\n  hooks, on-call acknowledgement.'\nassumptions:\n- You can defer large refactors; ship safely first.\npedagogy:\n- kind: Socratic\n  text: If we had to roll back in 5 minutes, how?\n- kind: Aphorism\n  text: Plan the rollback before the rollout.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 10679b47e25ea1c981f846f04fc1866994737d7dcc52f8d5888e6774d9debf5f\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -3016,7 +3076,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/llm.pr_test_hints_v1.yaml",
+      "_file": "./capsules/llm/llm.pr_test_hints_v1.yaml",
       "_raw": "id: llm.pr_test_hints_v1\nversion: 1.0.0\ndomain: pr_review\ntitle: PR Review - Minimal Tests\nstatement: Propose 2–4 smallest tests that would catch a regression introduced by\n  this diff (include inputs/edges).\nassumptions:\n- Some testing harness exists (unit/integration).\npedagogy:\n- kind: Socratic\n  text: What’s the cheapest test that would fail if you’re wrong?\n- kind: Aphorism\n  text: One failing test beats ten opinions.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 9a9f2f0b564e7630e4fec39fbe9762f65a5e68eae959ff9038a4a0f014399641\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -3073,7 +3133,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/llm.pii_redaction_guard_v1.yaml",
+      "_file": "./capsules/llm/llm.pii_redaction_guard_v1.yaml",
       "_raw": "id: llm.pii_redaction_guard_v1\nversion: 1.0.0\ndomain: llm\ntitle: PII redaction\nstatement: Output must not contain raw PII (emails/phones). Use placeholders or abstain.\nassumptions:\n- Operating in a general context\npedagogy:\n- kind: Socratic\n  text: What evidence supports this claim?\n- kind: Aphorism\n  text: Cite or abstain.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:53:50.511776Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 87d8414f424427fac995afd8b04e8f7e2ec47d8520c13067cb2117bb40928c60\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -3140,7 +3200,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "medium",
         "notes": ""
       },
-      "_file": "./capsules/llm.pr_risk_tags_v1.yaml",
+      "_file": "./capsules/llm/llm.pr_risk_tags_v1.yaml",
       "_raw": "id: llm.pr_risk_tags_v1\nversion: 1.0.0\ndomain: pr_review\ntitle: PR Review - Risk Tags\nstatement: Assign risk tags {security, performance, availability, migration, breaking_change,\n  data_loss} with 0–1 severity and 1–2 line rationale.\nassumptions:\n- Risk framing helps prioritize deeper review and testing.\npedagogy:\n- kind: Socratic\n  text: Which user/system risk is most plausible here?\n- kind: Aphorism\n  text: Name the risk, shrink the risk.\nwitnesses:\n  - name: pr_review_covers_risks\n    language: python\n    env:\n      DIFF_PATH: artifacts/examples/pr_diff.patch\n      REVIEW_PATH: artifacts/examples/pr_review.md\n    code: |-\n      import os, re, json, sys, pathlib\n\n      diff_path   = os.getenv(\"DIFF_PATH\",   \"artifacts/examples/pr_diff.patch\")\n      review_path = os.getenv(\"REVIEW_PATH\", \"artifacts/examples/pr_review.md\")\n\n      dp = pathlib.Path(diff_path)\n      rp = pathlib.Path(review_path)\n      if not dp.exists():\n        print(json.dumps({\"witness\":\"pr_review_covers_risks\",\"error\":f\"missing diff: {dp}\"})); sys.exit(2)\n      if not rp.exists():\n        print(json.dumps({\"witness\":\"pr_review_covers_risks\",\"error\":f\"missing review: {rp}\"})); sys.exit(2)\n\n      diff   = dp.read_text(encoding=\"utf-8\", errors=\"replace\")\n      review = rp.read_text(encoding=\"utf-8\", errors=\"replace\")\n\n      # Minimal, explainable heuristics → tag the diff\n      TAGS = {\n        \"secrets\": r\"(AWS_|SECRET|api[_-]?key|password\\s*=)\",\n        \"auth\":    r\"(oauth|jwt|session|login|auth[^a-z])\",\n        \"net\":     r\"(http[s]?://|requests\\.|fetch\\(|socket\\.)\",\n        \"fs\":      r\"(open\\(|os\\.remove|shutil\\.)\",\n        \"pii\":     r\"(ssn|social[- ]?security|^\\+?\\d{10,}$|[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,})\",\n      }\n      present = {tag for tag, rgx in TAGS.items() if re.search(rgx, diff, re.I|re.M)}\n\n      # If no risks detected in diff, SKIP (informational)\n      if not present:\n          print(json.dumps({\n              \"witness\": \"pr_review_covers_risks\",\n              \"found_tags\": [],\n              \"status\": \"SKIP\",\n              \"inputs\": {\"diff\": str(dp), \"review\": str(rp)}\n          }, indent=2))\n          sys.exit(0)\n\n      # Require review to *name* each risk and have a \"Mitigation\" mention\n      missing = []\n      for tag in sorted(present):\n        if not re.search(fr\"\\b{tag}\\b\", review, re.I):\n          missing.append({\"tag\": tag, \"reason\": \"tag-not-mentioned\"})\n        elif not re.search(r\"\\bmitigat(ion|e|ed)\\b\", review, re.I):\n          missing.append({\"tag\": tag, \"reason\": \"no-mitigation\"})\n\n      out = {\n        \"witness\": \"pr_review_covers_risks\",\n        \"found_tags\": sorted(present),\n        \"missing\": missing,\n        \"status\": \"PASS\" if not missing else \"FAIL\",\n        \"inputs\": {\"diff\": str(dp), \"review\": str(rp)}\n      }\n      print(json.dumps(out, indent=2))\n      sys.exit(0 if out[\"status\"]==\"PASS\" else 1)\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 58c5802699d64ffa2632d255638c27617e0b3cbd1be1c7aa5a6d6bba9eff39a2\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: medium\n  notes: ''\n",
       "posture": "witnessed",
       "_witness_count": 1
@@ -3197,7 +3257,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/llm.evidence_gap_triage_v1.yaml",
+      "_file": "./capsules/llm/llm.evidence_gap_triage_v1.yaml",
       "_raw": "id: llm.evidence_gap_triage_v1\nversion: 1.0.0\ndomain: llm\ntitle: Evidence Gap Triage\nstatement: Identify missing evidence blocking a sound answer; request the single smallest\n  artifact that would unlock progress.\nassumptions:\n- The model/user can ask for one clarifying item.\npedagogy:\n- kind: Socratic\n  text: What one artifact would collapse uncertainty the most?\n- kind: Aphorism\n  text: Ask once, ask small.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: eb49e65eaa19a8197d7f1b38547a7c66c4ba49b81c1bf18718a57135a3d8e1e4\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -3254,7 +3314,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/llm.pr_change_impact_v1.yaml",
+      "_file": "./capsules/llm/llm.pr_change_impact_v1.yaml",
       "_raw": "id: llm.pr_change_impact_v1\nversion: 1.0.0\ndomain: pr_review\ntitle: PR Review - Change Impact\nstatement: Describe user-facing impact (if any), docs to update, and a single line\n  release note.\nassumptions:\n- Every externally visible change gets a note or is explicitly internal-only.\npedagogy:\n- kind: Socratic\n  text: Who will notice this change tomorrow?\n- kind: Aphorism\n  text: If it matters, document it.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: cb5ede16f518629a9bb6118a91ad15595d7b72c6bec8952edc9a9deb5fcb0fab\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -3312,7 +3372,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/llm.counterfactual_probe_v1.yaml",
+      "_file": "./capsules/llm/llm.counterfactual_probe_v1.yaml",
       "_raw": "id: llm.counterfactual_probe_v1\nversion: 1.0.0\ndomain: llm\ntitle: Counterfactual Probe\nstatement: Before concluding, generate 2–3 counterfactual worlds that would flip the\n  decision; list the observable tests that would distinguish them.\nassumptions:\n- There is uncertainty worth exploring.\n- Budget allows 1–3 tiny tests.\npedagogy:\n- kind: Socratic\n  text: What would have to be true for the opposite decision to be best?\n- kind: Aphorism\n  text: Seek disconfirming evidence first.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 97645585b83080f11a69418850b492fdde87eb8a9e6b4183d5fbb1ee017f569a\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -3383,7 +3443,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/llm.red_team_assessment_v1.yaml",
+      "_file": "./capsules/llm/llm.red_team_assessment_v1.yaml",
       "_raw": "id: llm.red_team_assessment_v1\nversion: 1.0.0\ndomain: llm\ntitle: Red Team Assessment Protocol\nstatement: 'On a red-team request, perform an adversarial evaluation: clarify objective\n  & asset, list assumptions, identify actors & capabilities, enumerate plausible attacks,\n  show at least one concrete exploit path, rate severity×likelihood (0–1), propose\n  mitigations and a 48‑hour action plan.'\nassumptions:\n- The user explicitly requests a red-team assessment for constructive hardening.\n- Information provided is for defense; do not share sensitive exploit details beyond\n  what is necessary to mitigate.\n- Follow platform safety policies; redact secrets and PII.\npedagogy:\n- kind: Socratic\n  text: What asset are we protecting and from whom (top 2 threat actors)?\n- kind: Socratic\n  text: What assumption, if false, makes failure most likely?\n- kind: Socratic\n  text: What is the cheapest path to impact for an attacker?\n- kind: Aphorism\n  text: Assume a breach; prove recovery.\n- kind: Aphorism\n  text: Strong claims require strong evidence.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: a7ee80b6f0de049176869e5168f2d9968fbcdd97da2dac47206f46c508fcf942\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -3440,7 +3500,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/llm.tool_json_contract_v1.yaml",
+      "_file": "./capsules/llm/llm.tool_json_contract_v1.yaml",
       "_raw": "id: llm.tool_json_contract_v1\nversion: 1.0.0\ndomain: llm\ntitle: Tool JSON contract\nstatement: Tool call args must match the JSON schema (required fields & types).\nassumptions:\n- Operating in a general context\npedagogy:\n- kind: Socratic\n  text: What evidence supports this claim?\n- kind: Aphorism\n  text: Cite or abstain.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:53:50.511776Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 1a7282f0873062f269a62fb2de28f3d5971f103b603c87381316e7c1a1161cc0\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -3497,7 +3557,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/llm.five_whys_root_cause_v1.yaml",
+      "_file": "./capsules/llm/llm.five_whys_root_cause_v1.yaml",
       "_raw": "id: llm.five_whys_root_cause_v1\nversion: 1.0.0\ndomain: llm\ntitle: Five Whys (Root Cause)\nstatement: Perform a 3–5 Whys drill; propose a countermeasure for the root cause and\n  one guardrail to prevent regression.\nassumptions:\n- Event or defect is concrete and recent.\npedagogy:\n- kind: Socratic\n  text: Why did this happen? Why was that possible? (repeat)\n- kind: Aphorism\n  text: Fix the system, not the symptom.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 1bbdd1db6b770ba4b9a73c6fe6e9f9d309cc4524e6edb4105199ce83922bc563\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -3554,7 +3614,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/llm.judge_answer_quality_v1.yaml",
+      "_file": "./capsules/llm/llm.judge_answer_quality_v1.yaml",
       "_raw": "id: llm.judge_answer_quality_v1\nversion: 1.0.0\ndomain: llm\ntitle: Judge answer quality\nstatement: LLM-judge must score >= 0.8 with JSON {score, verdict, justification}.\nassumptions:\n- Operating in a general context\npedagogy:\n- kind: Socratic\n  text: What evidence supports this claim?\n- kind: Aphorism\n  text: Cite or abstain.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:53:50.511776Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 8ae3b7c3603d54649baccf26fda915dc95c28484f04b542962afa8e796995caf\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -3611,7 +3671,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/llm.safety_refusal_guard_v1.yaml",
+      "_file": "./capsules/llm/llm.safety_refusal_guard_v1.yaml",
       "_raw": "id: llm.safety_refusal_guard_v1\nversion: 1.0.0\ndomain: llm\ntitle: Safety & Refusal Guard\nstatement: If a request risks policy or safety violations, refuse with a brief reason\n  and offer the closest safe alternative.\nassumptions:\n- Policies and safety priorities apply to this context.\npedagogy:\n- kind: Socratic\n  text: What is the minimal safe deliverable that still helps?\n- kind: Aphorism\n  text: Refuse early, redirect helpfully.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: fc210d0ff24f4f0b6ab7eb320d7c008a30f4a558170b78ae50fc73642b48a7bb\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -3668,7 +3728,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/llm.fermi_estimation_v1.yaml",
+      "_file": "./capsules/llm/llm.fermi_estimation_v1.yaml",
       "_raw": "id: llm.fermi_estimation_v1\nversion: 1.0.0\ndomain: llm\ntitle: Fermi Estimation\nstatement: Produce an order‑of‑magnitude estimate with explicit factors, ranges, and\n  resulting uncertainty (log‑scale).\nassumptions:\n- A back‑of‑the‑envelope answer is acceptable to guide decision making.\npedagogy:\n- kind: Socratic\n  text: What are the 3–5 multiplicative factors?\n- kind: Aphorism\n  text: Be roughly right faster, then refine.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: ff0b085cd83a53d0c4493dc44bfe48847f27d399227bb1abcdf0af3155fd29d8\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -3726,7 +3786,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/llm.pr_diff_first_v1.yaml",
+      "_file": "./capsules/llm/llm.pr_diff_first_v1.yaml",
       "_raw": "id: llm.pr_diff_first_v1\nversion: 1.0.0\ndomain: pr_review\ntitle: PR Review - Diff First\nstatement: Always read the diff first. Summarize changes in ≤5 bullets with file counts\n  and risky areas (auth, I/O, concurrency, migrations).\nassumptions:\n- A textual diff or list of changed files is available.\n- Goal is actionable review, not style nitpicks.\npedagogy:\n- kind: Socratic\n  text: What actually changed (files, functions, interfaces)?\n- kind: Aphorism\n  text: Review behavior, not just syntax.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: b519f3cdb754d00b97862fd38de1fd74c389b78f691986f34b65de370bb45d82\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -3783,7 +3843,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/llm.bias_checklist_v1.yaml",
+      "_file": "./capsules/llm/llm.bias_checklist_v1.yaml",
       "_raw": "id: llm.bias_checklist_v1\nversion: 1.0.0\ndomain: llm\ntitle: Bias & Mode Collapse Check\nstatement: 'Before finalizing, scan for common failure modes: confirmation bias, selection\n  bias, overconfident tone, mode collapse.'\nassumptions:\n- Brief self‑audit improves reliability.\npedagogy:\n- kind: Socratic\n  text: Which plausible alternative did we ignore?\n- kind: Aphorism\n  text: Doubt is a feature.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: ac2b51c4e496a89372de921918c2cacd072e548934aaf385f15f9b0678da2dbb\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -3840,7 +3900,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/llm.plan_verify_answer_v1.yaml",
+      "_file": "./capsules/llm/llm.plan_verify_answer_v1.yaml",
       "_raw": "id: llm.plan_verify_answer_v1\nversion: 1.0.0\ndomain: llm\ntitle: Plan → Verify → Answer\nstatement: Plan→Verify→Answer. The final answer references collected evidence.\nassumptions:\n- Operating in a general context\npedagogy:\n- kind: Socratic\n  text: What evidence supports this claim?\n- kind: Aphorism\n  text: Cite or abstain.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:53:50.511776Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 0aab055bc4c1b504cca4d9ddb8be1074a71835c9b3aab076d7c511c425a9664f\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -3897,7 +3957,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/llm.assumption_to_test_v1.yaml",
+      "_file": "./capsules/llm/llm.assumption_to_test_v1.yaml",
       "_raw": "id: llm.assumption_to_test_v1\nversion: 1.0.0\ndomain: llm\ntitle: Assumptions → Tests\nstatement: Convert each critical assumption into a falsifiable micro-test with owner,\n  required evidence, and a 24–72h timebox.\nassumptions:\n- Assumptions are enumerated or can be elicited with one question.\npedagogy:\n- kind: Socratic\n  text: Which single assumption, if wrong, invalidates the plan?\n- kind: Aphorism\n  text: Make failure explicit and reversible.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 9695ca488e9ab7912ff2e76b08a7205b08fb08627e1cab70fe0caa5fb9f54ed5\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -3954,70 +4014,10 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/llm.steelmanning_v1.yaml",
+      "_file": "./capsules/llm/llm.steelmanning_v1.yaml",
       "_raw": "id: llm.steelmanning_v1\nversion: 1.0.0\ndomain: llm\ntitle: Steelmanning\nstatement: Before critiquing, restate the strongest version of the opposing view in\n  3 bullets, then highlight one genuine crux.\nassumptions:\n- There exists an alternative that a reasonable expert could endorse.\npedagogy:\n- kind: Socratic\n  text: What would a smart critic say against this?\n- kind: Aphorism\n  text: Steelman before you strike.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: ba8a2206b3716e290bef35a11a577c7e59bfbb69d9535f640b611e3d4e7e98ee\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
-    },
-    "pedagogy.problem_solving_v1": {
-      "id": "pedagogy.problem_solving_v1",
-      "version": "1.0.0",
-      "title": "Five-step problem-solving discipline",
-      "domain": "pedagogy",
-      "statement": "A valid solution includes: (1) objective, (2) assumptions, (3) plan, (4) evidence, (5) summary with trade-offs and next step.",
-      "pedagogy": [
-        {
-          "kind": "Socratic",
-          "text": "What is the concrete objective and success criteria?"
-        },
-        {
-          "kind": "Aphorism",
-          "text": "One small experiment beats a thousand meetings."
-        }
-      ],
-      "witnesses": [
-        {
-          "name": "five_step_gate",
-          "language": "python",
-          "code": "import json, os\n\np = os.getenv(\"PS_REPORT\", \"artifacts/examples/problem_solving_ok.json\")\n\nr = json.load(open(p))\n\nneed = [\"objective\",\"assumptions\",\"plan\",\"evidence\",\"summary\"]\n\nmissing = [k for k in need if not r.get(k)]\n\nassert not missing, f\"Missing fields: {missing}\"\n\nassert isinstance(r[\"assumptions\"], list) and len(r[\"assumptions\"])>=1\n\nassert isinstance(r[\"evidence\"], list) and any(len(str(e))>=10 for e in r[\"evidence\"])"
-        }
-      ],
-      "provenance": {
-        "author": "Truth Capsules",
-        "license": "MIT",
-        "schema": "provenance.v1",
-        "org": "Truth Capsules Demo",
-        "source_url": "https://example.com/truth-capsules",
-        "created": "2025-11-07T03:53:50.511776Z",
-        "updated": "2025-11-07T03:56:05.351404Z",
-        "review": {
-          "status": "draft",
-          "reviewers": [],
-          "last_reviewed": null
-        },
-        "signing": {
-          "method": "ed25519",
-          "key_id": null,
-          "pubkey": null,
-          "digest": "b797a413841b047de9564e761934526f7b6b22d98b284aa418d4f2775e099a8a",
-          "signature": null
-        }
-      },
-      "applies_to": [
-        "conversation",
-        "code_assistant",
-        "ci"
-      ],
-      "dependencies": [],
-      "incompatible_with": [],
-      "security": {
-        "sensitivity": "low",
-        "notes": ""
-      },
-      "_file": "./capsules/pedagogy/pedagogy.problem_solving_v1.yaml",
-      "_raw": "id: pedagogy.problem_solving_v1\nversion: 1.0.0\ntitle: Five-step problem-solving discipline\ndomain: pedagogy\nstatement: 'A valid solution includes: (1) objective, (2) assumptions, (3) plan, (4)\n  evidence, (5) summary with trade-offs and next step.'\npedagogy:\n- kind: Socratic\n  text: What is the concrete objective and success criteria?\n- kind: Aphorism\n  text: One small experiment beats a thousand meetings.\nwitnesses:\n- name: five_step_gate\n  language: python\n  code: 'import json, os\n\n\n    p = os.getenv(\"PS_REPORT\", \"artifacts/examples/problem_solving_ok.json\")\n\n\n    r = json.load(open(p))\n\n\n    need = [\"objective\",\"assumptions\",\"plan\",\"evidence\",\"summary\"]\n\n\n    missing = [k for k in need if not r.get(k)]\n\n\n    assert not missing, f\"Missing fields: {missing}\"\n\n\n    assert isinstance(r[\"assumptions\"], list) and len(r[\"assumptions\"])>=1\n\n\n    assert isinstance(r[\"evidence\"], list) and any(len(str(e))>=10 for e in r[\"evidence\"])'\nprovenance:\n  author: Truth Capsules\n  license: MIT\n  schema: provenance.v1\n  org: Truth Capsules Demo\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:53:50.511776Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: b797a413841b047de9564e761934526f7b6b22d98b284aa418d4f2775e099a8a\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
-      "posture": "witnessed",
-      "_witness_count": 1
     },
     "business.decision_log_v1": {
       "id": "business.decision_log_v1",
@@ -4082,6 +4082,1698 @@ Prism.languages.js = Prism.languages.javascript;
       "_raw": "id: business.decision_log_v1\nversion: 1.0.0\ndomain: business\ntitle: Decision Log Gate\nstatement: Decision records must include decision, ≥3 options, ≥2 criteria, and a\n  rationale mentioning a trade-off.\nassumptions:\n- Decision records are structured as JSON\n- Criteria and options can be enumerated\npedagogy:\n- kind: Socratic\n  text: Which option best satisfies the stated criteria?\n- kind: Aphorism\n  text: Make trade-offs explicit, not implicit.\nwitnesses:\n- name: decision_log_gate\n  language: python\n  code: 'import json, os\n\n\n    p = os.getenv(\"DEC_REPORT\", \"artifacts/examples/decision_log_ok.json\")\n\n\n    r = json.load(open(p))\n\n\n    assert r.get(\"decision\")\n\n\n    assert isinstance(r.get(\"options\"), list) and len(r[\"options\"])>=3\n\n\n    assert isinstance(r.get(\"criteria\"), list) and len(r[\"criteria\"])>=2\n\n\n    assert \"trade-off\" in (r.get(\"rationale\",\"\")+\"\").lower() or \"because\" in (r.get(\"rationale\",\"\")+\"\").lower()'\nprovenance:\n  author: Truth Capsules\n  license: MIT\n  schema: provenance.v1\n  org: Truth Capsules Demo\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:53:50.511776Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: 7f5356a5eb951df4478793f0a90c927331e39ae9031e1197236f18e519c331cb\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- ci\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "witnessed",
       "_witness_count": 1
+    },
+    "macgyver.world_as_typed_graph_v1": {
+      "id": "macgyver.world_as_typed_graph_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "World as a Typed Graph",
+      "statement": "Model materials and energies as nodes with typed edges for conversions; plan paths with minimal risk and cost.",
+      "assumptions": [
+        "Graph mindset helps enumerate options and constraints."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "What is the next low‑risk edge from here to the goal?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Map the edges; choose the gentlest path."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.world_as_typed_graph_v1.yaml",
+      "_raw": "id: macgyver.world_as_typed_graph_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: World as a Typed Graph\nstatement: Model materials and energies as nodes with typed edges for conversions;\n  plan paths with minimal risk and cost.\nassumptions:\n- Graph mindset helps enumerate options and constraints.\npedagogy:\n- kind: Socratic\n  text: What is the next low‑risk edge from here to the goal?\n- kind: Aphorism\n  text: Map the edges; choose the gentlest path.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.reality_check_v1": {
+      "id": "macgyver.reality_check_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Reality Check vs Fiction",
+      "statement": "Use TV scenarios only as metaphors for safe, legal, non‑hazard practice. Substitute benign analogues.",
+      "assumptions": [
+        "No hazardous chemistry/electrics or bypassing of security systems."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "What benign analogue teaches the same principle?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Learn the law; keep the lesson."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "medium",
+        "notes": "Explicitly rejects hazardous replication."
+      },
+      "_file": "./capsules/macgyver/macgyver.reality_check_v1.yaml",
+      "_raw": "id: macgyver.reality_check_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Reality Check vs Fiction\nstatement: Use TV scenarios only as metaphors for safe, legal, non‑hazard practice.\n  Substitute benign analogues.\nassumptions:\n- No hazardous chemistry/electrics or bypassing of security systems.\npedagogy:\n- kind: Socratic\n  text: What benign analogue teaches the same principle?\n- kind: Aphorism\n  text: Learn the law; keep the lesson.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: medium\n  notes: Explicitly rejects hazardous replication.\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.functional_fixedness_avoidance_v1": {
+      "id": "macgyver.functional_fixedness_avoidance_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Avoid Functional Fixedness",
+      "statement": "Intentionally re-label objects by their properties and verbs to unlock alternative roles.",
+      "assumptions": [
+        "User practices re-framing and is open to substitution."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "What else can this become if I ignore its default name?"
+        },
+        {
+          "kind": "Socratic",
+          "text": "Which property, not present in this item, can be paired to create a new role?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Every object hides a verb."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.functional_fixedness_avoidance_v1.yaml",
+      "_raw": "id: macgyver.functional_fixedness_avoidance_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Avoid Functional Fixedness\nstatement: Intentionally re-label objects by their properties and verbs to unlock\n  alternative roles.\nassumptions:\n- User practices re-framing and is open to substitution.\npedagogy:\n- kind: Socratic\n  text: What else can this become if I ignore its default name?\n- kind: Socratic\n  text: Which property, not present in this item, can be paired to create a new role?\n- kind: Aphorism\n  text: Every object hides a verb.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.fail_safe_defaults_v1": {
+      "id": "macgyver.fail_safe_defaults_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Fail‑Safe Defaults",
+      "statement": "Design so that interruptions and errors do not cause harm; plan graceful aborts.",
+      "assumptions": [
+        "Interruption is likely; failure must be safe."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "What happens if we stop at Step 2? Make that harmless."
+        },
+        {
+          "kind": "Aphorism",
+          "text": "If it must fail, let it fail safe."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.fail_safe_defaults_v1.yaml",
+      "_raw": "id: macgyver.fail_safe_defaults_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Fail‑Safe Defaults\nstatement: Design so that interruptions and errors do not cause harm; plan graceful\n  aborts.\nassumptions:\n- Interruption is likely; failure must be safe.\npedagogy:\n- kind: Socratic\n  text: What happens if we stop at Step 2? Make that harmless.\n- kind: Aphorism\n  text: If it must fail, let it fail safe.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.affordance_matrix_template_v1": {
+      "id": "macgyver.affordance_matrix_template_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Affordance Matrix Template",
+      "statement": "Tabulate assets→properties→law→role→risk to externalize options and surface safer substitutions.",
+      "assumptions": [
+        "Externalizing information reduces oversight."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "Fill three rows: what role can each asset play safely?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "What you table, you can reason about."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.affordance_matrix_template_v1.yaml",
+      "_raw": "id: macgyver.affordance_matrix_template_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Affordance Matrix Template\nstatement: Tabulate assets→properties→law→role→risk to externalize options and surface\n  safer substitutions.\nassumptions:\n- Externalizing information reduces oversight.\npedagogy:\n- kind: Socratic\n  text: 'Fill three rows: what role can each asset play safely?'\n- kind: Aphorism\n  text: What you table, you can reason about.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.legal_ethical_guardrails_v1": {
+      "id": "macgyver.legal_ethical_guardrails_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Legal & Ethical Guardrails",
+      "statement": "Operate with consent, legality, and non‑maleficence; solutions are for safety, rescue, education, prototyping.",
+      "assumptions": [
+        "User agrees to legal and ethical constraints."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "Whose consent or safety is implicated? Stop if unclear."
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Better a delayed win than a wrongful one."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "medium",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.legal_ethical_guardrails_v1.yaml",
+      "_raw": "id: macgyver.legal_ethical_guardrails_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Legal & Ethical Guardrails\nstatement: Operate with consent, legality, and non‑maleficence; solutions are for\n  safety, rescue, education, prototyping.\nassumptions:\n- User agrees to legal and ethical constraints.\npedagogy:\n- kind: Socratic\n  text: Whose consent or safety is implicated? Stop if unclear.\n- kind: Aphorism\n  text: Better a delayed win than a wrongful one.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: medium\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.property_matching_v1": {
+      "id": "macgyver.property_matching_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Property-to-Law Matching",
+      "statement": "Map constraints to physical laws (pressure, torque, optics, buoyancy, friction) and then to available properties and parts.",
+      "assumptions": [
+        "Basic physics are more portable than specific tools."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "Which law satisfies the need with the fewest steps?"
+        },
+        {
+          "kind": "Socratic",
+          "text": "What property‑set makes that law easy to apply here?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Name the energy, not the object."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.property_matching_v1.yaml",
+      "_raw": "id: macgyver.property_matching_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Property-to-Law Matching\nstatement: Map constraints to physical laws (pressure, torque, optics, buoyancy, friction)\n  and then to available properties and parts.\nassumptions:\n- Basic physics are more portable than specific tools.\npedagogy:\n- kind: Socratic\n  text: Which law satisfies the need with the fewest steps?\n- kind: Socratic\n  text: What property‑set makes that law easy to apply here?\n- kind: Aphorism\n  text: Name the energy, not the object.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.affordances_over_objects_v1": {
+      "id": "macgyver.affordances_over_objects_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Affordances Over Objects",
+      "statement": "Prioritize material properties (conducts, insulates, reflects, absorbs, seals, flexes, burns, reacts) over brand-form labels to unlock repurposing.",
+      "assumptions": [
+        "Scene contains everyday materials with varied properties."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "For each nearby object, list three properties that could serve your goal."
+        },
+        {
+          "kind": "Socratic",
+          "text": "Which property is missing—and what simple substitute adds it?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Every object hides a verb."
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Properties beat brand names."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.affordances_over_objects_v1.yaml",
+      "_raw": "id: macgyver.affordances_over_objects_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Affordances Over Objects\nstatement: Prioritize material properties (conducts, insulates, reflects, absorbs,\n  seals, flexes, burns, reacts) over brand-form labels to unlock repurposing.\nassumptions:\n- Scene contains everyday materials with varied properties.\npedagogy:\n- kind: Socratic\n  text: For each nearby object, list three properties that could serve your goal.\n- kind: Socratic\n  text: Which property is missing—and what simple substitute adds it?\n- kind: Aphorism\n  text: Every object hides a verb.\n- kind: Aphorism\n  text: Properties beat brand names.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.transduction_chains_v1": {
+      "id": "macgyver.transduction_chains_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Transduction Chains",
+      "statement": "Route one energy into the effect you need: chemical→thermal→mechanical, optical→thermal, electrical→magnetic, pneumatic/hydraulic→force.",
+      "assumptions": [
+        "Safer energy conversions exist than direct brute force."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "Which energy form is easiest to start from in your scene?"
+        },
+        {
+          "kind": "Socratic",
+          "text": "What two-stage conversion achieves the effect with lower risk?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Route energy; don’t brute energy."
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Two cheap stages outrun one clever stage."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.transduction_chains_v1.yaml",
+      "_raw": "id: macgyver.transduction_chains_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Transduction Chains\nstatement: 'Route one energy into the effect you need: chemical→thermal→mechanical,\n  optical→thermal, electrical→magnetic, pneumatic/hydraulic→force.'\nassumptions:\n- Safer energy conversions exist than direct brute force.\npedagogy:\n- kind: Socratic\n  text: Which energy form is easiest to start from in your scene?\n- kind: Socratic\n  text: What two-stage conversion achieves the effect with lower risk?\n- kind: Aphorism\n  text: Route energy; don’t brute energy.\n- kind: Aphorism\n  text: Two cheap stages outrun one clever stage.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.prompt_skeleton_v1": {
+      "id": "macgyver.prompt_skeleton_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "LLM Prompt Skeleton",
+      "statement": "A structured prompt to force safe, legal, non‑destructive chain synthesis for a defined goal and setting.",
+      "assumptions": [
+        "LLMs need structure and guardrails for reliable outputs."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "Does the prompt enforce assets, laws, three chains, premortem, and micro‑test?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Prompts are levers for minds."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "training"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.prompt_skeleton_v1.yaml",
+      "_raw": "id: macgyver.prompt_skeleton_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: LLM Prompt Skeleton\nstatement: A structured prompt to force safe, legal, non‑destructive chain synthesis\n  for a defined goal and setting.\nassumptions:\n- LLMs need structure and guardrails for reliable outputs.\npedagogy:\n- kind: Socratic\n  text: Does the prompt enforce assets, laws, three chains, premortem, and micro‑test?\n- kind: Aphorism\n  text: Prompts are levers for minds.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- training\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.chain_design_v1": {
+      "id": "macgyver.chain_design_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Chain Design: Sense→Gate→Amplify→Actuate",
+      "statement": "Build solutions as short chains with a clear trigger and amplification before actuation.",
+      "assumptions": [
+        "Multi‑stage steps increase control and predictability."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "Where is the gate/trigger? How is the effect amplified?"
+        },
+        {
+          "kind": "Socratic",
+          "text": "Can sensing/illusion replace force?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Think chains: sense→gate→amplify→actuate."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.chain_design_v1.yaml",
+      "_raw": "id: macgyver.chain_design_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: 'Chain Design: Sense→Gate→Amplify→Actuate'\nstatement: Build solutions as short chains with a clear trigger and amplification\n  before actuation.\nassumptions:\n- Multi‑stage steps increase control and predictability.\npedagogy:\n- kind: Socratic\n  text: Where is the gate/trigger? How is the effect amplified?\n- kind: Socratic\n  text: Can sensing/illusion replace force?\n- kind: Aphorism\n  text: 'Think chains: sense→gate→amplify→actuate.'\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.parallel_options_v1": {
+      "id": "macgyver.parallel_options_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Parallel Optioning",
+      "statement": "Always generate three routes: Physical, Informational, Environmental.",
+      "assumptions": [
+        "Time allows at least brief divergent ideation."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "List one Physical, one Informational, one Environmental route."
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Don’t hunt with one arrow."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.parallel_options_v1.yaml",
+      "_raw": "id: macgyver.parallel_options_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Parallel Optioning\nstatement: 'Always generate three routes: Physical, Informational, Environmental.'\nassumptions:\n- Time allows at least brief divergent ideation.\npedagogy:\n- kind: Socratic\n  text: List one Physical, one Informational, one Environmental route.\n- kind: Aphorism\n  text: Don’t hunt with one arrow.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.redundancy_chokepoints_v1": {
+      "id": "macgyver.redundancy_chokepoints_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Redundancy & Choke Points",
+      "statement": "Protect your own single points of failure while removing the opponent’s options.",
+      "assumptions": [
+        "System thinking improves robustness and containment."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "Where is the single point of failure—and how do we cushion it?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Add a backup or remove a choke."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.redundancy_chokepoints_v1.yaml",
+      "_raw": "id: macgyver.redundancy_chokepoints_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Redundancy & Choke Points\nstatement: Protect your own single points of failure while removing the opponent’s\n  options.\nassumptions:\n- System thinking improves robustness and containment.\npedagogy:\n- kind: Socratic\n  text: Where is the single point of failure—and how do we cushion it?\n- kind: Aphorism\n  text: Add a backup or remove a choke.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.mvp_mechanism_bias_v1": {
+      "id": "macgyver.mvp_mechanism_bias_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "MVP Mechanism Bias",
+      "statement": "Prefer the smallest reversible mechanism that might work; escalate complexity only as needed.",
+      "assumptions": [
+        "Reversible steps reduce risk and damage."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "What is the least‑effort, reversible move that could work?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Use reversibility as a brake."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.mvp_mechanism_bias_v1.yaml",
+      "_raw": "id: macgyver.mvp_mechanism_bias_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: MVP Mechanism Bias\nstatement: Prefer the smallest reversible mechanism that might work; escalate complexity\n  only as needed.\nassumptions:\n- Reversible steps reduce risk and damage.\npedagogy:\n- kind: Socratic\n  text: What is the least‑effort, reversible move that could work?\n- kind: Aphorism\n  text: Use reversibility as a brake.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.prompts_as_programs_v1": {
+      "id": "macgyver.prompts_as_programs_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Prompts as Programs",
+      "statement": "Use structured prompts/checklists to force enumeration, comparison, and premortems.",
+      "assumptions": [
+        "Structure improves breadth and reduces blind spots."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "Have we enumerated three routes and a premortem yet?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Prompt the mind you want."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.prompts_as_programs_v1.yaml",
+      "_raw": "id: macgyver.prompts_as_programs_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Prompts as Programs\nstatement: Use structured prompts/checklists to force enumeration, comparison, and\n  premortems.\nassumptions:\n- Structure improves breadth and reduces blind spots.\npedagogy:\n- kind: Socratic\n  text: Have we enumerated three routes and a premortem yet?\n- kind: Aphorism\n  text: Prompt the mind you want.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.low_tech_first_v1": {
+      "id": "macgyver.low_tech_first_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Low-Tech First",
+      "statement": "Prefer simple mechanisms (rope, wedge, lever, mirror) before powered or chemical routes.",
+      "assumptions": [
+        "Simple tools are present; powered tools are risky/unavailable."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "What non‑powered mechanism could replace this powered step?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Small forces win with leverage, pressure, and time."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.low_tech_first_v1.yaml",
+      "_raw": "id: macgyver.low_tech_first_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Low-Tech First\nstatement: Prefer simple mechanisms (rope, wedge, lever, mirror) before powered or\n  chemical routes.\nassumptions:\n- Simple tools are present; powered tools are risky/unavailable.\npedagogy:\n- kind: Socratic\n  text: What non‑powered mechanism could replace this powered step?\n- kind: Aphorism\n  text: Small forces win with leverage, pressure, and time.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.five_rails_v1": {
+      "id": "macgyver.five_rails_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "The Five Rails of Action",
+      "statement": "Operate along five rails: Sensing, Shaping, Timing, Power, Signaling. Compose minimally sufficient sets to achieve the goal.",
+      "assumptions": [
+        "Any solution can be decomposed across the five rails."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "Which rails are absolutely necessary for this problem?"
+        },
+        {
+          "kind": "Socratic",
+          "text": "Can sensing replace force (e.g., bypass over break)?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "If you can’t make it stronger, make it smarter."
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Reduce the problem, not the world."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.five_rails_v1.yaml",
+      "_raw": "id: macgyver.five_rails_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: The Five Rails of Action\nstatement: 'Operate along five rails: Sensing, Shaping, Timing, Power, Signaling.\n  Compose minimally sufficient sets to achieve the goal.'\nassumptions:\n- Any solution can be decomposed across the five rails.\npedagogy:\n- kind: Socratic\n  text: Which rails are absolutely necessary for this problem?\n- kind: Socratic\n  text: Can sensing replace force (e.g., bypass over break)?\n- kind: Aphorism\n  text: If you can’t make it stronger, make it smarter.\n- kind: Aphorism\n  text: Reduce the problem, not the world.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.bias_checklist_v1": {
+      "id": "macgyver.bias_checklist_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Bias & Mode Collapse Check",
+      "statement": "Before finalizing, scan for confirmation bias, selection bias, overconfidence, and mode collapse.",
+      "assumptions": [
+        "Brief self‑audit improves reliability."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "Which plausible alternative did we ignore?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Doubt is a feature."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.bias_checklist_v1.yaml",
+      "_raw": "id: macgyver.bias_checklist_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Bias & Mode Collapse Check\nstatement: Before finalizing, scan for confirmation bias, selection bias, overconfidence,\n  and mode collapse.\nassumptions:\n- Brief self‑audit improves reliability.\npedagogy:\n- kind: Socratic\n  text: Which plausible alternative did we ignore?\n- kind: Aphorism\n  text: Doubt is a feature.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.latency_control_v1": {
+      "id": "macgyver.latency_control_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Latency Control",
+      "statement": "Design predictable timing via burn, dissolve, flow, charging, cooling; prefer slow, observable delays.",
+      "assumptions": [
+        "Delays can be made visible and interruptible."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "What delay is safest and most observable here?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Delay is a component."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.latency_control_v1.yaml",
+      "_raw": "id: macgyver.latency_control_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Latency Control\nstatement: Design predictable timing via burn, dissolve, flow, charging, cooling;\n  prefer slow, observable delays.\nassumptions:\n- Delays can be made visible and interruptible.\npedagogy:\n- kind: Socratic\n  text: What delay is safest and most observable here?\n- kind: Aphorism\n  text: Delay is a component.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.deliberate_practice_v1": {
+      "id": "macgyver.deliberate_practice_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Deliberate Practice Drills",
+      "statement": "Short, repeatable drills: 2‑minute affordance scans; law‑matching flashcards; chain sketches from household scenes.",
+      "assumptions": [
+        "Skill improves with frequent, safe micro‑reps."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "What 2‑minute drill can you run right now in this room?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Small drills make big instincts."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.deliberate_practice_v1.yaml",
+      "_raw": "id: macgyver.deliberate_practice_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Deliberate Practice Drills\nstatement: 'Short, repeatable drills: 2‑minute affordance scans; law‑matching flashcards;\n  chain sketches from household scenes.'\nassumptions:\n- Skill improves with frequent, safe micro‑reps.\npedagogy:\n- kind: Socratic\n  text: What 2‑minute drill can you run right now in this room?\n- kind: Aphorism\n  text: Small drills make big instincts.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.inventory_thinking_v1": {
+      "id": "macgyver.inventory_thinking_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Inventory Thinking",
+      "statement": "Represent the scene as {assets, properties, converters, storers, triggers, constraints}.",
+      "assumptions": [
+        "A fast written inventory improves plan quality."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "List assets→properties in 60 seconds. What’s missing?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "What you write down exists for strategy."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.inventory_thinking_v1.yaml",
+      "_raw": "id: macgyver.inventory_thinking_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Inventory Thinking\nstatement: Represent the scene as {assets, properties, converters, storers, triggers,\n  constraints}.\nassumptions:\n- A fast written inventory improves plan quality.\npedagogy:\n- kind: Socratic\n  text: List assets→properties in 60 seconds. What’s missing?\n- kind: Aphorism\n  text: What you write down exists for strategy.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.reflection_loop_v1": {
+      "id": "macgyver.reflection_loop_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Reflection Loop",
+      "statement": "After action: identify the governing law, the choke point, and one substitution that would lower risk next time.",
+      "assumptions": [
+        "Retrospective improves future plan quality."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "Which law actually did the work? What will you change next time?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Name the win mechanism or you won’t keep it."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.reflection_loop_v1.yaml",
+      "_raw": "id: macgyver.reflection_loop_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Reflection Loop\nstatement: 'After action: identify the governing law, the choke point, and one substitution\n  that would lower risk next time.'\nassumptions:\n- Retrospective improves future plan quality.\npedagogy:\n- kind: Socratic\n  text: Which law actually did the work? What will you change next time?\n- kind: Aphorism\n  text: Name the win mechanism or you won’t keep it.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.deception_force_multiplier_v1": {
+      "id": "macgyver.deception_force_multiplier_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Deception as Force Multiplier",
+      "statement": "Use diversions and illusions to buy time and reduce the need for force.",
+      "assumptions": [
+        "Solutions should avoid harm and de-escalate."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "What harmless diversion buys a safe minute?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "A signal that buys a minute beats a force that breaks a wall."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.deception_force_multiplier_v1.yaml",
+      "_raw": "id: macgyver.deception_force_multiplier_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Deception as Force Multiplier\nstatement: Use diversions and illusions to buy time and reduce the need for force.\nassumptions:\n- Solutions should avoid harm and de-escalate.\npedagogy:\n- kind: Socratic\n  text: What harmless diversion buys a safe minute?\n- kind: Aphorism\n  text: A signal that buys a minute beats a force that breaks a wall.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.sop_10min_loop_v1": {
+      "id": "macgyver.sop_10min_loop_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "SOP: The 10‑Minute MacGyver Loop",
+      "statement": "A 10‑step loop: clarify target, map layout, inventory properties, pick a law, sketch three chains, choose low‑risk, add timing control, premortem, micro‑test, execute & observe.",
+      "assumptions": [
+        "Timeboxed planning increases safety and success."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "Which step can you perform in under 60 seconds right now?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Process is the parachute."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping",
+        "training"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.sop_10min_loop_v1.yaml",
+      "_raw": "id: macgyver.sop_10min_loop_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: 'SOP: The 10‑Minute MacGyver Loop'\nstatement: 'A 10‑step loop: clarify target, map layout, inventory properties, pick\n  a law, sketch three chains, choose low‑risk, add timing control, premortem, micro‑test,\n  execute & observe.'\nassumptions:\n- Timeboxed planning increases safety and success.\npedagogy:\n- kind: Socratic\n  text: Which step can you perform in under 60 seconds right now?\n- kind: Aphorism\n  text: Process is the parachute.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\n- training\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver_problem_collapse_v1": {
+      "id": "macgyver_problem_collapse_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Problem Space Collapse → New Solutions",
+      "statement": "Collapse a problem like macgyver.",
+      "assumptions": [
+        "Assumptions are enumerated or can be elicited with one question."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "Which single assumption, if wrong, invalidates the plan?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Make failure explicit and reversible."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules",
+        "created": "2025-11-07T03:56:05.351404Z",
+        "updated": "2025-11-07T03:56:05.351404Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": null,
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "life"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.problem_collapse_v1.yaml",
+      "_raw": "id: macgyver_problem_collapse_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Problem Space Collapse → New Solutions\nstatement: Collapse a problem like macgyver.\nassumptions:\n- Assumptions are enumerated or can be elicited with one question.\npedagogy:\n- kind: Socratic\n  text: Which single assumption, if wrong, invalidates the plan?\n- kind: Aphorism\n  text: Make failure explicit and reversible.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: null\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- life\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.stock_verbs_v1": {
+      "id": "macgyver.stock_verbs_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Stock Verbs",
+      "statement": "Memorize a small verb lexicon: tie, wedge, knot, jam, twist, short, bridge, reflect, refract, siphon, vent, pack, wick, damp, shim, lash.",
+      "assumptions": [
+        "Motor skills and basic materials available."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "Which two verbs change the state with least effort?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Verbs, not nouns, move worlds."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.stock_verbs_v1.yaml",
+      "_raw": "id: macgyver.stock_verbs_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Stock Verbs\nstatement: 'Memorize a small verb lexicon: tie, wedge, knot, jam, twist, short, bridge,\n  reflect, refract, siphon, vent, pack, wick, damp, shim, lash.'\nassumptions:\n- Motor skills and basic materials available.\npedagogy:\n- kind: Socratic\n  text: Which two verbs change the state with least effort?\n- kind: Aphorism\n  text: Verbs, not nouns, move worlds.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.rails_ledgers_hub_mapping_v1": {
+      "id": "macgyver.rails_ledgers_hub_mapping_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Rails/Ledgers/Hub Mapping",
+      "statement": "Map solutions to rails (Sensing, Shaping, Timing, Power, Signaling), bundle minimal commuting rails as a ledger, schedule steps via the hub (ordered gates/delays).",
+      "assumptions": [
+        "A shared vocabulary improves collaboration and auditability."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "Which minimal set of rails forms the ledger here?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Gate→Gear→Hub keeps projects clean."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.rails_ledgers_hub_mapping_v1.yaml",
+      "_raw": "id: macgyver.rails_ledgers_hub_mapping_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Rails/Ledgers/Hub Mapping\nstatement: Map solutions to rails (Sensing, Shaping, Timing, Power, Signaling), bundle\n  minimal commuting rails as a ledger, schedule steps via the hub (ordered gates/delays).\nassumptions:\n- A shared vocabulary improves collaboration and auditability.\npedagogy:\n- kind: Socratic\n  text: Which minimal set of rails forms the ledger here?\n- kind: Aphorism\n  text: Gate→Gear→Hub keeps projects clean.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.blast_radius_humility_v1": {
+      "id": "macgyver.blast_radius_humility_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Blast-Radius Humility",
+      "statement": "Prefer diversion, disablement, and exit over destructive outcomes; minimize the space of unintended effects.",
+      "assumptions": [
+        "Safety and ethics are paramount; bystanders matter."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "If this misfires, who is at risk? How do we shrink that radius?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "Build exits before entries."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "medium",
+        "notes": "Discourages hazardous actions; focuses on reduction of harm."
+      },
+      "_file": "./capsules/macgyver/macgyver.blast_radius_humility_v1.yaml",
+      "_raw": "id: macgyver.blast_radius_humility_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Blast-Radius Humility\nstatement: Prefer diversion, disablement, and exit over destructive outcomes; minimize\n  the space of unintended effects.\nassumptions:\n- Safety and ethics are paramount; bystanders matter.\npedagogy:\n- kind: Socratic\n  text: If this misfires, who is at risk? How do we shrink that radius?\n- kind: Aphorism\n  text: Build exits before entries.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: medium\n  notes: Discourages hazardous actions; focuses on reduction of harm.\n",
+      "posture": "informational",
+      "_witness_count": 0
+    },
+    "macgyver.environment_as_component_v1": {
+      "id": "macgyver.environment_as_component_v1",
+      "version": "1.0.0",
+      "domain": "macgyver",
+      "title": "Environment as a Component",
+      "statement": "Treat gravity, sunlight, water, wind, terrain, and architecture as active parts of the design.",
+      "assumptions": [
+        "The environment can safely contribute force, flow, or information."
+      ],
+      "pedagogy": [
+        {
+          "kind": "Socratic",
+          "text": "Which environmental asset can replace a bought part?"
+        },
+        {
+          "kind": "Socratic",
+          "text": "How can layout (doors, shafts, slopes) create or remove options?"
+        },
+        {
+          "kind": "Aphorism",
+          "text": "The floorplan is your toolkit."
+        }
+      ],
+      "witnesses": [],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/macgyver",
+        "created": "2025-11-10T18:12:37Z",
+        "updated": "2025-11-10T18:12:37Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "conversation",
+        "planning",
+        "prototyping"
+      ],
+      "dependencies": [],
+      "incompatible_with": [],
+      "security": {
+        "sensitivity": "low",
+        "notes": ""
+      },
+      "_file": "./capsules/macgyver/macgyver.environment_as_component_v1.yaml",
+      "_raw": "id: macgyver.environment_as_component_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Environment as a Component\nstatement: Treat gravity, sunlight, water, wind, terrain, and architecture as active\n  parts of the design.\nassumptions:\n- The environment can safely contribute force, flow, or information.\npedagogy:\n- kind: Socratic\n  text: Which environmental asset can replace a bought part?\n- kind: Socratic\n  text: How can layout (doors, shafts, slopes) create or remove options?\n- kind: Aphorism\n  text: The floorplan is your toolkit.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
+      "posture": "informational",
+      "_witness_count": 0
     },
     "ops.rollback_plan_v1": {
       "id": "ops.rollback_plan_v1",
@@ -4447,6 +6139,38 @@ Prism.languages.js = Prism.languages.javascript;
       },
       "_file": "./profiles/ci_llm_judge.yaml",
       "_raw": "kind: profile\nid: profile.ci_llm_judge_v1\ntitle: CI Gate - LLM Judge\nversion: 1.0.0\ndescription: LLM evaluates artifacts; score + verdict + justification + citations.\nresponse:\n  format: json\n  policy: |\n    Score 0–1; verdict in {pass,fail}; brief justification; cite or abstain.\n  schema_ref: judge.schema.v1\n  rubric:\n    - Factual\n    - Reproducible evidence\n    - Citations present (or abstain)\n  system_block: |\n    SYSTEM: Profile=CI LLM Judge\n    POLICY: Score 0–1; verdict in {pass,fail}; brief justification; cite or abstain.\n    SCHEMA: See JUDGE_SCHEMA below.\n  projection:\n    include:\n      - title\n      - statement\n      - assumptions[:2]\n    render:\n      capsule_header: \"CAPSULE: {id} v{version}\"\n      assumption_bullet: \"  - {text}\"\n      enforcement_footer: \"ENFORCEMENT: Obey or abstain.\"\ndownload:\n  suggested_ext: json\n"
+    },
+    "profile.macgyver_v1": {
+      "id": "profile.macgyver_v1",
+      "title": "Macgyverisms",
+      "version": "1.0.0",
+      "description": "Bootstrap yourself or an LLM to solve problems like Macgyver.",
+      "response": {
+        "format": "natural",
+        "policy": "Cite or abstain; follow Plan→Verify→Answer; ask ONE crisp follow-up if required.\n",
+        "system_block": "SYSTEM: Profile=Macgyver\n\nFORMAT: Natural language.\n",
+        "projection": {
+          "include": [
+            "title",
+            "statement",
+            "assumptions[:5]",
+            "pedagogy.socratic[:3]",
+            "pedagogy.aphorisms[:3]"
+          ],
+          "render": {
+            "capsule_header": "BEGIN CAPSULE id={id} version={version} domain={domain}",
+            "assumption_bullet": "  - {text}",
+            "socratic_bullet": "  - {text}",
+            "aphorism_bullet": "  - {text}",
+            "enforcement_footer": "ENFORCEMENT: Ensure outputs satisfy this capsule; otherwise abstain and request the minimal missing info."
+          }
+        }
+      },
+      "download": {
+        "suggested_ext": "txt"
+      },
+      "_file": "./profiles/conversational_macgyver.yaml",
+      "_raw": "kind: profile\nid: profile.macgyver_v1\ntitle: Macgyverisms\nversion: 1.0.0\ndescription: Bootstrap yourself or an LLM to solve problems like Macgyver.\nresponse:\n  format: natural\n  policy: |\n    Cite or abstain; follow Plan→Verify→Answer; ask ONE crisp follow-up if required.\n  system_block: |\n    SYSTEM: Profile=Macgyver\n\n    FORMAT: Natural language.\n  projection:\n    include:\n    - title\n    - statement\n    - assumptions[:5]\n    - pedagogy.socratic[:3]\n    - pedagogy.aphorisms[:3]\n    render:\n      capsule_header: BEGIN CAPSULE id={id} version={version} domain={domain}\n      assumption_bullet: '  - {text}'\n      socratic_bullet: '  - {text}'\n      aphorism_bullet: '  - {text}'\n      enforcement_footer: 'ENFORCEMENT: Ensure outputs satisfy this capsule; otherwise\n        abstain and request the minimal missing info.'\ndownload:\n  suggested_ext: txt"
     },
     "profile.code_patch_v1": {
       "id": "profile.code_patch_v1",
@@ -4822,39 +6546,69 @@ Prism.languages.js = Prism.languages.javascript;
 
 
       /* ------------ Renderers ------------ */
-      function renderProfiles() {
-  const sel = $('profiles'); 
-  sel.innerHTML = '';
+     function renderProfiles() {
+  const sel    = $('profiles');
+  const descEl = $('profileDesc');
+  const pmap   = DATA.profiles || {};
+  const keys   = Object.keys(pmap).sort();
 
-  const pmap = DATA.profiles || {};
-  const keys = Object.keys(pmap).sort();
-
-  // Build <option>s (unchanged behavior)
+  // rebuild options
+  sel.textContent = '';
   for (const k of keys) {
     const p = pmap[k] || {};
     const o = document.createElement('option');
     o.value = k;
     o.textContent = (p.title || k) + ' (' + (p.version || '1.0.0') + ')';
-    // stash desc for convenience (optional)
     o.dataset.desc = p.description || '';
     sel.appendChild(o);
   }
 
-  if (!STATE.profile) STATE.profile = keys[0] || null;
-  sel.value = STATE.profile || '';
+  // prefer browser-remembered; else STATE; else first
+  const remembered = sel.value;
+  let target =
+    (remembered && pmap[remembered]) ? remembered :
+    (STATE.profile && pmap[STATE.profile]) ? STATE.profile :
+    (keys[0] || '');
 
-  // ALWAYS show the selected profile's description
-  const descEl = $('profileDesc');
-  const show = (pmap[STATE.profile || ''] || {}).description || '';
-  if (descEl) descEl.textContent = show ? ('— ' + show) : '';
+  sel.value = target;
+  STATE.profile = target;
 
+  // startup description
+  if (descEl) {
+    const p0 = pmap[target] || {};
+    descEl.textContent = p0.description ? ('— ' + p0.description) : '';
+  }
+
+  // keep your existing change handler
   sel.onchange = () => {
     STATE.profile = sel.value;
     const p = pmap[STATE.profile] || {};
     if (descEl) descEl.textContent = p.description ? ('— ' + p.description) : '';
-    compose();
+    if (typeof compose === 'function') compose();
   };
+
+  // --- FAKE TOGGLE TO FORCE ACTIVATION ON LOAD ---
+  // If there’s more than one profile, switch to a different one and back.
+  if (keys.length > 1) {
+    const alt = (keys[0] === target) ? keys[1] : keys[0];
+
+    // 1) flip to alt (fires any listeners)
+    sel.value = alt;
+    sel.dispatchEvent(new Event('change', { bubbles: true }));
+
+    // 2) next tick, flip back to target (final state correct)
+    setTimeout(() => {
+      sel.value = target;
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+    }, 0);
+  } else {
+    // only one option: just fire a change to run downstream logic
+    sel.dispatchEvent(new Event('change', { bubbles: true }));
+  }
 }
+
+
+
 
 
       function capsuleRow(c, id, opts = {}) {

@@ -1,0 +1,41 @@
+id: macgyver.prompts_as_programs_v1
+version: 1.0.0
+domain: macgyver
+title: Prompts as Programs
+statement: Use structured prompts/checklists to force enumeration, comparison, and
+  premortems.
+assumptions:
+- Structure improves breadth and reduces blind spots.
+pedagogy:
+- kind: Socratic
+  text: Have we enumerated three routes and a premortem yet?
+- kind: Aphorism
+  text: Prompt the mind you want.
+witnesses: []
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/macgyver
+  created: '2025-11-10T18:12:37Z'
+  updated: '2025-11-10T18:12:37Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- conversation
+- planning
+- prototyping
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: low
+  notes: ''

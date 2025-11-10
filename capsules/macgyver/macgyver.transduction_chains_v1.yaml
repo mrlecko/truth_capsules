@@ -1,0 +1,45 @@
+id: macgyver.transduction_chains_v1
+version: 1.0.0
+domain: macgyver
+title: Transduction Chains
+statement: 'Route one energy into the effect you need: chemical→thermal→mechanical,
+  optical→thermal, electrical→magnetic, pneumatic/hydraulic→force.'
+assumptions:
+- Safer energy conversions exist than direct brute force.
+pedagogy:
+- kind: Socratic
+  text: Which energy form is easiest to start from in your scene?
+- kind: Socratic
+  text: What two-stage conversion achieves the effect with lower risk?
+- kind: Aphorism
+  text: Route energy; don’t brute energy.
+- kind: Aphorism
+  text: Two cheap stages outrun one clever stage.
+witnesses: []
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/macgyver
+  created: '2025-11-10T18:12:37Z'
+  updated: '2025-11-10T18:12:37Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- conversation
+- planning
+- prototyping
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: low
+  notes: ''

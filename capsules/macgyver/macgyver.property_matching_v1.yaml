@@ -1,0 +1,43 @@
+id: macgyver.property_matching_v1
+version: 1.0.0
+domain: macgyver
+title: Property-to-Law Matching
+statement: Map constraints to physical laws (pressure, torque, optics, buoyancy, friction)
+  and then to available properties and parts.
+assumptions:
+- Basic physics are more portable than specific tools.
+pedagogy:
+- kind: Socratic
+  text: Which law satisfies the need with the fewest steps?
+- kind: Socratic
+  text: What property‑set makes that law easy to apply here?
+- kind: Aphorism
+  text: Name the energy, not the object.
+witnesses: []
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/macgyver
+  created: '2025-11-10T18:12:37Z'
+  updated: '2025-11-10T18:12:37Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- conversation
+- planning
+- prototyping
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: low
+  notes: ''

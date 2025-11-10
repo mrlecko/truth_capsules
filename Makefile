@@ -1,6 +1,9 @@
 .PHONY: help setup lint lint-strict test digest digest-verify digest-reset sign verify kg compose compose-bundle \
         spa spa-pages smoke keygen clean clean-venv preflight list-bundles list-profiles \
-        scaffold run-witness witness-pass witness-fail witness-skip freeze sandbox-image sandbox-smoke 
+        scaffold run-witness witness-pass witness-fail witness-skip freeze sandbox-image sandbox-smoke \
+		keygen-dev key-fingerprint guard-no-privkeys \
+        demo-cite-green demo-cite-red verify-witness-latest pages-on-docs \
+		mint-profile
 
 # --- Paths & tools -----------------------------------------------------------
 PY        ?= python3
@@ -45,6 +48,7 @@ help:
 	@echo "  make kg                 - Export RDF/NDJSON-LD + SHACL validate"
 	@echo "  make compose            - Compose example prompt+manifest"
 	@echo "  make compose-bundle     - Compose any bundle (BUNDLE=..., PROFILE=...)"
+	@echo "  make profile		     - Create a new usage profile"
 	@echo "  make spa                - Generate SPA ($(SPA_OUT))"
 	@echo "  make spa-pages          - Generate SPA to docs/index.html"
 	@echo "  make spa-strict         - SPA with embedded libs (strict; fails if any missing)"
@@ -79,7 +83,6 @@ SANDBOX_FLAGS  ?= --rm \
                   --network=none \
                   --tmpfs /tmp:rw,nosuid,nodev,mode=1777,size=64m \
                   -w /work
-
 
 # Resolve engine/image at make-time (empty env won't blank them out)
 ENGINE := $(if $(strip $(SANDBOX_ENGINE)), $(SANDBOX_ENGINE), docker)
@@ -202,21 +205,6 @@ witness-sandbox:
 	fi
 
 	exit $$rc
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # --- Quality -----------------------------------------------------------------
 lint: $(PYBIN)
@@ -418,10 +406,19 @@ clean-venv:
 
 # --- Conveniences ------------------------------------------------------------
 
-.PHONY: keygen-dev key-fingerprint guard-no-privkeys \
-        demo-cite-green demo-cite-red verify-witness-latest pages-on-docs
+PROFILE_NAME ?= new_profile_v1
+PROFILE_TITLE ?= New Profile
+PROFILE_DESC ?=
+PROFILE_DIR ?= profiles
+PROFILE_FORCE ?= 0
 
-
+mint-profile:
+	@python3 scripts/mint_profile.py \
+		--name "$(PROFILE_NAME)" \
+		--title "$(PROFILE_TITLE)" \
+		$(if $(PROFILE_DESC),--description "$(PROFILE_DESC)",) \
+		--dir "$(PROFILE_DIR)" \
+		$(if $(filter 1 true yes,$(PROFILE_FORCE)),--force,)
 
 
 # Generate an Ed25519 dev pair with the names the repo already uses by default

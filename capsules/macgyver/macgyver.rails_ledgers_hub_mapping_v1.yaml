@@ -1,0 +1,41 @@
+id: macgyver.rails_ledgers_hub_mapping_v1
+version: 1.0.0
+domain: macgyver
+title: Rails/Ledgers/Hub Mapping
+statement: Map solutions to rails (Sensing, Shaping, Timing, Power, Signaling), bundle
+  minimal commuting rails as a ledger, schedule steps via the hub (ordered gates/delays).
+assumptions:
+- A shared vocabulary improves collaboration and auditability.
+pedagogy:
+- kind: Socratic
+  text: Which minimal set of rails forms the ledger here?
+- kind: Aphorism
+  text: Gate→Gear→Hub keeps projects clean.
+witnesses: []
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/macgyver
+  created: '2025-11-10T18:12:37Z'
+  updated: '2025-11-10T18:12:37Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- conversation
+- planning
+- prototyping
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: low
+  notes: ''

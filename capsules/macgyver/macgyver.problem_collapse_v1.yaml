@@ -1,0 +1,38 @@
+id: macgyver_problem_collapse_v1
+version: 1.0.0
+domain: macgyver
+title: Problem Space Collapse → New Solutions
+statement: Collapse a problem like macgyver.
+assumptions:
+- Assumptions are enumerated or can be elicited with one question.
+pedagogy:
+- kind: Socratic
+  text: Which single assumption, if wrong, invalidates the plan?
+- kind: Aphorism
+  text: Make failure explicit and reversible.
+witnesses: []
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules
+  created: '2025-11-07T03:56:05.351404Z'
+  updated: '2025-11-07T03:56:05.351404Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: null
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- life
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: low
+  notes: ''

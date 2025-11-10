@@ -1,0 +1,41 @@
+id: macgyver.redundancy_chokepoints_v1
+version: 1.0.0
+domain: macgyver
+title: Redundancy & Choke Points
+statement: Protect your own single points of failure while removing the opponent’s
+  options.
+assumptions:
+- System thinking improves robustness and containment.
+pedagogy:
+- kind: Socratic
+  text: Where is the single point of failure—and how do we cushion it?
+- kind: Aphorism
+  text: Add a backup or remove a choke.
+witnesses: []
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/macgyver
+  created: '2025-11-10T18:12:37Z'
+  updated: '2025-11-10T18:12:37Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- conversation
+- planning
+- prototyping
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: low
+  notes: ''

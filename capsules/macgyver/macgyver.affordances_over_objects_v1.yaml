@@ -1,0 +1,45 @@
+id: macgyver.affordances_over_objects_v1
+version: 1.0.0
+domain: macgyver
+title: Affordances Over Objects
+statement: Prioritize material properties (conducts, insulates, reflects, absorbs,
+  seals, flexes, burns, reacts) over brand-form labels to unlock repurposing.
+assumptions:
+- Scene contains everyday materials with varied properties.
+pedagogy:
+- kind: Socratic
+  text: For each nearby object, list three properties that could serve your goal.
+- kind: Socratic
+  text: Which property is missing—and what simple substitute adds it?
+- kind: Aphorism
+  text: Every object hides a verb.
+- kind: Aphorism
+  text: Properties beat brand names.
+witnesses: []
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/macgyver
+  created: '2025-11-10T18:12:37Z'
+  updated: '2025-11-10T18:12:37Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- conversation
+- planning
+- prototyping
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: low
+  notes: ''

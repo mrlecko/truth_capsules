@@ -1,0 +1,43 @@
+id: macgyver.functional_fixedness_avoidance_v1
+version: 1.0.0
+domain: macgyver
+title: Avoid Functional Fixedness
+statement: Intentionally re-label objects by their properties and verbs to unlock
+  alternative roles.
+assumptions:
+- User practices re-framing and is open to substitution.
+pedagogy:
+- kind: Socratic
+  text: What else can this become if I ignore its default name?
+- kind: Socratic
+  text: Which property, not present in this item, can be paired to create a new role?
+- kind: Aphorism
+  text: Every object hides a verb.
+witnesses: []
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/macgyver
+  created: '2025-11-10T18:12:37Z'
+  updated: '2025-11-10T18:12:37Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- conversation
+- planning
+- prototyping
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: low
+  notes: ''

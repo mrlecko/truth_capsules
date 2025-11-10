@@ -1,0 +1,41 @@
+id: macgyver.fail_safe_defaults_v1
+version: 1.0.0
+domain: macgyver
+title: Fail‑Safe Defaults
+statement: Design so that interruptions and errors do not cause harm; plan graceful
+  aborts.
+assumptions:
+- Interruption is likely; failure must be safe.
+pedagogy:
+- kind: Socratic
+  text: What happens if we stop at Step 2? Make that harmless.
+- kind: Aphorism
+  text: If it must fail, let it fail safe.
+witnesses: []
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/macgyver
+  created: '2025-11-10T18:12:37Z'
+  updated: '2025-11-10T18:12:37Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- conversation
+- planning
+- prototyping
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: low
+  notes: ''

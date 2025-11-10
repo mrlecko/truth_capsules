@@ -1,0 +1,41 @@
+id: macgyver.stock_verbs_v1
+version: 1.0.0
+domain: macgyver
+title: Stock Verbs
+statement: 'Memorize a small verb lexicon: tie, wedge, knot, jam, twist, short, bridge,
+  reflect, refract, siphon, vent, pack, wick, damp, shim, lash.'
+assumptions:
+- Motor skills and basic materials available.
+pedagogy:
+- kind: Socratic
+  text: Which two verbs change the state with least effort?
+- kind: Aphorism
+  text: Verbs, not nouns, move worlds.
+witnesses: []
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/macgyver
+  created: '2025-11-10T18:12:37Z'
+  updated: '2025-11-10T18:12:37Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- conversation
+- planning
+- prototyping
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: low
+  notes: ''

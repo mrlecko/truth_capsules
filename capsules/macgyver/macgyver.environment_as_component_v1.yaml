@@ -1,0 +1,43 @@
+id: macgyver.environment_as_component_v1
+version: 1.0.0
+domain: macgyver
+title: Environment as a Component
+statement: Treat gravity, sunlight, water, wind, terrain, and architecture as active
+  parts of the design.
+assumptions:
+- The environment can safely contribute force, flow, or information.
+pedagogy:
+- kind: Socratic
+  text: Which environmental asset can replace a bought part?
+- kind: Socratic
+  text: How can layout (doors, shafts, slopes) create or remove options?
+- kind: Aphorism
+  text: The floorplan is your toolkit.
+witnesses: []
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/macgyver
+  created: '2025-11-10T18:12:37Z'
+  updated: '2025-11-10T18:12:37Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- conversation
+- planning
+- prototyping
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: low
+  notes: ''

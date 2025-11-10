@@ -1,0 +1,41 @@
+id: macgyver.prompt_skeleton_v1
+version: 1.0.0
+domain: macgyver
+title: LLM Prompt Skeleton
+statement: A structured prompt to force safe, legal, non‑destructive chain synthesis
+  for a defined goal and setting.
+assumptions:
+- LLMs need structure and guardrails for reliable outputs.
+pedagogy:
+- kind: Socratic
+  text: Does the prompt enforce assets, laws, three chains, premortem, and micro‑test?
+- kind: Aphorism
+  text: Prompts are levers for minds.
+witnesses: []
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/macgyver
+  created: '2025-11-10T18:12:37Z'
+  updated: '2025-11-10T18:12:37Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- conversation
+- planning
+- training
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: low
+  notes: ''

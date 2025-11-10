@@ -1,0 +1,41 @@
+id: macgyver.mvp_mechanism_bias_v1
+version: 1.0.0
+domain: macgyver
+title: MVP Mechanism Bias
+statement: Prefer the smallest reversible mechanism that might work; escalate complexity
+  only as needed.
+assumptions:
+- Reversible steps reduce risk and damage.
+pedagogy:
+- kind: Socratic
+  text: What is the least‑effort, reversible move that could work?
+- kind: Aphorism
+  text: Use reversibility as a brake.
+witnesses: []
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/macgyver
+  created: '2025-11-10T18:12:37Z'
+  updated: '2025-11-10T18:12:37Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- conversation
+- planning
+- prototyping
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: low
+  notes: ''

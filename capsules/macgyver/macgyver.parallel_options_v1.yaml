@@ -1,0 +1,40 @@
+id: macgyver.parallel_options_v1
+version: 1.0.0
+domain: macgyver
+title: Parallel Optioning
+statement: 'Always generate three routes: Physical, Informational, Environmental.'
+assumptions:
+- Time allows at least brief divergent ideation.
+pedagogy:
+- kind: Socratic
+  text: List one Physical, one Informational, one Environmental route.
+- kind: Aphorism
+  text: Don’t hunt with one arrow.
+witnesses: []
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/macgyver
+  created: '2025-11-10T18:12:37Z'
+  updated: '2025-11-10T18:12:37Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- conversation
+- planning
+- prototyping
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: low
+  notes: ''

@@ -621,7 +621,7 @@ details.panel-collapsible > .list{
     <h1>Truth Capsule Prompt Composer</h1>
     <div class="small" style="font-size:12px; margin-top:5px;">Generated {{ generated_at }}</div>
     <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-      <button style="display:none;" class="btn" id="composeBtn" title="Compose (Ctrl/Cmd+Enter)">🟢 Compose</button>
+      <button class="btn" id="composeBtn" title="Compose (Ctrl/Cmd+Enter)">🟢 Compose</button>
       <button class="btn" id="copyBtn" title="Copy prompt">📋 Copy Prompt</button>
       <button class="btn" id="copyLlmBtn" title="Copy LLM command">💻 Copy LLM Bash</button>
       <button class="btn" id="dlBtn" title="Download prompt">⬇️ Download Prompt</button>
@@ -1002,39 +1002,65 @@ details.panel-collapsible > .list{
 
       /* ------------ Renderers ------------ */
       function renderProfiles() {
-  const sel = $('profiles'); 
-  sel.innerHTML = '';
+        const sel    = $('profiles');
+        const descEl = $('profileDesc');
+        const pmap   = DATA.profiles || {};
+        const keys   = Object.keys(pmap).sort();
 
-  const pmap = DATA.profiles || {};
-  const keys = Object.keys(pmap).sort();
+        // rebuild options
+        sel.textContent = '';
+        for (const k of keys) {
+          const p = pmap[k] || {};
+          const o = document.createElement('option');
+          o.value = k;
+          o.textContent = (p.title || k) + ' (' + (p.version || '1.0.0') + ')';
+          o.dataset.desc = p.description || '';
+          sel.appendChild(o);
+        }
 
-  // Build <option>s (unchanged behavior)
-  for (const k of keys) {
-    const p = pmap[k] || {};
-    const o = document.createElement('option');
-    o.value = k;
-    o.textContent = (p.title || k) + ' (' + (p.version || '1.0.0') + ')';
-    // stash desc for convenience (optional)
-    o.dataset.desc = p.description || '';
-    sel.appendChild(o);
-  }
+        // prefer browser-remembered; else STATE; else first
+        const remembered = sel.value;
+        let target =
+          (remembered && pmap[remembered]) ? remembered :
+          (STATE.profile && pmap[STATE.profile]) ? STATE.profile :
+          (keys[0] || '');
 
-  if (!STATE.profile) STATE.profile = keys[0] || null;
-  sel.value = STATE.profile || '';
+        sel.value = target;
+        STATE.profile = target;
 
-  // ALWAYS show the selected profile's description
-  const descEl = $('profileDesc');
-  const show = (pmap[STATE.profile || ''] || {}).description || '';
-  if (descEl) descEl.textContent = show ? ('— ' + show) : '';
+        // startup description
+        if (descEl) {
+          const p0 = pmap[target] || {};
+          descEl.textContent = p0.description ? ('— ' + p0.description) : '';
+        }
 
-  sel.onchange = () => {
-    STATE.profile = sel.value;
-    const p = pmap[STATE.profile] || {};
-    if (descEl) descEl.textContent = p.description ? ('— ' + p.description) : '';
-    compose();
-  };
-}
+        // keep your existing change handler
+        sel.onchange = () => {
+          STATE.profile = sel.value;
+          const p = pmap[STATE.profile] || {};
+          if (descEl) descEl.textContent = p.description ? ('— ' + p.description) : '';
+          if (typeof compose === 'function') compose();
+        };
 
+        // --- FAKE TOGGLE TO FORCE ACTIVATION ON LOAD ---
+        // If there’s more than one profile, switch to a different one and back.
+        if (keys.length > 1) {
+          const alt = (keys[0] === target) ? keys[1] : keys[0];
+
+          // 1) flip to alt (fires any listeners)
+          sel.value = alt;
+          sel.dispatchEvent(new Event('change', { bubbles: true }));
+
+          // 2) next tick, flip back to target (final state correct)
+          setTimeout(() => {
+            sel.value = target;
+            sel.dispatchEvent(new Event('change', { bubbles: true }));
+          }, 0);
+        } else {
+          // only one option: just fire a change to run downstream logic
+          sel.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
 
       function capsuleRow(c, id, opts = {}) {
         const showDomainChip = !!opts.showDomainChip;

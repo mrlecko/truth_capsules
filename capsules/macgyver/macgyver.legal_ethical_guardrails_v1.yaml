@@ -1,0 +1,41 @@
+id: macgyver.legal_ethical_guardrails_v1
+version: 1.0.0
+domain: macgyver
+title: Legal & Ethical Guardrails
+statement: Operate with consent, legality, and non‑maleficence; solutions are for
+  safety, rescue, education, prototyping.
+assumptions:
+- User agrees to legal and ethical constraints.
+pedagogy:
+- kind: Socratic
+  text: Whose consent or safety is implicated? Stop if unclear.
+- kind: Aphorism
+  text: Better a delayed win than a wrongful one.
+witnesses: []
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/macgyver
+  created: '2025-11-10T18:12:37Z'
+  updated: '2025-11-10T18:12:37Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- conversation
+- planning
+- prototyping
+dependencies: []
+incompatible_with: []
+security:
+  sensitivity: medium
+  notes: ''
