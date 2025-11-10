@@ -1,8 +1,0 @@
-{
-  "profile": "profile.conversational_guidance_v1",
-  "bundles": [],
-  "capsules": [
-    "llm.pii_redaction_guard_v1"
-  ],
-  "generated_at": "2025-11-08T00:27:01.048711Z"
-}

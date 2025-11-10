@@ -1,0 +1,26 @@
+name: bundle.ci_quality_gates_v1
+version: 1.0.0
+description: "Release Integrity: SBOM presence, license allowlist, container hardening, reproducible artifact, and build-env secret checks."
+default_profile: ci.gates.yaml
+applies_to:
+  - ci
+  - release
+capsules:
+  - ci.sbom_present_v1
+  - ci.license_compliance_v1
+  - ci.container_hardening_v1
+  - ci.reproducible_artifact_hash_v1
+  - ci.secrets_in_build_env_v1
+order:
+  - ci.sbom_present_v1
+  - ci.license_compliance_v1
+  - ci.container_hardening_v1
+  - ci.reproducible_artifact_hash_v1
+  - ci.secrets_in_build_env_v1
+tags:
+  - ci
+  - supply_chain
+  - release
+  - v1
+notes: |
+  Witnessed-first: each capsule carries executable checks with JSON outputs. Defaults point at example fixtures in artifacts/examples/ci.

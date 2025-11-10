@@ -1,0 +1,23 @@
+kind: profile
+id: profile.ci.gates_v1
+title: CI Quality Gates — Fail Fast
+version: 1.0.0
+description: Strict, proof-carrying CI gates. Output GREEN/RED with concise JSON. Abort unless all mandatory witnesses pass.
+response:
+  format: natural
+  policy: |
+    Emit crisp GREEN/RED summary with JSON evidence. Fail fast unless all mandatory gates pass.
+    Do not speculate; if evidence missing, mark RED with the minimal required next step.
+  system_block: |
+    SYSTEM: Profile=CIGates
+    ROLE: CI quality gate reporter (witnessed-first)
+    STYLE: terse; bullet verdicts; include JSON snippets for failures.
+  projection:
+    include:
+      - title
+      - statement
+    render:
+      capsule_header: "BEGIN CAPSULE id={id} version={version} domain={domain}"
+      enforcement_footer: "ENFORCEMENT: All gates must be GREEN; otherwise mark RED and stop."
+download:
+  suggested_ext: txt

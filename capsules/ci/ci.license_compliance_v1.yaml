@@ -1,0 +1,105 @@
+id: ci.license_compliance_v1
+version: 1.0.0
+domain: ci
+title: License Compliance — Allowlist Only
+statement: |-
+  All package licenses in the SBOM must be on an allowlist. Fail on any package with a disallowed or unknown license.
+
+witnesses:
+  - name: spdx_allowlist_only
+    language: python
+    entrypoint: python3
+    args: []
+    env:
+      SBOM_PATH: artifacts/examples/ci/sbom.json
+      ALLOWED_LICENSES_JSON: '["MIT","Apache-2.0","BSD-3-Clause","BSD-2-Clause","ISC","Python-2.0"]'
+    timeout_ms: 5000
+    memory_mb: 128
+    net: false
+    fs_mode: ro
+    code: |-
+      import os, json, sys, re
+
+      def load_json(path):
+          with open(path, "r", errors="ignore") as f:
+              return json.load(f)
+
+      def collect_licenses(sbom):
+          found = []
+
+          comps = sbom.get("components") or []
+          for c in comps:
+              if "licenses" in c and isinstance(c["licenses"], list):
+                  for it in c["licenses"]:
+                      lic = it.get("license") if isinstance(it, dict) else None
+                      if isinstance(lic, dict):
+                          if "id" in lic:
+                              found.append(lic["id"])
+                          elif "name" in lic:
+                              found.append(lic["name"])
+              if "license" in c and isinstance(c["license"], (str, dict)):
+                  if isinstance(c["license"], str):
+                      found.append(c["license"])
+                  else:
+                      found.append(c["license"].get("id") or c["license"].get("name"))
+
+          pkgs = sbom.get("packages") or []
+          for p in pkgs:
+              for key in ("licenseConcluded", "licenseDeclared", "license"):
+                  if key in p and p[key]:
+                      found.append(p[key])
+
+          text = json.dumps(sbom, ensure_ascii=False)
+          for m in re.findall(r'\b([A-Za-z0-9\-\.\+]+-?(License)?)\b', text):
+              token = m[0]
+              if any(ch.isdigit() for ch in token) or "-" in token:
+                  found.append(token)
+
+          return [s for s in { (s or "").strip() for s in found } if s]
+
+      def main():
+          sbom_path = os.environ.get("SBOM_PATH", "artifacts/examples/ci/sbom.json")
+          allow_json = os.environ.get("ALLOWED_LICENSES_JSON", '["MIT","Apache-2.0","BSD-3-Clause","BSD-2-Clause","ISC","Python-2.0"]')
+          try:
+              allow = set(json.loads(allow_json))
+          except Exception:
+              allow = set(["MIT","Apache-2.0","BSD-3-Clause","BSD-2-Clause","ISC","Python-2.0"])
+
+          try:
+              sbom = load_json(sbom_path)
+              licenses = collect_licenses(sbom)
+          except Exception as e:
+              print(json.dumps({"ok": False, "error": str(e), "sbom_path": sbom_path}, indent=2))
+              sys.exit(1)
+
+          unknown = [lic for lic in licenses if lic not in allow]
+          result = {"ok": len(unknown) == 0, "licenses": sorted(set(licenses)), "disallowed": sorted(set(unknown)), "allowlist": sorted(allow)}
+          print(json.dumps(result, indent=2))
+          sys.exit(0 if result["ok"] else 1)
+
+      if __name__ == "__main__":
+          main()
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/ci
+  created: '2025-11-10T21:10:00Z'
+  updated: '2025-11-10T21:10:00Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- ci
+- release
+security:
+  sensitivity: medium
+  notes: "Runs in restricted CI; no network by default; read-only FS recommended."

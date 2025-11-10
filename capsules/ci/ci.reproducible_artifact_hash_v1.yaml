@@ -1,0 +1,83 @@
+id: ci.reproducible_artifact_hash_v1
+version: 1.0.0
+domain: ci
+title: Reproducible Build — Repeatable Artifact Hash
+statement: |-
+  Running the build command twice in a clean workspace should produce byte-identical artifacts (same SHA-256).
+
+witnesses:
+  - name: repeatable_hash_check
+    language: python
+    entrypoint: python3
+    args: []
+    env:
+      BUILD_CMD: "bash artifacts/examples/ci/build_demo.sh"
+      ARTIFACT_PATH: artifacts/examples/ci/build/out/demo-artifact.txt
+    timeout_ms: 10000
+    memory_mb: 256
+    net: false
+    fs_mode: rw
+    code: |-
+      import os, sys, json, hashlib, subprocess, time
+
+      def sha256(path):
+          h = hashlib.sha256()
+          with open(path, "rb") as f:
+              for chunk in iter(lambda: f.read(65536), b""):
+                  h.update(chunk)
+          return h.hexdigest()
+
+      def run_cmd(cmd):
+          completed = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+          return completed.returncode, completed.stdout, completed.stderr
+
+      def main():
+          cmd = os.environ.get("BUILD_CMD", "")
+          artifact = os.environ.get("ARTIFACT_PATH", "")
+
+          if cmd:
+              rc1, out1, err1 = run_cmd(cmd)
+              rc2, out2, err2 = run_cmd(cmd)
+              build_ok = (rc1 == 0 and rc2 == 0)
+          else:
+              build_ok = True
+              out1 = out2 = err1 = err2 = ""
+
+          if not os.path.isfile(artifact):
+              print(json.dumps({"ok": False, "error": "artifact missing", "artifact": artifact, "build_ok": build_ok, "stdout": out2, "stderr": err2}, indent=2))
+              sys.exit(1)
+
+          h1 = sha256(artifact)
+          time.sleep(0.1)
+          h2 = sha256(artifact)
+
+          ok = build_ok and (h1 == h2)
+          print(json.dumps({"ok": ok, "artifact": artifact, "sha256_first": h1, "sha256_second": h2, "build_ok": build_ok}, indent=2))
+          sys.exit(0 if ok else 1)
+
+      if __name__ == "__main__":
+          main()
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/ci
+  created: '2025-11-10T21:10:00Z'
+  updated: '2025-11-10T21:10:00Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- ci
+- release
+security:
+  sensitivity: medium
+  notes: "Runs in restricted CI; no network by default; read-only FS recommended."

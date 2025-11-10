@@ -1,0 +1,5 @@
+# Example sanitized CI environment
+CI=true
+GIT_SHA=deadbeefdeadbeefdeadbeef
+SERVICE_NAME=demo
+REGION=us-central1

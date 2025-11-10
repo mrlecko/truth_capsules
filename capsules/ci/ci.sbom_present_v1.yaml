@@ -1,0 +1,94 @@
+id: ci.sbom_present_v1
+version: 1.0.0
+domain: ci
+title: SBOM Present for the Release
+statement: |-
+  A Software Bill of Materials (SBOM) must be attached to every release artifact.
+  The SBOM file must exist, be non-empty, and parse as JSON or SPDX tag-value text.
+
+witnesses:
+  - name: sbom_file_exists
+    language: python
+    entrypoint: python3
+    args: []
+    env:
+      ARTIFACTS_DIR: artifacts/examples/ci
+      SBOM_NAME: sbom.json
+    timeout_ms: 4000
+    memory_mb: 128
+    net: false
+    fs_mode: ro
+    code: |-
+      import os, json, sys
+
+      def is_nonempty_file(path):
+          try:
+              return os.path.isfile(path) and os.path.getsize(path) > 0
+          except Exception:
+              return False
+
+      def try_parse_json(path):
+          try:
+              with open(path, "r", errors="ignore") as f:
+                  json.load(f)
+              return True, "json"
+          except Exception:
+              return False, None
+
+      def try_spdx_tagvalue(path):
+          try:
+              with open(path, "r", errors="ignore") as f:
+                  head = f.read(2048)
+              return "SPDXVersion:" in head or "PackageName:" in head
+          except Exception:
+              return False
+
+      def main():
+          artifacts = os.environ.get("ARTIFACTS_DIR", "artifacts/examples/ci")
+          name = os.environ.get("SBOM_NAME", "sbom.json")
+          path = os.path.join(artifacts, name)
+
+          exists = is_nonempty_file(path)
+          parsed = False
+          fmt = None
+          if exists:
+              ok, fmt = try_parse_json(path)
+              if not ok:
+                  if try_spdx_tagvalue(path):
+                      parsed = True
+                      fmt = "spdx-tagvalue"
+                  else:
+                      parsed = False
+              else:
+                  parsed = True
+
+          result = {"ok": exists and parsed, "path": path, "exists": exists, "parsed": parsed, "format": fmt}
+          print(json.dumps(result, indent=2))
+          sys.exit(0 if result["ok"] else 1)
+
+      if __name__ == "__main__":
+          main()
+provenance:
+  schema: provenance.v1
+  author: John Macgregor
+  org: Truth Capsules Demo
+  license: MIT
+  source_url: https://example.com/truth-capsules/ci
+  created: '2025-11-10T21:10:00Z'
+  updated: '2025-11-10T21:10:00Z'
+  review:
+    status: draft
+    reviewers: []
+    last_reviewed: null
+  signing:
+    method: ed25519
+    key_id: null
+    pubkey: null
+    digest: null
+    signature: null
+applies_to:
+- ci
+- release
+security:
+  sensitivity: medium
+  notes: "Runs in restricted CI; no network by default; read-only FS recommended."
