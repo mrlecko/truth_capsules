@@ -97,10 +97,12 @@ def _run_make_witness(capsule: str | None, witness: str | None, env_vars: str = 
     # The target may echo banners/commands. Extract the last JSON array from stdout.
     # Strategy: find the last '[' ... ']' that parses as JSON list.
     def _extract_last_json_array(s: str) -> list[dict]:
-        # Greedy scan from the end
-        last_open = s.rfind("[")
+    # Walk closing brackets from the end until we parse a JSON list.
         last_close = s.rfind("]")
-        while last_open != -1 and last_close != -1 and last_close > last_open:
+        while last_close != -1:
+            last_open = s.rfind("[", 0, last_close + 1)
+            if last_open == -1:
+                break
             candidate = s[last_open:last_close + 1].strip()
             try:
                 data = json.loads(candidate)
@@ -108,9 +110,9 @@ def _run_make_witness(capsule: str | None, witness: str | None, env_vars: str = 
                     return data
             except Exception:
                 pass
-            # Move left to find an earlier '['
-            last_open = s.rfind("[", 0, last_open)
-        raise AssertionError(f"Could not parse JSON from stdout.\n--- stdout ---\n{stdout}\n--- stderr ---\n{proc.stderr}")
+            last_close = s.rfind("]", 0, last_close)  # move left
+        raise AssertionError(f"Could not parse JSON from stdout.\n--- stdout ---\n{s}\n")
+
 
     data = _extract_last_json_array(stdout)
     return proc.returncode, data

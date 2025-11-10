@@ -15,9 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added quickstarts and makefile conveniences
 
 ### Fixed
-  - capsule digests
+  - Capsule Digests
   - SPA visuals
-  - github workflows
+  - Github Workflows
+  
 
 ## [0.0.9] - 2025-11-08
 

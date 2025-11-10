@@ -1,6 +1,6 @@
 id: ollama_llama3_local
 label: "Ollama: llama3 (local)"
-model: "ollama:llama3"
+model: "llama3"
 description: "Local model; file input."
 engine: "llm"
 input_mode: "file"
