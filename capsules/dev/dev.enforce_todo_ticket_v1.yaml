@@ -1,10 +1,27 @@
 id: dev.enforce_todo_ticket_v1
 version: 1.0.0
 domain: dev
-title: TODO/FIXME Must Reference a Ticket
+title: Enforce TODO/FIXME Lines Reference a Ticket
 statement: |-
-  Any added TODO/FIXME in the diff must include a ticket reference matching TICKET_REGEX.
-  Default regex targets common trackers like ABC-123, PROJ-42, etc.
+  Any newly added TODO/FIXME lines in a diff must include a valid ticket reference.
+  Default format is `(PROJ|JIRA)-[0-9]+` and can be customized with env `TICKET_REGEX`.
+  Scope: added lines only (unified diff), excluding headers (`+++`, `@@`, `diff --git`).
+  Pass criteria:
+    • If no TODO/FIXME were added ⇒ PASS.
+    • If TODO/FIXME were added ⇒ each TODO line must contain a ticket reference that matches `TICKET_REGEX`.
+
+assumptions:
+  - Diff is a standard unified diff (e.g., `git diff`).
+  - Reviewers accept TODOs only when linked to tracked work.
+  - Ticket prefix is stable and communicated to the team.
+
+pedagogy:
+  - kind: Socratic
+    text: If this TODO is worth shipping, where’s the ticket to follow it up?
+  - kind: Socratic
+    text: What template would keep TODOs actionable and time-bounded?
+  - kind: Aphorism
+    text: No ticket, no TODO.
 
 witnesses:
   - name: todo_refs_present
@@ -12,64 +29,80 @@ witnesses:
     entrypoint: python3
     args: []
     env:
-      DIFF_PATH: artifacts/examples/dev/pr_diff.patch
-      TICKET_REGEX: "[A-Z]{2,10}-\d+"
+      DIFF_PATH: artifacts/examples/pr_diff.patch
+      TICKET_REGEX: "(PROJ|JIRA)-[0-9]+"
     timeout_ms: 5000
     memory_mb: 128
     net: false
     fs_mode: ro
     code: |-
-      import os, re, json, sys
+      import os, sys, re, json
 
-      def read(path):
-          with open(path, "r", errors="ignore") as f:
-              return f.readlines()
+      DIFF_PATH = os.environ.get("DIFF_PATH", "artifacts/examples/pr_diff.patch")
+      TICKET_REGEX = os.environ.get("TICKET_REGEX", r"(PROJ|JIRA)-[0-9]+")
+      ticket_rx = re.compile(TICKET_REGEX)
+
+      def iter_added_lines(p):
+          with open(p, "r", errors="ignore") as f:
+              for line in f:
+                  if line.startswith("+++ ") or line.startswith("--- "):  # file headers
+                      continue
+                  if line.startswith("@@ "):  # hunk headers
+                      continue
+                  if line.startswith("diff --git "):  # git headers
+                      continue
+                  if line.startswith("+++"):  # guard against "+++b/file"
+                      continue
+                  if line.startswith("+") and not line.startswith("+++") and not line.startswith("+@@"):
+                      yield line[1:].rstrip("\n")
 
       def main():
-          diff_path = os.environ.get("DIFF_PATH", "artifacts/examples/dev/pr_diff.patch")
-          ticket_regex = os.environ.get("TICKET_REGEX", r"[A-Z]{2,10}-\d+")
-          rx_ticket = re.compile(ticket_regex)
+          todo_lines = []
+          with_ticket = []
+          missing = []
 
-          if os.path.isdir(diff_path):
-              diff_path = os.path.join(diff_path, "pr_diff.patch")
+          for added in iter_added_lines(DIFF_PATH):
+              # We treat "TODO" or "FIXME" (any case) as a tracked to-do marker
+              if re.search(r"(?i)\b(TODO|FIXME)\b", added):
+                  todo_lines.append(added)
+                  if ticket_rx.search(added):
+                      with_ticket.append(added)
+                  else:
+                      missing.append(added)
 
-          lines = read(diff_path)
-          violations = []
-          for line in lines:
-              if not line.startswith("+") or line.startswith("+++ "):
-                  continue
-              if re.search(r"\b(TODO|FIXME)\b", line, flags=re.I):
-                  if not rx_ticket.search(line):
-                      violations.append(line.strip())
+          ok = (len(todo_lines) == 0) or (len(missing) == 0)
 
-          result = {"ok": len(violations) == 0, "missing_ticket_refs": violations, "diff": diff_path, "ticket_regex": ticket_regex}
-          print(json.dumps(result, indent=2))
-          sys.exit(0 if result["ok"] else 1)
+          out = {
+              "ok": ok,
+              "diff": DIFF_PATH,
+              "regex": TICKET_REGEX,
+              "todo_added_count": len(todo_lines),
+              "todo_with_ticket": len(with_ticket),
+              "todo_missing_ticket": len(missing),
+              "examples_missing": missing[:5]
+          }
+          print(json.dumps(out, indent=2))
+          sys.exit(0 if ok else 1)
 
       if __name__ == "__main__":
           main()
+
 provenance:
   schema: provenance.v1
-  author: John Macgregor
+  author: Truth Capsules
   org: Truth Capsules Demo
   license: MIT
-  source_url: https://example.com/truth-capsules/dev
-  created: '2025-11-10T20:25:00Z'
-  updated: '2025-11-10T20:25:00Z'
-  review:
-    status: draft
-    reviewers: []
-    last_reviewed: null
-  signing:
-    method: ed25519
-    key_id: null
-    pubkey: null
-    digest: null
-    signature: null
+  source_url: https://example.com/truth-capsules
+  created: 2025-11-10T00:00:00Z
+  updated: 2025-11-10T00:00:00Z
+
 applies_to:
-- conversation
-- code_assistant
-- review
+  - ci
+  - code_assistant
+
+dependencies: []
+incompatible_with: []
+
 security:
-  sensitivity: medium
+  sensitivity: low
   notes: ""

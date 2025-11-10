@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import argparse, json, os, sys, glob, yaml, hashlib
-from datetime import datetime
+from datetime import datetime, date
 from urllib.request import urlopen, Request
 from urllib.error import URLError, HTTPError
 from jinja2 import Template
@@ -47,6 +47,13 @@ CDN_ALTS = {
         "sortablejs@1.15.2/Sortable.min.js",
     ],
 }
+
+def _json_default(o):
+    # Make YAML timestamps JSON-serializable
+    if isinstance(o, (datetime, date)):
+        return o.isoformat()
+    # Add other oddballs here if needed (Path, bytes, set, Decimal, etc.)
+    return str(o)
 
 def _guess_ext(key: str) -> str:
     return ".css" if "css" in key else ".js"
@@ -292,7 +299,7 @@ def generate_spa(root_dir, template_path, output_path, vendor_dir, inline_cdn, o
 
     print(f"\n🔧 Rendering SPA...")
     generated_at = datetime.utcnow().isoformat() + "Z"
-    data_json = json.dumps(data, indent=2, ensure_ascii=False)
+    data_json = json.dumps(data, indent=2, ensure_ascii=False, default=_json_default)
 
     libs = {k: "" for k in CDN}
     digests = {k: "" for k in CDN}
@@ -355,7 +362,7 @@ def main():
 
         # Prepare render vars
         data = collect_data(args.root)
-        data_json = json.dumps(data, indent=2, ensure_ascii=False)
+        data_json = json.dumps(data, indent=2, ensure_ascii=False, default=_json_default)
         generated_at = datetime.utcnow().isoformat() + "Z"
 
         with open(args.template, "r", encoding="utf-8") as f:

@@ -13,6 +13,8 @@ witnesses:
     env:
       SBOM_PATH: artifacts/examples/ci/sbom.json
       ALLOWED_LICENSES_JSON: '["MIT","Apache-2.0","BSD-3-Clause","BSD-2-Clause","ISC","Python-2.0"]'
+      STRICT_FIELDS_ONLY: "true"          # prefer known SBOM fields, avoid heuristics
+      IGNORE_NUMERIC_TOKENS: "true"       # ignore tokens that look like versions/numbers
     timeout_ms: 5000
     memory_mb: 128
     net: false
@@ -20,60 +22,107 @@ witnesses:
     code: |-
       import os, json, sys, re
 
+      VERSION_RE = re.compile(r"^\d+(?:\.\d+){0,3}$")
+
+      def env_bool(name, default):
+          v = os.environ.get(name, str(default)).strip().lower()
+          return v in ("1","true","yes","on")
+
       def load_json(path):
           with open(path, "r", errors="ignore") as f:
               return json.load(f)
 
-      def collect_licenses(sbom):
-          found = []
+      def norm(s):
+          return (s or "").strip()
 
+      def collect_from_known_fields(sbom):
+          out = set()
+
+          # CycloneDX components
           comps = sbom.get("components") or []
           for c in comps:
-              if "licenses" in c and isinstance(c["licenses"], list):
-                  for it in c["licenses"]:
-                      lic = it.get("license") if isinstance(it, dict) else None
+              # CycloneDX license list format
+              lic_list = c.get("licenses") or []
+              for it in lic_list:
+                  if isinstance(it, dict):
+                      lic = it.get("license")
                       if isinstance(lic, dict):
-                          if "id" in lic:
-                              found.append(lic["id"])
-                          elif "name" in lic:
-                              found.append(lic["name"])
-              if "license" in c and isinstance(c["license"], (str, dict)):
-                  if isinstance(c["license"], str):
-                      found.append(c["license"])
-                  else:
-                      found.append(c["license"].get("id") or c["license"].get("name"))
+                          out.add(norm(lic.get("id") or lic.get("name")))
+                      elif isinstance(lic, str):
+                          out.add(norm(lic))
+              # simple fallback: component.license
+              if isinstance(c.get("license"), str):
+                  out.add(norm(c["license"]))
+              elif isinstance(c.get("license"), dict):
+                  out.add(norm(c["license"].get("id") or c["license"].get("name")))
 
+          # SPDX packages
           pkgs = sbom.get("packages") or []
           for p in pkgs:
-              for key in ("licenseConcluded", "licenseDeclared", "license"):
+              for key in ("licenseConcluded","licenseDeclared","license"):
                   if key in p and p[key]:
-                      found.append(p[key])
+                      if isinstance(p[key], str):
+                          out.add(norm(p[key]))
+                      elif isinstance(p[key], dict):
+                          out.add(norm(p[key].get("id") or p[key].get("name")))
 
+          return {x for x in out if x}
+
+      def collect_heuristic_tokens(sbom):
+          # Last-resort heuristic over raw text; may misfire.
+          # We will filter numeric/version-looking tokens below.
           text = json.dumps(sbom, ensure_ascii=False)
-          for m in re.findall(r'\b([A-Za-z0-9\-\.\+]+-?(License)?)\b', text):
-              token = m[0]
-              if any(ch.isdigit() for ch in token) or "-" in token:
-                  found.append(token)
-
-          return [s for s in { (s or "").strip() for s in found } if s]
+          # Simple token pass for SPDX-like ids
+          toks = set(re.findall(r"\b[A-Za-z][A-Za-z0-9\.\-\+]{1,}\b", text))
+          return toks
 
       def main():
           sbom_path = os.environ.get("SBOM_PATH", "artifacts/examples/ci/sbom.json")
-          allow_json = os.environ.get("ALLOWED_LICENSES_JSON", '["MIT","Apache-2.0","BSD-3-Clause","BSD-2-Clause","ISC","Python-2.0"]')
           try:
-              allow = set(json.loads(allow_json))
+              allow = set(json.loads(os.environ.get(
+                  "ALLOWED_LICENSES_JSON",
+                  '["MIT","Apache-2.0","BSD-3-Clause","BSD-2-Clause","ISC","Python-2.0"]'
+              )))
           except Exception:
-              allow = set(["MIT","Apache-2.0","BSD-3-Clause","BSD-2-Clause","ISC","Python-2.0"])
+              allow = {"MIT","Apache-2.0","BSD-3-Clause","BSD-2-Clause","ISC","Python-2.0"}
+
+          STRICT = env_bool("STRICT_FIELDS_ONLY", True)
+          IGN_NUM = env_bool("IGNORE_NUMERIC_TOKENS", True)
 
           try:
               sbom = load_json(sbom_path)
-              licenses = collect_licenses(sbom)
           except Exception as e:
-              print(json.dumps({"ok": False, "error": str(e), "sbom_path": sbom_path}, indent=2))
+              print(json.dumps({"ok": False, "error": f"load:{e}", "sbom_path": sbom_path}, indent=2))
               sys.exit(1)
 
-          unknown = [lic for lic in licenses if lic not in allow]
-          result = {"ok": len(unknown) == 0, "licenses": sorted(set(licenses)), "disallowed": sorted(set(unknown)), "allowlist": sorted(allow)}
+          licenses = set()
+          # Prefer structured fields
+          licenses |= collect_from_known_fields(sbom)
+
+          if not STRICT:
+              # Heuristic fallback (filtered)
+              licenses |= collect_heuristic_tokens(sbom)
+
+          # Filter empties and numeric/version-looking tokens
+          cleaned = []
+          for x in licenses:
+              if not x: 
+                  continue
+              if IGN_NUM and VERSION_RE.match(x):
+                  continue
+              cleaned.append(x)
+
+          cleaned = sorted(set(map(str, cleaned)))
+          disallowed = sorted({x for x in cleaned if x not in allow})
+
+          result = {
+              "ok": len(disallowed) == 0,
+              "licenses": cleaned,
+              "disallowed": disallowed,
+              "allowlist": sorted(allow),
+              "strict_fields_only": STRICT,
+              "ignore_numeric_tokens": IGN_NUM
+          }
           print(json.dumps(result, indent=2))
           sys.exit(0 if result["ok"] else 1)
 

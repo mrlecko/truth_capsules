@@ -5,7 +5,10 @@
   <meta charset="utf-8" />
   <title>Truth Capsule Viewer & Prompt Composer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+  <link
+    rel="shortcut icon"
+    href="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='.8%20.8%2014.4%2014.4'%3e%3cpath%20d='M10%208.99a1%201%200%2000-.695%201.717l4.004%204a1%201%200%20101.414-1.414l-4.004-4A1%201%200%200010%208.99z'%20fill='%2380b0ff'%20stroke='%235D7FDDaa'%20stroke-width='.3'/%3e%3cpath%20d='M6.508%201C3.48%201%201.002%203.474%201.002%206.5S3.48%2012%206.508%2012s5.504-2.474%205.504-5.5S9.536%201%206.508%201zm0%202a3.486%203.486%200%20013.504%203.5c0%201.944-1.556%203.5-3.504%203.5a3.488%203.488%200%2001-3.506-3.5C3.002%204.556%204.56%203%206.508%203z'%20fill='%2380b0ff'%20stroke='%235D7FDDaa'%20stroke-width='.3'/%3e%3c/svg%3e"
+  >
   <!-- THEME + LAYOUT -->
 <style>
   /* ============================
@@ -671,9 +674,8 @@ details.panel-collapsible > .list{
   <!-- split_js: sha256={{ digests['split_js'] }} -->
   <!-- sortable_js: sha256={{ digests['sortable_js'] }} -->
 
-  <style>
-    {{prism_css_inline | safe}}
-  </style>
+  <style>{{prism_css_inline | safe}}</style>
+  
   <script>{{ prism_core_inline | safe }}</script>
   <script>{{ prism_yaml_inline | safe }}</script>
   <script>{{ prism_json_inline | safe }}</script>
