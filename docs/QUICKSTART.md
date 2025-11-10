@@ -549,9 +549,9 @@ python scripts/compose_capsules_cli.py \
 
 ## Next Steps
 
-- **Read [Bundle Schema v1.1](BUNDLES_SCHEMA_v1.md)** - Learn about advanced bundle features
-- **Read [Profile Reference](PROFILES_REFERENCE.md)** - Understand projections and profiles
-- **Read [Capsule Schema](CAPSULE_SCHEMA_v1.md)** - Create your own capsules
+- **Read [Bundle Schema v1.1](schemas/BUNDLES_SCHEMA_v1.md)** - Learn about advanced bundle features
+- **Read [Profile Reference](profiles/PROFILES_REFERENCE.md)** - Understand projections and profiles
+- **Read [Capsule Schema](schemas/CAPSULE_SCHEMA_v1.md)** - Create your own capsules
 - **Explore [Use Cases](USE_CASES.md)** - See real-world examples
 
 ---

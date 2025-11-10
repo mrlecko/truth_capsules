@@ -29,7 +29,7 @@ When running witness code via `run_witnesses.py`:
 - No network access
 - Read-only filesystem access
 - Time and memory limits enforced
-- See [WITNESSES_GUIDE.md](docs/WITNESSES_GUIDE.md) for security considerations
+- See [WITNESSES_GUIDE.md](witnesses/WITNESSES_GUIDE.md) for security considerations
 
 ### Dependency Management
 
@@ -42,7 +42,7 @@ When running witness code via `run_witnesses.py`:
 - Capsule signing uses Ed25519 (strong cryptographic signatures)
 - Signatures verify provenance and integrity
 - Public keys are documented in provenance metadata
-- See [PROVENANCE_SIGNING.md](docs/PROVENANCE_SIGNING.md) for details
+- See [PROVENANCE_SIGNING.md](misc/PROVENANCE_SIGNING.md) for details
 
 ## Supported Versions
 

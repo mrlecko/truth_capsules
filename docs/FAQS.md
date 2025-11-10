@@ -1,11 +1,7 @@
-Here’s a polished, link-rich FAQ you can drop in as `docs/FAQ.md`.
-
----
-
 # Truth Capsules - Frequently Asked Questions
 
 **Docs quick links:**
-[Capsule Schema v1](./CAPSULE_SCHEMA_v1.md) · [KG One-Pager](./KG_ONE_PAGER.md) · [Capsule Graph Annotations Guide](./CAPSULE_GRAPH_ANNOTATIONS_GUIDE.md) · [Provenance & Signing](./PROVENANCE_SIGNING.md) · [Linter Guide](./LINTER_GUIDE.md) · [CI Guide](./CI_GUIDE.md) · [Profiles](./PROFILES.md) · [Profiles Reference](./PROFILES_REFERENCE.md)
+[Capsule Schema v1](./schemas/CAPSULE_SCHEMA_v1.md) · [KG One-Pager](./KG_ONE_PAGER.md) · [Capsule Graph Annotations Guide](./graph/CAPSULE_GRAPH_ANNOTATIONS_GUIDE.md) · [Provenance & Signing](./PROVENANCE_SIGNING.md) · [Linter Guide](./misc/LINTER_GUIDE.md) · [CI Guide](./CI_GUIDE.md) · [Profiles Reference](./misc/PROFILES_REFERENCE.md)
 
 ---
 
