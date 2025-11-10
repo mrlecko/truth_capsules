@@ -245,7 +245,7 @@ digest-reset: digest
 sign: $(PYBIN) digest
 	@if [ -z "$(SIGNING_KEY)" ]; then \
 		echo "Error: SIGNING_KEY not set"; \
-		echo "Usage: make sign SIGNING_KEY=keys/dev.pem"; \
+		echo "Usage: make sign SIGNING_KEY=keys/dev_ed25519_sk.pem"; \
 		exit 1; \
 	fi
 	$(PYBIN) scripts/capsule_sign.py \
@@ -257,7 +257,7 @@ sign: $(PYBIN) digest
 verify: $(PYBIN)
 	@if [ -z "$(PUBLIC_KEY)" ]; then \
 		echo "Error: PUBLIC_KEY not set"; \
-		echo "Usage: make verify PUBLIC_KEY=keys/dev.pub"; \
+		echo "Usage: make verify PUBLIC_KEY=keys/dev_ed25519_pk.pem"; \
 		exit 1; \
 	fi
 	$(PYBIN) scripts/capsule_verify.py --in $(NDJSONSIG) --pub $(PUBLIC_KEY)
@@ -387,9 +387,9 @@ smoke: $(PYBIN) lint digest sign kg
 keygen:
 	@mkdir -p keys
 	@# Dev Ed25519 keypair
-	openssl genpkey -algorithm ED25519 -out keys/dev.pem
-	openssl pkey -in keys/dev.pem -pubout -out keys/dev.pub
-	@echo "✓ Keys: keys/dev.pem (priv), keys/dev.pub (pub)"
+	openssl genpkey -algorithm ED25519 -out keys/dev_ed25519_sk.pem
+	openssl pkey -in keys/dev_ed25519_sk.pem -pubout -out keys/dev_ed25519_pk.pem
+	@echo "✓ Keys: keys/dev_ed25519_sk.pem (priv), keys/dev_ed25519_pk.pem (pub)"
 
 freeze: $(PYBIN)
 	$(PIP) freeze > requirements.txt
@@ -417,6 +417,9 @@ clean-venv:
 
 .PHONY: keygen-dev key-fingerprint guard-no-privkeys \
         demo-cite-green demo-cite-red verify-witness-latest pages-on-docs
+
+
+
 
 # Generate an Ed25519 dev pair with the names the repo already uses by default
 keygen-dev:
