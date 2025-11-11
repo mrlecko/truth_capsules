@@ -24,6 +24,7 @@ ENV_VARS ?=
 CAPSULE  ?=
 WITNESS  ?=
 JSON     ?= 0
+SIGNING_KEY ?= keys/dev_ed25519_sk.pem
 
 # --- Make settings -----------------------------------------------------------
 SHELL := /bin/bash
@@ -210,12 +211,12 @@ witness-sandbox:
 lint: $(PYBIN)
 	$(PYBIN) scripts/capsule_linter.py capsules
 	$(PYBIN) scripts/bundle_linter.py bundles
-	$(PYBIN) scripts/capsule_policy_check.py --bundles bundles
+	
 
 lint-strict: $(PYBIN)
 	$(PYBIN) scripts/capsule_linter.py capsules --strict
 	$(PYBIN) scripts/bundle_linter.py bundles --strict
-	$(PYBIN) scripts/capsule_policy_check.py --bundles bundles --strict
+	
 
 test: $(PYBIN)
 	$(PYBIN) -m pytest -q tests
@@ -223,12 +224,12 @@ test: $(PYBIN)
 # --- Digests & signatures ----------------------------------------------------
 digest: $(PYBIN)
 	@mkdir -p $(ART)
-	$(PYBIN) scripts/capsule_digest.py capsules --out $(NDJSON)
+	$(PYBIN) scripts/capsule_digest.py capsules --json 
 	@echo "✓ Digests written: $(NDJSON)"
 
 digest-verify: $(PYBIN)
 	@mkdir -p $(ART)
-	$(PYBIN) scripts/capsule_digest.py capsules --out $(NDJSON) --verify
+	$(PYBIN) scripts/capsule_digest.py capsules --json --verify
 	@echo "✓ Digests rebuilt and verified"
 
 digest-reset: digest

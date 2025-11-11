@@ -3,495 +3,1167 @@
 @prefix tc: <https://w3id.org/tc#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<https://w3id.org/tc/capsule/business.decision_log_v1> a tc:Capsule ;
-    dct:created "2025-11-07T03:53:50.511776+00:00"^^xsd:dateTime ;
+<https://w3id.org/tc/capsule/ci.container_hardening_v1> a tc:Capsule ;
+    dct:created "2025-11-10T21:10:00+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "ci.container_hardening_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T21:10:00+00:00"^^xsd:dateTime ;
+    dct:title "Container Hardening — Non-Root + No-Cache + Version Pins" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "release" ;
+    tc:domain "ci" ;
+    tc:hasWitness <https://w3id.org/tc/capsule/ci.container_hardening_v1#w/dockerfile_has_nonroot_nocache_pins> ;
+    tc:inBundle <https://w3id.org/tc/bundle/bundle.ci_quality_gates_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "medium" ;
+    tc:statement """The Dockerfile must:
+  1) drop privileges with a non-root USER,
+  2) avoid build-time caches for package managers (e.g., pip --no-cache-dir or apt lists cleanup),
+  3) pin versions for installed packages (e.g., pip ==, apt package=version).""" .
+
+<https://w3id.org/tc/capsule/ci.license_compliance_v1> a tc:Capsule ;
+    dct:created "2025-11-10T21:10:00+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "ci.license_compliance_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T21:10:00+00:00"^^xsd:dateTime ;
+    dct:title "License Compliance — Allowlist Only" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "release" ;
+    tc:domain "ci" ;
+    tc:hasWitness <https://w3id.org/tc/capsule/ci.license_compliance_v1#w/spdx_allowlist_only> ;
+    tc:inBundle <https://w3id.org/tc/bundle/bundle.ci_quality_gates_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "medium" ;
+    tc:statement "All package licenses in the SBOM must be on an allowlist. Fail on any package with a disallowed or unknown license." .
+
+<https://w3id.org/tc/capsule/ci.reproducible_artifact_hash_v1> a tc:Capsule ;
+    dct:created "2025-11-10T21:10:00+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "ci.reproducible_artifact_hash_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T21:10:00+00:00"^^xsd:dateTime ;
+    dct:title "Reproducible Build — Repeatable Artifact Hash" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "release" ;
+    tc:domain "ci" ;
+    tc:hasWitness <https://w3id.org/tc/capsule/ci.reproducible_artifact_hash_v1#w/repeatable_hash_check> ;
+    tc:inBundle <https://w3id.org/tc/bundle/bundle.ci_quality_gates_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "medium" ;
+    tc:statement "Running the build command twice in a clean workspace should produce byte-identical artifacts (same SHA-256)." .
+
+<https://w3id.org/tc/capsule/ci.sbom_present_v1> a tc:Capsule ;
+    dct:created "2025-11-10T21:10:00+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "ci.sbom_present_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T21:10:00+00:00"^^xsd:dateTime ;
+    dct:title "SBOM Present for the Release" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "release" ;
+    tc:domain "ci" ;
+    tc:hasWitness <https://w3id.org/tc/capsule/ci.sbom_present_v1#w/sbom_file_exists> ;
+    tc:inBundle <https://w3id.org/tc/bundle/bundle.ci_quality_gates_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "medium" ;
+    tc:statement """A Software Bill of Materials (SBOM) must be attached to every release artifact.
+The SBOM file must exist, be non-empty, and parse as JSON or SPDX tag-value text.""" .
+
+<https://w3id.org/tc/capsule/ci.secrets_in_build_env_v1> a tc:Capsule ;
+    dct:created "2025-11-10T21:10:00+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "ci.secrets_in_build_env_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T21:10:00+00:00"^^xsd:dateTime ;
+    dct:title "Build Environment — No Secrets in Env Dump" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "ci",
+        "release" ;
+    tc:domain "ci" ;
+    tc:hasWitness <https://w3id.org/tc/capsule/ci.secrets_in_build_env_v1#w/no_forbidden_env_keys> ;
+    tc:inBundle <https://w3id.org/tc/bundle/bundle.ci_quality_gates_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "medium" ;
+    tc:statement "The build environment dump must not contain forbidden keys. Fail if any env var key matches a forbidden prefix or exact name." .
+
+<https://w3id.org/tc/capsule/dev.commit_conventions_v1> a tc:Capsule ;
+    dct:created "2025-11-10T20:25:00+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "dev.commit_conventions_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T20:25:00+00:00"^^xsd:dateTime ;
+    dct:title "Conventional Commits (with Examples)" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "code_assistant",
+        "conversation",
+        "review" ;
+    tc:domain "dev" ;
+    tc:inBundle <https://w3id.org/tc/bundle/bundle.dev_code_assistant_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "medium" ;
+    tc:statement """Consistent messages → better changelogs, semantic versioning, and easier reviews.
+
+Types
+  • feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
+
+Format
+  • type(scope): brief imperative summary
+  • Blank line, then optional body; footer for BREAKING CHANGE or issues.
+
+Examples
+  • feat(api): add pagination to listUsers
+  • fix(auth): handle expired refresh tokens
+  • docs(readme): add quickstart docker commands
+
+Diff etiquette
+  • Keep PRs small; isolate unrelated changes; include before/after snippets when helpful.""" .
+
+<https://w3id.org/tc/capsule/dev.diff_risk_tags_v1> a tc:Capsule ;
+    dct:created "2025-11-10T20:25:00+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "dev.diff_risk_tags_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T20:25:00+00:00"^^xsd:dateTime ;
+    dct:title "Diff-Derived Risk Tags are Addressed in Review" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "code_assistant",
+        "conversation",
+        "review" ;
+    tc:domain "dev" ;
+    tc:hasWitness <https://w3id.org/tc/capsule/dev.diff_risk_tags_v1#w/pr_review_covers_risks> ;
+    tc:inBundle <https://w3id.org/tc/bundle/bundle.dev_code_assistant_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "medium" ;
+    tc:statement """Compute risk tags from the diff and require the review to explicitly address each tag.
+Tags include (non-exhaustive): security, performance, migration, breaking, dependency,
+infrastructure, tests, docs. Review must mention each inferred tag.""" .
+
+<https://w3id.org/tc/capsule/dev.enforce_todo_ticket_v1> a tc:Capsule ;
+    dct:created "2025-11-10T00:00:00+00:00"^^xsd:dateTime ;
     dct:creator "Truth Capsules" ;
-    dct:identifier "business.decision_log_v1" ;
+    dct:identifier "dev.enforce_todo_ticket_v1" ;
     dct:license "MIT" ;
-    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:modified "2025-11-10T00:00:00+00:00"^^xsd:dateTime ;
+    dct:title "Enforce TODO/FIXME Lines Reference a Ticket" ;
     ns1:affiliation "Truth Capsules Demo" ;
     ns1:version "1.0.0" ;
     tc:applies_to "ci",
-        "code_assistant",
-        "conversation" ;
-    tc:domain "business" ;
-    tc:hasWitness <https://w3id.org/tc/capsule/business.decision_log_v1#w/decision_log_gate> ;
-    tc:inBundle <https://w3id.org/tc/bundle/ci_nonllm_baseline_v1> ;
-    tc:reviewStatus "draft" ;
+        "code_assistant" ;
+    tc:assumption "Diff is a standard unified diff (e.g., `git diff`).",
+        "Reviewers accept TODOs only when linked to tracked work.",
+        "Ticket prefix is stable and communicated to the team." ;
+    tc:domain "dev" ;
+    tc:hasWitness <https://w3id.org/tc/capsule/dev.enforce_todo_ticket_v1#w/todo_refs_present> ;
+    tc:inBundle <https://w3id.org/tc/bundle/bundle.dev_code_assistant_v1> ;
     tc:sensitivity "low" ;
-    tc:statement "Decision records must include decision, ≥3 options, ≥2 criteria, and a rationale mentioning a trade-off." .
+    tc:statement """Any newly added TODO/FIXME lines in a diff must include a valid ticket reference.
+Default format is `(PROJ|JIRA)-[0-9]+` and can be customized with env `TICKET_REGEX`.
+Scope: added lines only (unified diff), excluding headers (`+++`, `@@`, `diff --git`).
+Pass criteria:
+  • If no TODO/FIXME were added ⇒ PASS.
+  • If TODO/FIXME were added ⇒ each TODO line must contain a ticket reference that matches `TICKET_REGEX`.""" .
 
-<https://w3id.org/tc/capsule/llm.assumption_to_test_v1> a tc:Capsule ;
-    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+<https://w3id.org/tc/capsule/dev.prompt_safety_rules_v1> a tc:Capsule ;
+    dct:created "2025-11-10T20:25:00+00:00"^^xsd:dateTime ;
     dct:creator "John Macgregor" ;
-    dct:identifier "llm.assumption_to_test_v1" ;
+    dct:identifier "dev.prompt_safety_rules_v1" ;
     dct:license "MIT" ;
-    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:title "Assumptions → Tests" ;
+    dct:modified "2025-11-10T20:25:00+00:00"^^xsd:dateTime ;
+    dct:title "Prompt Safety Rules (No Secrets, No PHI/PII, Scratchpad Discipline)" ;
     ns1:affiliation "Truth Capsules Demo" ;
     ns1:version "1.0.0" ;
-    tc:applies_to "ci",
-        "code_assistant",
-        "conversation" ;
-    tc:assumption "Assumptions are enumerated or can be elicited with one question." ;
-    tc:domain "llm" ;
-    tc:inBundle <https://w3id.org/tc/bundle/conversation_red_team_baseline_v1> ;
+    tc:applies_to "code_assistant",
+        "conversation",
+        "review" ;
+    tc:domain "dev" ;
+    tc:inBundle <https://w3id.org/tc/bundle/bundle.dev_code_assistant_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "medium" ;
+    tc:statement """Guardrails for safe, reproducible dev prompting.
+
+Do
+  • Redact or mask secrets/PHI/PII before pasting (tokens, keys, emails, phone numbers).
+  • Use a scratchpad file; summarize context; paste only minimal diffs, errors, and file paths.
+  • State desired output explicitly (patch/diff, function signature, CLI snippet).
+  • Declare toolchain versions and OS when relevant (python 3.11, node 20, ubuntu 22.04).
+  • Prefer small, testable changes; include tests or commands to verify.
+
+Don’t
+  • Paste .env, private keys, customer data, or production URLs.
+  • Demand sweeping refactors; avoid touching unrelated files.
+  • Bury the lede — put the objective first; attach diagnostics after.
+
+Scratchpad discipline
+  • Keep a running PLAN → VERIFY → ANSWER section.
+  • Use fenced code blocks for diffs/patches; keep commit-ready.""" .
+
+<https://w3id.org/tc/capsule/dev.review_checklist_v1> a tc:Capsule ;
+    dct:created "2025-11-10T20:25:00+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "dev.review_checklist_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T20:25:00+00:00"^^xsd:dateTime ;
+    dct:title "PR Review Checklist (Security, Perf, i18n, Docs, Tests)" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "code_assistant",
+        "conversation",
+        "review" ;
+    tc:domain "dev" ;
+    tc:inBundle <https://w3id.org/tc/bundle/bundle.dev_code_assistant_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "medium" ;
+    tc:statement """Minimal checklist for actionable reviews.
+
+Security
+  • Inputs validated; authz checked; secrets not logged; dependencies sane.
+Performance
+  • No accidental N^2; hot paths measured; allocations/retries bounded.
+i18n & UX
+  • Text externalized; RTL and accessibility considered for UI.
+Docs & Tests
+  • README/CHANGELOG touched if behavior changes; tests added/updated; coverage stable.""" .
+
+<https://w3id.org/tc/capsule/dev.secret_scan_baseline_v1> a tc:Capsule ;
+    dct:created "2025-11-10T20:25:00+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "dev.secret_scan_baseline_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T20:25:00+00:00"^^xsd:dateTime ;
+    dct:title "Secret Scan Baseline (No Keys, No High-Entropy Blobs)" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "code_assistant",
+        "conversation",
+        "review" ;
+    tc:domain "dev" ;
+    tc:hasWitness <https://w3id.org/tc/capsule/dev.secret_scan_baseline_v1#w/no_high_entropy_or_keys> ;
+    tc:inBundle <https://w3id.org/tc/bundle/bundle.dev_code_assistant_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "medium" ;
+    tc:statement """Scan source tree for obvious secrets and high-entropy blobs. Skip vendor and binary paths.
+Fail on suspected credentials or suspicious entropy across text files.""" .
+
+<https://w3id.org/tc/capsule/dev.style_guide_js_v1> a tc:Capsule ;
+    dct:created "2025-11-10T20:25:00+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "dev.style_guide_js_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T20:25:00+00:00"^^xsd:dateTime ;
+    dct:title "JS/TS Style Guide (Practical Defaults)" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "code_assistant",
+        "conversation",
+        "review" ;
+    tc:domain "dev" ;
+    tc:inBundle <https://w3id.org/tc/bundle/bundle.dev_code_assistant_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "medium" ;
+    tc:statement """Keep the surface consistent; let tools fight bikeshedding.
+
+Formatter & Lint
+  • Prettier; ESLint with recommended + security (eslint-plugin-security) + import/order.
+  • TypeScript strict for libraries; app code minimally typed but typed at boundaries.
+
+Testing & UI
+  • Jest/Vitest + Testing Library; prefer role-based queries; avoid brittle snapshots.
+  • Keep components pure; derive state; lift state when two consumers need it.
+
+Examples
+  • API calls have abort controllers and sane timeouts.
+  • Avoid implicit any; prefer union types to magic strings.""" .
+
+<https://w3id.org/tc/capsule/dev.style_guide_python_v1> a tc:Capsule ;
+    dct:created "2025-11-10T20:25:00+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "dev.style_guide_python_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T20:25:00+00:00"^^xsd:dateTime ;
+    dct:title "Python Style Guide (Practical Defaults)" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "code_assistant",
+        "conversation",
+        "review" ;
+    tc:domain "dev" ;
+    tc:inBundle <https://w3id.org/tc/bundle/bundle.dev_code_assistant_v1> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "medium" ;
+    tc:statement """Use boring, reliable defaults to keep diffs clean and onboarding fast.
+
+Formatter & Lint
+  • Black (line-length 88), isort (profile=black), Ruff (or flake8) with error-level lint.
+  • mypy: --strict for libraries, relaxed for apps; add types for new/changed code.
+
+Docstrings & Tests
+  • Google or NumPy style docstrings; include Args/Returns/Raises.
+  • pytest for tests; AAA pattern; prefer small, focused tests.
+
+Examples
+  • Function signature changes require typing + tests.
+  • IO code uses context managers; network calls have timeouts.
+  • Use pathlib, not os.path string munging; f-strings over format().""" .
+
+<https://w3id.org/tc/capsule/macgyver.affordance_matrix_template_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.affordance_matrix_template_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "Affordance Matrix Template" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "Externalizing information reduces oversight." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
     tc:reviewStatus "draft" ;
     tc:sensitivity "low" ;
-    tc:statement "Convert each critical assumption into a falsifiable micro-test with owner, required evidence, and a 24–72h timebox." .
+    tc:statement "Tabulate assets→properties→law→role→risk to externalize options and surface safer substitutions." .
 
-<https://w3id.org/tc/capsule/llm.bias_checklist_v1> a tc:Capsule ;
-    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+<https://w3id.org/tc/capsule/macgyver.affordances_over_objects_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
     dct:creator "John Macgregor" ;
-    dct:identifier "llm.bias_checklist_v1" ;
+    dct:identifier "macgyver.affordances_over_objects_v1" ;
     dct:license "MIT" ;
-    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "Affordances Over Objects" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "Scene contains everyday materials with varied properties." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Prioritize material properties (conducts, insulates, reflects, absorbs, seals, flexes, burns, reacts) over brand-form labels to unlock repurposing." .
+
+<https://w3id.org/tc/capsule/macgyver.bias_checklist_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.bias_checklist_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
     dct:title "Bias & Mode Collapse Check" ;
     ns1:affiliation "Truth Capsules Demo" ;
     ns1:version "1.0.0" ;
-    tc:applies_to "ci",
-        "code_assistant",
-        "conversation" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
     tc:assumption "Brief self‑audit improves reliability." ;
-    tc:domain "llm" ;
-    tc:inBundle <https://w3id.org/tc/bundle/conversation_red_team_baseline_v1> ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
     tc:reviewStatus "draft" ;
     tc:sensitivity "low" ;
-    tc:statement "Before finalizing, scan for common failure modes: confirmation bias, selection bias, overconfident tone, mode collapse." .
+    tc:statement "Before finalizing, scan for confirmation bias, selection bias, overconfidence, and mode collapse." .
 
-<https://w3id.org/tc/capsule/llm.citation_required_v1> a tc:Capsule ;
-    dct:created "2025-11-07T03:53:50.511776+00:00"^^xsd:dateTime ;
+<https://w3id.org/tc/capsule/macgyver.blast_radius_humility_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
     dct:creator "John Macgregor" ;
-    dct:identifier "llm.citation_required_v1" ;
+    dct:identifier "macgyver.blast_radius_humility_v1" ;
     dct:license "MIT" ;
-    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:title "Citations required" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "Blast-Radius Humility" ;
     ns1:affiliation "Truth Capsules Demo" ;
     ns1:version "1.0.0" ;
-    tc:applies_to "ci",
-        "code_assistant",
-        "conversation" ;
-    tc:assumption "Operating in a general context" ;
-    tc:domain "llm" ;
-    tc:inBundle <https://w3id.org/tc/bundle/assistant_baseline_v1>,
-        <https://w3id.org/tc/bundle/ci_llm_baseline_v1>,
-        <https://w3id.org/tc/bundle/test_v1_1_bundle> ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "Safety and ethics are paramount; bystanders matter." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "medium" ;
+    tc:statement "Prefer diversion, disablement, and exit over destructive outcomes; minimize the space of unintended effects." .
+
+<https://w3id.org/tc/capsule/macgyver.chain_design_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.chain_design_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "Chain Design: Sense→Gate→Amplify→Actuate" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "Multi‑stage steps increase control and predictability." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
     tc:reviewStatus "draft" ;
     tc:sensitivity "low" ;
-    tc:statement "Answers must include at least one citation or abstain." .
+    tc:statement "Build solutions as short chains with a clear trigger and amplification before actuation." .
 
-<https://w3id.org/tc/capsule/llm.citation_required_v1_signed> a tc:Capsule ;
-    dct:created "2025-11-07T04:51:20.658919+00:00"^^xsd:dateTime ;
-    dct:creator "Truth Capsules Demo" ;
-    dct:identifier "llm.citation_required_v1_signed" ;
+<https://w3id.org/tc/capsule/macgyver.deception_force_multiplier_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.deception_force_multiplier_v1" ;
     dct:license "MIT" ;
-    dct:title "Citations required (signed demo)" ;
-    ns1:affiliation "Truth Capsules" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "Deception as Force Multiplier" ;
+    ns1:affiliation "Truth Capsules Demo" ;
     ns1:version "1.0.0" ;
-    tc:domain "llm" ;
-    tc:statement "Answers must include at least one citation or abstain." .
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "Solutions should avoid harm and de-escalate." ;
+    tc:domain "macgyver" ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Use diversions and illusions to buy time and reduce the need for force." .
 
-<https://w3id.org/tc/capsule/llm.counterfactual_probe_v1> a tc:Capsule ;
+<https://w3id.org/tc/capsule/macgyver.deliberate_practice_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.deliberate_practice_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "Deliberate Practice Drills" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "Skill improves with frequent, safe micro‑reps." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Short, repeatable drills: 2‑minute affordance scans; law‑matching flashcards; chain sketches from household scenes." .
+
+<https://w3id.org/tc/capsule/macgyver.environment_as_component_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.environment_as_component_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "Environment as a Component" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "The environment can safely contribute force, flow, or information." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Treat gravity, sunlight, water, wind, terrain, and architecture as active parts of the design." .
+
+<https://w3id.org/tc/capsule/macgyver.fail_safe_defaults_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.fail_safe_defaults_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "Fail‑Safe Defaults" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "Interruption is likely; failure must be safe." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Design so that interruptions and errors do not cause harm; plan graceful aborts." .
+
+<https://w3id.org/tc/capsule/macgyver.five_rails_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.five_rails_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "The Five Rails of Action" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "Any solution can be decomposed across the five rails." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Operate along five rails: Sensing, Shaping, Timing, Power, Signaling. Compose minimally sufficient sets to achieve the goal." .
+
+<https://w3id.org/tc/capsule/macgyver.functional_fixedness_avoidance_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.functional_fixedness_avoidance_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "Avoid Functional Fixedness" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "User practices re-framing and is open to substitution." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Intentionally re-label objects by their properties and verbs to unlock alternative roles." .
+
+<https://w3id.org/tc/capsule/macgyver.inventory_thinking_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.inventory_thinking_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "Inventory Thinking" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "A fast written inventory improves plan quality." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Represent the scene as {assets, properties, converters, storers, triggers, constraints}." .
+
+<https://w3id.org/tc/capsule/macgyver.latency_control_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.latency_control_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "Latency Control" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "Delays can be made visible and interruptible." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Design predictable timing via burn, dissolve, flow, charging, cooling; prefer slow, observable delays." .
+
+<https://w3id.org/tc/capsule/macgyver.legal_ethical_guardrails_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.legal_ethical_guardrails_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "Legal & Ethical Guardrails" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "User agrees to legal and ethical constraints." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "medium" ;
+    tc:statement "Operate with consent, legality, and non‑maleficence; solutions are for safety, rescue, education, prototyping." .
+
+<https://w3id.org/tc/capsule/macgyver.low_tech_first_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.low_tech_first_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "Low-Tech First" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "Simple tools are present; powered tools are risky/unavailable." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Prefer simple mechanisms (rope, wedge, lever, mirror) before powered or chemical routes." .
+
+<https://w3id.org/tc/capsule/macgyver.mvp_mechanism_bias_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.mvp_mechanism_bias_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "MVP Mechanism Bias" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "Reversible steps reduce risk and damage." ;
+    tc:domain "macgyver" ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Prefer the smallest reversible mechanism that might work; escalate complexity only as needed." .
+
+<https://w3id.org/tc/capsule/macgyver.parallel_options_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.parallel_options_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "Parallel Optioning" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "Time allows at least brief divergent ideation." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Always generate three routes: Physical, Informational, Environmental." .
+
+<https://w3id.org/tc/capsule/macgyver.problem_collapse_v1> tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> .
+
+<https://w3id.org/tc/capsule/macgyver.prompt_skeleton_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.prompt_skeleton_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "LLM Prompt Skeleton" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "training" ;
+    tc:assumption "LLMs need structure and guardrails for reliable outputs." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "A structured prompt to force safe, legal, non‑destructive chain synthesis for a defined goal and setting." .
+
+<https://w3id.org/tc/capsule/macgyver.prompts_as_programs_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.prompts_as_programs_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "Prompts as Programs" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "Structure improves breadth and reduces blind spots." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Use structured prompts/checklists to force enumeration, comparison, and premortems." .
+
+<https://w3id.org/tc/capsule/macgyver.property_matching_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.property_matching_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "Property-to-Law Matching" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "Basic physics are more portable than specific tools." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Map constraints to physical laws (pressure, torque, optics, buoyancy, friction) and then to available properties and parts." .
+
+<https://w3id.org/tc/capsule/macgyver.rails_ledgers_hub_mapping_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.rails_ledgers_hub_mapping_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "Rails/Ledgers/Hub Mapping" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "A shared vocabulary improves collaboration and auditability." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Map solutions to rails (Sensing, Shaping, Timing, Power, Signaling), bundle minimal commuting rails as a ledger, schedule steps via the hub (ordered gates/delays)." .
+
+<https://w3id.org/tc/capsule/macgyver.reality_check_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.reality_check_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "Reality Check vs Fiction" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "No hazardous chemistry/electrics or bypassing of security systems." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "medium" ;
+    tc:statement "Use TV scenarios only as metaphors for safe, legal, non‑hazard practice. Substitute benign analogues." .
+
+<https://w3id.org/tc/capsule/macgyver.redundancy_chokepoints_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.redundancy_chokepoints_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "Redundancy & Choke Points" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "System thinking improves robustness and containment." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Protect your own single points of failure while removing the opponent’s options." .
+
+<https://w3id.org/tc/capsule/macgyver.reflection_loop_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.reflection_loop_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "Reflection Loop" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "Retrospective improves future plan quality." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "After action: identify the governing law, the choke point, and one substitution that would lower risk next time." .
+
+<https://w3id.org/tc/capsule/macgyver.sop_10min_loop_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.sop_10min_loop_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "SOP: The 10‑Minute MacGyver Loop" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping",
+        "training" ;
+    tc:assumption "Timeboxed planning increases safety and success." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "A 10‑step loop: clarify target, map layout, inventory properties, pick a law, sketch three chains, choose low‑risk, add timing control, premortem, micro‑test, execute & observe." .
+
+<https://w3id.org/tc/capsule/macgyver.stock_verbs_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.stock_verbs_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "Stock Verbs" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "Motor skills and basic materials available." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Memorize a small verb lexicon: tie, wedge, knot, jam, twist, short, bridge, reflect, refract, siphon, vent, pack, wick, damp, shim, lash." .
+
+<https://w3id.org/tc/capsule/macgyver.transduction_chains_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.transduction_chains_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "Transduction Chains" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "Safer energy conversions exist than direct brute force." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Route one energy into the effect you need: chemical→thermal→mechanical, optical→thermal, electrical→magnetic, pneumatic/hydraulic→force." .
+
+<https://w3id.org/tc/capsule/macgyver.world_as_typed_graph_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:creator "John Macgregor" ;
+    dct:identifier "macgyver.world_as_typed_graph_v1" ;
+    dct:license "MIT" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "World as a Typed Graph" ;
+    ns1:affiliation "Truth Capsules Demo" ;
+    ns1:version "1.0.0" ;
+    tc:applies_to "conversation",
+        "planning",
+        "prototyping" ;
+    tc:assumption "Graph mindset helps enumerate options and constraints." ;
+    tc:domain "macgyver" ;
+    tc:inBundle <https://w3id.org/tc/bundle/macgyver_core_v1_bundle> ;
+    tc:reviewStatus "draft" ;
+    tc:sensitivity "low" ;
+    tc:statement "Model materials and energies as nodes with typed edges for conversions; plan paths with minimal risk and cost." .
+
+<https://w3id.org/tc/capsule/macgyver_problem_collapse_v1> a tc:Capsule ;
     dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
     dct:creator "John Macgregor" ;
-    dct:identifier "llm.counterfactual_probe_v1" ;
+    dct:identifier "macgyver_problem_collapse_v1" ;
     dct:license "MIT" ;
     dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:title "Counterfactual Probe" ;
+    dct:title "Problem Space Collapse → New Solutions" ;
     ns1:affiliation "Truth Capsules Demo" ;
     ns1:version "1.0.0" ;
-    tc:applies_to "ci",
-        "code_assistant",
-        "conversation" ;
-    tc:assumption "Budget allows 1–3 tiny tests.",
-        "There is uncertainty worth exploring." ;
-    tc:domain "llm" ;
-    tc:inBundle <https://w3id.org/tc/bundle/conversation_red_team_baseline_v1> ;
+    tc:applies_to "life" ;
+    tc:assumption "Assumptions are enumerated or can be elicited with one question." ;
+    tc:domain "macgyver" ;
     tc:reviewStatus "draft" ;
     tc:sensitivity "low" ;
-    tc:statement "Before concluding, generate 2–3 counterfactual worlds that would flip the decision; list the observable tests that would distinguish them." .
+    tc:statement "Collapse a problem like macgyver." .
 
-<https://w3id.org/tc/capsule/llm.evidence_gap_triage_v1> a tc:Capsule ;
-    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+<https://w3id.org/tc/capsule/meta.truth_capsules_v1> a tc:Capsule ;
+    dct:created "2025-11-10T00:00:00+00:00"^^xsd:dateTime ;
     dct:creator "John Macgregor" ;
-    dct:identifier "llm.evidence_gap_triage_v1" ;
+    dct:identifier "meta.truth_capsules_v1" ;
     dct:license "MIT" ;
-    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:title "Evidence Gap Triage" ;
+    dct:modified "2025-11-10T00:00:00+00:00"^^xsd:dateTime ;
+    dct:title "Truth Capsules — Golden Explainer (v1)" ;
     ns1:affiliation "Truth Capsules Demo" ;
     ns1:version "1.0.0" ;
     tc:applies_to "ci",
         "code_assistant",
-        "conversation" ;
-    tc:assumption "The model/user can ask for one clarifying item." ;
-    tc:domain "llm" ;
-    tc:inBundle <https://w3id.org/tc/bundle/conversation_red_team_baseline_v1> ;
+        "conversation",
+        "education",
+        "release" ;
+    tc:assumption "Profiles will project `statement` (and optionally `title`) to build consistent, reproducible prompts.",
+        "Readers value GREEN/RED + JSON evidence over prose alone.",
+        "Witnesses execute in a minimal sandbox with explicit env allowlists and short timeouts." ;
+    tc:domain "meta" ;
+    tc:hasWitness <https://w3id.org/tc/capsule/meta.truth_capsules_v1#w/canonical_digest_demo> ;
     tc:reviewStatus "draft" ;
     tc:sensitivity "low" ;
-    tc:statement "Identify missing evidence blocking a sound answer; request the single smallest artifact that would unlock progress." .
+    tc:statement """TRUTH CAPSULES (v1): What they are, why they matter, and how to use them.
 
-<https://w3id.org/tc/capsule/llm.fermi_estimation_v1> a tc:Capsule ;
-    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+— WHAT —
+Truth Capsules are small, signed YAML knowledge objects that bundle:
+  • A clear normative STATEMENT (human-readable rule, method, or explainer)
+  • PEDAGOGY (Socratic prompts + aphorisms for fast onboarding)
+  • Optional WITNESSES (executable checks that emit machine-readable JSON and GREEN/RED outcomes)
+They are designed to be “projection-friendly”: profiles decide which fields to render (usually just `title` + `statement`), while witnesses provide proof-carrying automation for CI, codereview, or ops.
+
+— WHY (Proof-carrying knowledge) —
+  1) Reproducibility: capsules can include runnable checks; outputs are JSON with crisp GREEN/RED.
+  2) Composability: bundles group capsules into kits (e.g., CI gates, MacGyver pedagogy, Code Assistant).
+  3) Safety: witnesses run in locked-down sandboxes; provenance+signing provide audit trails.
+  4) Projection discipline: a profile creates consistent system prompts from the same source of truth.
+  5) Career/Org leverage: “show, don’t tell” — every claim can ship with a verifiable witness.
+
+— HOW (Views, Bundles, Witnesses) —
+  • Profiles (view): define which capsule fields are projected (e.g., title+statement) and output style (e.g., “fail fast on RED”).
+  • Bundles (kit): ordered lists of capsules for a task/context (e.g., ci_quality_gates_v1).
+  • Capsules: information-only (explainer/guidance) or witnessed (proof-carrying).
+    – Information-only: pedagogy-forward explainers for onboarding and conversation quality.
+    – Witnessed: executable checks (python/node/bash) with `code: |-` blocks and explicit `env` mappings.
+  • Execution model: a runner loads capsule YAML, extracts each witness, executes in a constrained environment, captures `{ok: bool, ...}` JSON, and returns exit code 0 (GREEN) or 1 (RED/error). CI treats any RED as a failing gate.
+
+— SCHEMA V1 (essentials) —
+  Required: `id`, `version`, `domain`, `statement`.
+  Recommended: `title`, `pedagogy`, `provenance`, `applies_to`, `security`.
+  Witnesses use inline code and should specify: `name`, `language`, `entrypoint`, `env` (mapping), `timeout_ms`, and `fs_mode`.
+  All human-visible guidance should live in `statement` so profiles can project a single coherent explainer.
+
+— SECURITY & OPERATIONAL NOTES —
+  • Run witnesses in containers (non-root, no network, read-only FS unless explicitly required).
+  • Use minimal `env:` allowlists; record provenance, review status, and signing metadata.
+  • Prefer deterministic fixtures for demo reliability; keep failure modes crisp and legible.
+
+— QUICKSTART (mental model) —
+  1) Choose a profile (view): e.g., conversational explainer vs CI gate reporter.
+  2) Load a bundle (kit): the ordered set of capsules for your task.
+  3) Project → the profile renders title+statement for humans; optionally execute witnesses for proofs.
+  4) Read the JSON evidence; GREEN/RED is the contract.
+
+— THIS GOLDEN EXPLAINER —
+  This capsule is the “rootmost” documentary explainer for the v1 demo. It’s informational (pedagogy-heavy) and ships with a tiny, self-contained witness that demonstrates canonicalization and hashing of “core content” (the proof-carrying ethos) without requiring any external files. Use it to sanity-test your runner and to onboard readers to the Truth Capsules approach.""" .
+
+<https://w3id.org/tc/capsule/support.billing_basics_v1> a tc:Capsule ;
+    dct:created "2025-11-10T19:05:00+00:00"^^xsd:dateTime ;
     dct:creator "John Macgregor" ;
-    dct:identifier "llm.fermi_estimation_v1" ;
+    dct:identifier "support.billing_basics_v1" ;
     dct:license "MIT" ;
-    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:title "Fermi Estimation" ;
+    dct:modified "2025-11-10T19:05:00+00:00"^^xsd:dateTime ;
+    dct:title "Billing Playbooks (SaaS)" ;
     ns1:affiliation "Truth Capsules Demo" ;
-    ns1:version "1.0.0" ;
-    tc:applies_to "ci",
-        "code_assistant",
-        "conversation" ;
-    tc:assumption "A back‑of‑the‑envelope answer is acceptable to guide decision making." ;
-    tc:domain "llm" ;
-    tc:inBundle <https://w3id.org/tc/bundle/conversation_red_team_baseline_v1> ;
+    ns1:version "1.1.0" ;
+    tc:applies_to "conversation",
+        "support" ;
+    tc:domain "support" ;
+    tc:inBundle <https://w3id.org/tc/bundle/support_agent_v1_bundle> ;
     tc:reviewStatus "draft" ;
-    tc:sensitivity "low" ;
-    tc:statement "Produce an order‑of‑magnitude estimate with explicit factors, ranges, and resulting uncertainty (log‑scale)." .
+    tc:sensitivity "medium" ;
+    tc:statement """Canonical flows for common billing issues without exposing PII or promising credits.
 
-<https://w3id.org/tc/capsule/llm.five_whys_root_cause_v1> a tc:Capsule ;
-    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+Playbook: Get invoice PDF
+  1) Ask for masked account identifier (e.g., ticket or org slug).
+  2) Guide to: Settings → Billing → Invoices → "Download PDF".
+  3) If missing, create ticket for Billing with masked reference.
+
+Playbook: Refund request (within policy)
+  1) Acknowledge and summarize the reason.
+  2) Link refunds policy (exact section) and timeframe.
+  3) Create Billing ticket; do not promise outcome; share reference ID.
+
+Playbook: Plan downgrade / cancel
+  1) Confirm effective date and proration link.
+  2) Guide to: Settings → Plan → "Change plan".
+  3) If blocked by contract, route to Billing Supervisor.""" .
+
+<https://w3id.org/tc/capsule/support.escalation_matrix_v1> a tc:Capsule ;
+    dct:created "2025-11-10T19:05:00+00:00"^^xsd:dateTime ;
     dct:creator "John Macgregor" ;
-    dct:identifier "llm.five_whys_root_cause_v1" ;
+    dct:identifier "support.escalation_matrix_v1" ;
     dct:license "MIT" ;
-    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:title "Five Whys (Root Cause)" ;
+    dct:modified "2025-11-10T19:05:00+00:00"^^xsd:dateTime ;
+    dct:title "Escalation Matrix & Handoffs" ;
     ns1:affiliation "Truth Capsules Demo" ;
-    ns1:version "1.0.0" ;
-    tc:applies_to "ci",
-        "code_assistant",
-        "conversation" ;
-    tc:assumption "Event or defect is concrete and recent." ;
-    tc:domain "llm" ;
-    tc:inBundle <https://w3id.org/tc/bundle/conversation_red_team_baseline_v1> ;
+    ns1:version "1.1.0" ;
+    tc:applies_to "conversation",
+        "support" ;
+    tc:domain "support" ;
+    tc:inBundle <https://w3id.org/tc/bundle/support_agent_v1_bundle> ;
     tc:reviewStatus "draft" ;
-    tc:sensitivity "low" ;
-    tc:statement "Perform a 3–5 Whys drill; propose a countermeasure for the root cause and one guardrail to prevent regression." .
+    tc:sensitivity "medium" ;
+    tc:statement """Route high-risk or restricted requests to the correct queue with a crisp customer explanation.
 
-<https://w3id.org/tc/capsule/llm.judge_answer_quality_v1> a tc:Capsule ;
-    dct:created "2025-11-07T03:53:50.511776+00:00"^^xsd:dateTime ;
+Matrix (placeholders in braces are filled by your system):
+  +------------------------+---------------------+----------------------+---------------------------+
+  | Scenario               | Tier / Owner        | SLA                  | Customer-Facing Message   |
+  +------------------------+---------------------+----------------------+---------------------------+
+  | Outage / Sev-1         | On-call SRE         | 15m ack / hourly upd | "We're experiencing an    |
+  |                        |                     |                      | outage. Status: {status_url}"    |
+  | Billing dispute >$500  | Billing Specialist  | 1 business day       | "I've opened a ticket     |
+  |                        |                     |                      | with Billing. Ref: {ticket_id}"  |
+  | Refund exceptions      | Billing Supervisor  | 2 business days      | "I'll escalate your refund|
+  |                        |                     |                      | request for review."      |
+  | Security/Privacy       | Security Team       | 1 business day       | "Escalated to security.   |
+  |                        |                     |                      | Ref: {ticket}"          |
+  | Data deletion (GDPR)   | Data Protection Off | 72 hours             | "Deletion in progress.    |
+  |                        |                     |                      | Ref: {ticket}"          |
+  +------------------------+---------------------+----------------------+---------------------------+
+
+Rules:
+  • If severity ≥ Sev-2 or involves legal/privacy, escalate immediately and provide a reference ID.
+  • Never modify or promise billing credits; create a ticket and route to Billing.
+  • Provide the customer with what will happen next and a timeframe.
+  • Record all escalations with ticket references; avoid free-form DMs.
+  • Do not request or store PII; use masked references only.""" .
+
+<https://w3id.org/tc/capsule/support.intent_router_sanity_v1> a tc:Capsule ;
+    dct:identifier "support.intent_router_sanity_v1" ;
+    dct:title "Intent Router Sanity Check" ;
+    ns1:version "1.0.0" ;
+    tc:domain "support" ;
+    tc:inBundle <https://w3id.org/tc/bundle/support_agent_v1_bundle> ;
+    tc:statement """Validate that baseline rules classify common support intents correctly. Defaults read
+fixtures under artifacts/examples/support_agent/. Accuracy must meet or exceed 0.8.""" .
+
+<https://w3id.org/tc/capsule/support.knowledge_view_projection_v1> a tc:Capsule ;
+    dct:created "2025-11-10T19:05:00+00:00"^^xsd:dateTime ;
     dct:creator "John Macgregor" ;
-    dct:identifier "llm.judge_answer_quality_v1" ;
+    dct:identifier "support.knowledge_view_projection_v1" ;
     dct:license "MIT" ;
-    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:title "Judge answer quality" ;
+    dct:modified "2025-11-10T19:05:00+00:00"^^xsd:dateTime ;
+    dct:title "Knowledge View & Citation Policy" ;
     ns1:affiliation "Truth Capsules Demo" ;
-    ns1:version "1.0.0" ;
-    tc:applies_to "ci",
-        "code_assistant",
-        "conversation" ;
-    tc:assumption "Operating in a general context" ;
-    tc:domain "llm" ;
-    tc:inBundle <https://w3id.org/tc/bundle/ci_llm_baseline_v1> ;
+    ns1:version "1.1.0" ;
+    tc:applies_to "conversation",
+        "support" ;
+    tc:domain "support" ;
+    tc:inBundle <https://w3id.org/tc/bundle/support_agent_v1_bundle> ;
     tc:reviewStatus "draft" ;
-    tc:sensitivity "low" ;
-    tc:statement "LLM-judge must score >= 0.8 with JSON {score, verdict, justification}." .
+    tc:sensitivity "medium" ;
+    tc:statement """Cite official docs with exact anchors; avoid paraphrasing policy-sensitive pages.
 
-<https://w3id.org/tc/capsule/llm.pii_redaction_guard_v1> a tc:Capsule ;
-    dct:created "2025-11-07T03:53:50.511776+00:00"^^xsd:dateTime ;
+Sources policy:
+  • Prefer official docs, status pages, and signed announcements. Avoid blog posts for policy.
+
+Citation rules:
+  • Link the exact doc section and version (e.g., /docs/billing#refunds v3.1).
+  • Summarize in one sentence, then provide the link; do not copy large passages.
+  • If doc is gated, describe the path (Settings → Billing → Invoices).
+  • For outages, always include {status_url} and the last update time.
+
+Link policy:
+  • Never link to internal-only resources in public responses.
+  • If a page moves, provide both old and new paths during the transition.""" .
+
+<https://w3id.org/tc/capsule/support.legal_privacy_rules_v1> a tc:Capsule ;
+    dct:created "2025-11-10T19:05:00+00:00"^^xsd:dateTime ;
     dct:creator "John Macgregor" ;
-    dct:identifier "llm.pii_redaction_guard_v1" ;
+    dct:identifier "support.legal_privacy_rules_v1" ;
     dct:license "MIT" ;
-    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:title "PII redaction" ;
+    dct:modified "2025-11-10T19:05:00+00:00"^^xsd:dateTime ;
+    dct:title "Legal & Privacy Rules (Public-Facing)" ;
     ns1:affiliation "Truth Capsules Demo" ;
-    ns1:version "1.0.0" ;
-    tc:applies_to "ci",
-        "code_assistant",
-        "conversation" ;
-    tc:assumption "Operating in a general context" ;
-    tc:domain "llm" ;
-    tc:inBundle <https://w3id.org/tc/bundle/assistant_baseline_v1>,
-        <https://w3id.org/tc/bundle/ci_llm_baseline_v1>,
-        <https://w3id.org/tc/bundle/test_v1_1_bundle> ;
+    ns1:version "1.1.0" ;
+    tc:applies_to "conversation",
+        "support" ;
+    tc:domain "support" ;
+    tc:inBundle <https://w3id.org/tc/bundle/support_agent_v1_bundle> ;
     tc:reviewStatus "draft" ;
-    tc:sensitivity "low" ;
-    tc:statement "Output must not contain raw PII (emails/phones). Use placeholders or abstain." .
+    tc:sensitivity "medium" ;
+    tc:statement """Prevent PII leakage and ensure compliant disclosures.
 
-<https://w3id.org/tc/capsule/llm.plan_backtest_v1> a tc:Capsule ;
-    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
+PII classes to avoid in public channels:
+  • email, phone, government_id, credit_card, street_address, ip_address
+
+Storage policy:
+  • Do not store PII in tickets or chat logs. Use masked IDs or internal references.
+
+Customer-facing disclaimers (choose 1 as needed):
+  • "For your security, please avoid sharing personal data (like email, phone, or payment info) here."
+  • "We can continue after I’ve created a secure ticket; I’ll share a masked reference ID."
+  • "I’m not able to provide legal or medical advice. I can link official resources instead.\"""" .
+
+<https://w3id.org/tc/capsule/support.pii_redaction_smoke_v1> a tc:Capsule ;
+    dct:created "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
     dct:creator "John Macgregor" ;
-    dct:identifier "llm.plan_backtest_v1" ;
+    dct:identifier "support.pii_redaction_smoke_v1" ;
     dct:license "MIT" ;
-    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:title "Plan Backtest" ;
+    dct:modified "2025-11-10T18:12:37+00:00"^^xsd:dateTime ;
+    dct:title "PII Redaction Smoke Test" ;
     ns1:affiliation "Truth Capsules Demo" ;
     ns1:version "1.0.0" ;
-    tc:applies_to "ci",
-        "code_assistant",
-        "conversation" ;
-    tc:assumption "We can reference at least one analogous case (internal or public)." ;
-    tc:domain "llm" ;
-    tc:inBundle <https://w3id.org/tc/bundle/conversation_red_team_baseline_v1> ;
+    tc:applies_to "conversation",
+        "support" ;
+    tc:domain "support" ;
+    tc:hasWitness <https://w3id.org/tc/capsule/support.pii_redaction_smoke_v1#w/no_plaintext_pii_in_examples> ;
+    tc:inBundle <https://w3id.org/tc/bundle/support_agent_v1_bundle> ;
     tc:reviewStatus "draft" ;
-    tc:sensitivity "low" ;
-    tc:statement "Backtest the plan on a prior similar case; report differences and whether the plan would have succeeded." .
+    tc:sensitivity "medium" ;
+    tc:statement """Ensure bundled examples contain no plaintext PII. This check scans example transcripts
+(default: artifacts/examples/support_agent/examples.txt) for emails, phone numbers,
+credit card patterns, government ID keywords, street addresses, and IP addresses.""" .
 
-<https://w3id.org/tc/capsule/llm.plan_verify_answer_v1> a tc:Capsule ;
-    dct:created "2025-11-07T03:53:50.511776+00:00"^^xsd:dateTime ;
+<https://w3id.org/tc/capsule/support.tone_style_guide_v1> a tc:Capsule ;
+    dct:created "2025-11-10T19:05:00+00:00"^^xsd:dateTime ;
     dct:creator "John Macgregor" ;
-    dct:identifier "llm.plan_verify_answer_v1" ;
+    dct:identifier "support.tone_style_guide_v1" ;
     dct:license "MIT" ;
-    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:title "Plan → Verify → Answer" ;
+    dct:modified "2025-11-10T19:05:00+00:00"^^xsd:dateTime ;
+    dct:title "Tone & Style Guide (Public-Facing)" ;
     ns1:affiliation "Truth Capsules Demo" ;
-    ns1:version "1.0.0" ;
-    tc:applies_to "ci",
-        "code_assistant",
-        "conversation" ;
-    tc:assumption "Operating in a general context" ;
-    tc:domain "llm" ;
-    tc:inBundle <https://w3id.org/tc/bundle/assistant_baseline_v1>,
-        <https://w3id.org/tc/bundle/ci_llm_baseline_v1>,
-        <https://w3id.org/tc/bundle/test_v1_1_bundle> ;
+    ns1:version "1.1.0" ;
+    tc:applies_to "conversation",
+        "support" ;
+    tc:domain "support" ;
+    tc:inBundle <https://w3id.org/tc/bundle/support_agent_v1_bundle> ;
     tc:reviewStatus "draft" ;
-    tc:sensitivity "low" ;
-    tc:statement "Plan→Verify→Answer. The final answer references collected evidence." .
+    tc:sensitivity "medium" ;
+    tc:statement """Be empathetic, concise, specific, and action-oriented; never echo or store PII.
+Rules:
+  • Lead with empathy and a one-sentence summary of the customer’s goal.
+  • Offer one actionable next step; avoid overwhelming lists.
+  • Prefer links to official docs; include exact anchor and version if relevant.
+  • Never guess order/account details; ask for the minimal non-sensitive clarifier.
+  • Use plain language; avoid internal acronyms or engineering jargon.
+  • Avoid absolute promises; reference policy and expected timeframes.""" .
 
-<https://w3id.org/tc/capsule/llm.pr_change_impact_v1> a tc:Capsule ;
-    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:creator "John Macgregor" ;
-    dct:identifier "llm.pr_change_impact_v1" ;
-    dct:license "MIT" ;
-    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:title "PR Review - Change Impact" ;
-    ns1:affiliation "Truth Capsules Demo" ;
-    ns1:version "1.0.0" ;
-    tc:applies_to "ci",
-        "code_assistant",
-        "conversation" ;
-    tc:assumption "Every externally visible change gets a note or is explicitly internal-only." ;
-    tc:domain "pr_review" ;
-    tc:inBundle <https://w3id.org/tc/bundle/pr_review_minibundle_v1> ;
-    tc:reviewStatus "draft" ;
-    tc:sensitivity "low" ;
-    tc:statement "Describe user-facing impact (if any), docs to update, and a single line release note." .
-
-<https://w3id.org/tc/capsule/llm.pr_deploy_checklist_v1> a tc:Capsule ;
-    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:creator "John Macgregor" ;
-    dct:identifier "llm.pr_deploy_checklist_v1" ;
-    dct:license "MIT" ;
-    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:title "PR Review - Deploy Checklist" ;
-    ns1:affiliation "Truth Capsules Demo" ;
-    ns1:version "1.0.0" ;
-    tc:applies_to "ci",
-        "code_assistant",
-        "conversation" ;
-    tc:assumption "You can defer large refactors; ship safely first." ;
-    tc:domain "pr_review" ;
-    tc:inBundle <https://w3id.org/tc/bundle/pr_review_minibundle_v1> ;
-    tc:reviewStatus "draft" ;
-    tc:sensitivity "low" ;
-    tc:statement "Gate deploy on: feature flag (if risky), migration plan + rollback, observability hooks, on-call acknowledgement." .
-
-<https://w3id.org/tc/capsule/llm.pr_diff_first_v1> a tc:Capsule ;
-    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:creator "John Macgregor" ;
-    dct:identifier "llm.pr_diff_first_v1" ;
-    dct:license "MIT" ;
-    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:title "PR Review - Diff First" ;
-    ns1:affiliation "Truth Capsules Demo" ;
-    ns1:version "1.0.0" ;
-    tc:applies_to "ci",
-        "code_assistant",
-        "conversation" ;
-    tc:assumption "A textual diff or list of changed files is available.",
-        "Goal is actionable review, not style nitpicks." ;
-    tc:domain "pr_review" ;
-    tc:inBundle <https://w3id.org/tc/bundle/pr_review_minibundle_v1> ;
-    tc:reviewStatus "draft" ;
-    tc:sensitivity "low" ;
-    tc:statement "Always read the diff first. Summarize changes in ≤5 bullets with file counts and risky areas (auth, I/O, concurrency, migrations)." .
-
-<https://w3id.org/tc/capsule/llm.pr_risk_tags_v1> a tc:Capsule ;
-    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:creator "John Macgregor" ;
-    dct:identifier "llm.pr_risk_tags_v1" ;
-    dct:license "MIT" ;
-    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:title "PR Review - Risk Tags" ;
-    ns1:affiliation "Truth Capsules Demo" ;
-    ns1:version "1.0.0" ;
-    tc:applies_to "ci",
-        "code_assistant",
-        "conversation" ;
-    tc:assumption "Risk framing helps prioritize deeper review and testing." ;
-    tc:domain "pr_review" ;
-    tc:inBundle <https://w3id.org/tc/bundle/pr_review_minibundle_v1> ;
-    tc:reviewStatus "draft" ;
-    tc:sensitivity "low" ;
-    tc:statement "Assign risk tags {security, performance, availability, migration, breaking_change, data_loss} with 0–1 severity and 1–2 line rationale." .
-
-<https://w3id.org/tc/capsule/llm.pr_test_hints_v1> a tc:Capsule ;
-    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:creator "John Macgregor" ;
-    dct:identifier "llm.pr_test_hints_v1" ;
-    dct:license "MIT" ;
-    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:title "PR Review - Minimal Tests" ;
-    ns1:affiliation "Truth Capsules Demo" ;
-    ns1:version "1.0.0" ;
-    tc:applies_to "ci",
-        "code_assistant",
-        "conversation" ;
-    tc:assumption "Some testing harness exists (unit/integration)." ;
-    tc:domain "pr_review" ;
-    tc:inBundle <https://w3id.org/tc/bundle/pr_review_minibundle_v1> ;
-    tc:reviewStatus "draft" ;
-    tc:sensitivity "low" ;
-    tc:statement "Propose 2–4 smallest tests that would catch a regression introduced by this diff (include inputs/edges)." .
-
-<https://w3id.org/tc/capsule/llm.red_team_assessment_v1> a tc:Capsule ;
-    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:creator "John Macgregor" ;
-    dct:identifier "llm.red_team_assessment_v1" ;
-    dct:license "MIT" ;
-    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:title "Red Team Assessment Protocol" ;
-    ns1:affiliation "Truth Capsules Demo" ;
-    ns1:version "1.0.0" ;
-    tc:applies_to "ci",
-        "code_assistant",
-        "conversation" ;
-    tc:assumption "Follow platform safety policies; redact secrets and PII.",
-        "Information provided is for defense; do not share sensitive exploit details beyond what is necessary to mitigate.",
-        "The user explicitly requests a red-team assessment for constructive hardening." ;
-    tc:domain "llm" ;
-    tc:inBundle <https://w3id.org/tc/bundle/conversation_red_team_baseline_v1>,
-        <https://w3id.org/tc/bundle/test_v1_1_bundle> ;
-    tc:reviewStatus "draft" ;
-    tc:sensitivity "low" ;
-    tc:statement "On a red-team request, perform an adversarial evaluation: clarify objective & asset, list assumptions, identify actors & capabilities, enumerate plausible attacks, show at least one concrete exploit path, rate severity×likelihood (0–1), propose mitigations and a 48‑hour action plan." .
-
-<https://w3id.org/tc/capsule/llm.safety_refusal_guard_v1> a tc:Capsule ;
-    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:creator "John Macgregor" ;
-    dct:identifier "llm.safety_refusal_guard_v1" ;
-    dct:license "MIT" ;
-    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:title "Safety & Refusal Guard" ;
-    ns1:affiliation "Truth Capsules Demo" ;
-    ns1:version "1.0.0" ;
-    tc:applies_to "ci",
-        "code_assistant",
-        "conversation" ;
-    tc:assumption "Policies and safety priorities apply to this context." ;
-    tc:domain "llm" ;
-    tc:inBundle <https://w3id.org/tc/bundle/conversation_red_team_baseline_v1>,
-        <https://w3id.org/tc/bundle/test_v1_1_bundle> ;
-    tc:reviewStatus "draft" ;
-    tc:sensitivity "low" ;
-    tc:statement "If a request risks policy or safety violations, refuse with a brief reason and offer the closest safe alternative." .
-
-<https://w3id.org/tc/capsule/llm.steelmanning_v1> a tc:Capsule ;
-    dct:created "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:creator "John Macgregor" ;
-    dct:identifier "llm.steelmanning_v1" ;
-    dct:license "MIT" ;
-    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:title "Steelmanning" ;
-    ns1:affiliation "Truth Capsules Demo" ;
-    ns1:version "1.0.0" ;
-    tc:applies_to "ci",
-        "code_assistant",
-        "conversation" ;
-    tc:assumption "There exists an alternative that a reasonable expert could endorse." ;
-    tc:domain "llm" ;
-    tc:inBundle <https://w3id.org/tc/bundle/conversation_red_team_baseline_v1> ;
-    tc:reviewStatus "draft" ;
-    tc:sensitivity "low" ;
-    tc:statement "Before critiquing, restate the strongest version of the opposing view in 3 bullets, then highlight one genuine crux." .
-
-<https://w3id.org/tc/capsule/llm.tool_json_contract_v1> a tc:Capsule ;
-    dct:created "2025-11-07T03:53:50.511776+00:00"^^xsd:dateTime ;
-    dct:creator "John Macgregor" ;
-    dct:identifier "llm.tool_json_contract_v1" ;
-    dct:license "MIT" ;
-    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:title "Tool JSON contract" ;
-    ns1:affiliation "Truth Capsules Demo" ;
-    ns1:version "1.0.0" ;
-    tc:applies_to "ci",
-        "code_assistant",
-        "conversation" ;
-    tc:assumption "Operating in a general context" ;
-    tc:domain "llm" ;
-    tc:inBundle <https://w3id.org/tc/bundle/assistant_baseline_v1>,
-        <https://w3id.org/tc/bundle/ci_llm_baseline_v1> ;
-    tc:reviewStatus "draft" ;
-    tc:sensitivity "low" ;
-    tc:statement "Tool call args must match the JSON schema (required fields & types)." .
-
-<https://w3id.org/tc/capsule/ops.rollback_plan_v1> a tc:Capsule ;
-    dct:created "2025-11-07T03:53:50.511776+00:00"^^xsd:dateTime ;
-    dct:creator "Truth Capsules" ;
-    dct:identifier "ops.rollback_plan_v1" ;
-    dct:license "MIT" ;
-    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    ns1:affiliation "Truth Capsules Demo" ;
-    ns1:version "1.0.0" ;
-    tc:applies_to "ci",
-        "code_assistant",
-        "conversation" ;
-    tc:domain "ops" ;
-    tc:hasWitness <https://w3id.org/tc/capsule/ops.rollback_plan_v1#w/rollback_present> ;
-    tc:inBundle <https://w3id.org/tc/bundle/ci_nonllm_baseline_v1> ;
-    tc:reviewStatus "draft" ;
-    tc:sensitivity "low" ;
-    tc:statement "Deploy plans must include a rollback step with trigger conditions and owner." .
-
-<https://w3id.org/tc/capsule/pedagogy.problem_solving_v1> a tc:Capsule ;
-    dct:created "2025-11-07T03:53:50.511776+00:00"^^xsd:dateTime ;
-    dct:creator "Truth Capsules" ;
-    dct:identifier "pedagogy.problem_solving_v1" ;
-    dct:license "MIT" ;
-    dct:modified "2025-11-07T03:56:05.351404+00:00"^^xsd:dateTime ;
-    dct:title "Five-step problem-solving discipline" ;
-    ns1:affiliation "Truth Capsules Demo" ;
-    ns1:version "1.0.0" ;
-    tc:applies_to "ci",
-        "code_assistant",
-        "conversation" ;
-    tc:domain "pedagogy" ;
-    tc:hasWitness <https://w3id.org/tc/capsule/pedagogy.problem_solving_v1#w/five_step_gate> ;
-    tc:inBundle <https://w3id.org/tc/bundle/conversation_pedagogy_v1> ;
-    tc:reviewStatus "draft" ;
-    tc:sensitivity "low" ;
-    tc:statement "A valid solution includes: (1) objective, (2) assumptions, (3) plan, (4) evidence, (5) summary with trade-offs and next step." .
-
-<https://w3id.org/tc/bundle/conversation_pedagogy_v1> a tc:Bundle ;
-    dct:identifier "conversation_pedagogy_v1" .
-
-<https://w3id.org/tc/capsule/business.decision_log_v1#w/decision_log_gate> a tc:Witness ;
-    tc:codeHash "ea539ac492c81d14ac49a8b3fd28388e608af6c0464903649244733a932bf69e" ;
+<https://w3id.org/tc/capsule/ci.container_hardening_v1#w/dockerfile_has_nonroot_nocache_pins> a tc:Witness ;
+    tc:codeHash "4c9e358f85aa6f5f10caa2f6f537485bbf2be47c68c5aebc911d966dcdf6e06c" ;
     tc:language "python" .
 
-<https://w3id.org/tc/capsule/ops.rollback_plan_v1#w/rollback_present> a tc:Witness ;
-    tc:codeHash "0d01bb163fe6c196893da5593d778ef786044f19d936c17e6b7e3baed4a3e48f" ;
+<https://w3id.org/tc/capsule/ci.license_compliance_v1#w/spdx_allowlist_only> a tc:Witness ;
+    tc:codeHash "833c5e19ed30911aca8df22e9012e8ecb43c67eefc1dd6ddf8eab5665a99e675" ;
     tc:language "python" .
 
-<https://w3id.org/tc/capsule/pedagogy.problem_solving_v1#w/five_step_gate> a tc:Witness ;
-    tc:codeHash "35d267c9c194af04f3a16d2bf7bba7598718b51299a9a1a3b99c7ec351aacc6a" ;
+<https://w3id.org/tc/capsule/ci.reproducible_artifact_hash_v1#w/repeatable_hash_check> a tc:Witness ;
+    tc:codeHash "a32130753218666ae37128fd46243fd9e731a6a0719ecc297fa132abac364d1c" ;
     tc:language "python" .
 
-<https://w3id.org/tc/bundle/ci_nonllm_baseline_v1> a tc:Bundle ;
-    dct:identifier "ci_nonllm_baseline_v1" .
+<https://w3id.org/tc/capsule/ci.sbom_present_v1#w/sbom_file_exists> a tc:Witness ;
+    tc:codeHash "a68393feb693e626dad4e7b5e88ce9ccb4b21b99e001eed8df2493af76eb25ec" ;
+    tc:language "python" .
 
-<https://w3id.org/tc/bundle/assistant_baseline_v1> a tc:Bundle ;
-    dct:identifier "assistant_baseline_v1" .
+<https://w3id.org/tc/capsule/ci.secrets_in_build_env_v1#w/no_forbidden_env_keys> a tc:Witness ;
+    tc:codeHash "af476cc67401afc0f222ac7553010d50ce9fae3dc6308684cb93d158c34d6357" ;
+    tc:language "python" .
 
-<https://w3id.org/tc/bundle/ci_llm_baseline_v1> a tc:Bundle ;
-    dct:identifier "ci_llm_baseline_v1" .
+<https://w3id.org/tc/capsule/dev.diff_risk_tags_v1#w/pr_review_covers_risks> a tc:Witness ;
+    tc:codeHash "f383cbe5f2a2e9f202a5aab79f6ca1367911ddda570503a7974ef818d0c0fb5a" ;
+    tc:language "python" .
 
-<https://w3id.org/tc/bundle/pr_review_minibundle_v1> a tc:Bundle ;
-    dct:identifier "pr_review_minibundle_v1" .
+<https://w3id.org/tc/capsule/dev.enforce_todo_ticket_v1#w/todo_refs_present> a tc:Witness ;
+    tc:codeHash "0345b9abe0bf09a4ad973fa25d58f6ce3294e5a3539e8c03643f5ba6faa634f9" ;
+    tc:language "python" .
 
-<https://w3id.org/tc/bundle/test_v1_1_bundle> a tc:Bundle ;
-    dct:identifier "test_v1_1_bundle" .
+<https://w3id.org/tc/capsule/dev.secret_scan_baseline_v1#w/no_high_entropy_or_keys> a tc:Witness ;
+    tc:codeHash "afa4665d2614a51ab6eee73efab4b896e83d4932cd15354e1eb3b5be1b75db0e" ;
+    tc:language "python" .
 
-<https://w3id.org/tc/bundle/conversation_red_team_baseline_v1> a tc:Bundle ;
-    dct:identifier "conversation_red_team_baseline_v1" .
+<https://w3id.org/tc/capsule/meta.truth_capsules_v1#w/canonical_digest_demo> a tc:Witness ;
+    tc:codeHash "60f54c45971caa116377a8e7c499fa45ca2cfc6a7ad1444a9f091993fa7df05d" ;
+    tc:language "python" .
+
+<https://w3id.org/tc/capsule/support.pii_redaction_smoke_v1#w/no_plaintext_pii_in_examples> a tc:Witness ;
+    tc:codeHash "c1a63606a50c97905a47c0890f8c265b88c98fd9e20a22eedb978767762da1b2" ;
+    tc:language "python" .
+
+<https://w3id.org/tc/bundle/bundle.ci_quality_gates_v1> a tc:Bundle ;
+    dct:identifier "bundle.ci_quality_gates_v1" .
+
+<https://w3id.org/tc/bundle/support_agent_v1_bundle> a tc:Bundle ;
+    dct:identifier "support_agent_v1_bundle" .
+
+<https://w3id.org/tc/bundle/bundle.dev_code_assistant_v1> a tc:Bundle ;
+    dct:identifier "bundle.dev_code_assistant_v1" .
+
+<https://w3id.org/tc/bundle/macgyver_core_v1_bundle> a tc:Bundle ;
+    dct:identifier "macgyver_core_v1_bundle" .
 

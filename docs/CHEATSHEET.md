@@ -83,9 +83,23 @@ python scripts/compose_capsules_cli.py --root . --list-profiles
 python scripts/compose_capsules_cli.py --root . --list-bundles
 ```
 
-Profile aliases you can use:
-`conversational, pedagogical, code_patch, tool_runner, ci_det, ci_llm, rules_gen`
+Profiles you can use:
 
+```
+Available Profiles:
+
+  profile.ci.gates_v1
+    Title: CI Quality Gates — Fail Fast
+
+  profile.dev.code_assistant_v1
+    Title: Developer Velocity — Code Assistant & Review Copilot
+
+  profile.macgyver_v1
+    Title: MacGyver Upgrade (Conversational)
+
+  profile.support_public_agent_v1
+    Title: Customer Support Copilot (Public-Facing)
+```
 ---
 
 ## 3) Compose System Prompts
@@ -190,12 +204,13 @@ until docker exec neo4j44 cypher-shell -u neo4j -p password --encryption=false "
 docker exec neo4j44 cypher-shell -u neo4j -p password --encryption=false \
   "RETURN apoc.version() AS apoc_version;"
 
-# Create constraints
+# Create constraints (must be separate commands)
 docker exec neo4j44 cypher-shell -u neo4j -p password --encryption=false \
-"CREATE CONSTRAINT capsule_pk IF NOT EXISTS FOR (c:Capsule) REQUIRE c.iri IS UNIQUE;
- CREATE CONSTRAINT witness_pk IF NOT EXISTS FOR (w:Witness) REQUIRE w.iri IS UNIQUE;"
+  "CREATE CONSTRAINT capsule_pk IF NOT EXISTS FOR (c:Capsule) REQUIRE c.iri IS UNIQUE;"
+docker exec neo4j44 cypher-shell -u neo4j -p password --encryption=false \
+  "CREATE CONSTRAINT witness_pk IF NOT EXISTS FOR (w:Witness) REQUIRE w.iri IS UNIQUE;"
 
-# Load NDJSON (sandbox-safe; no apoc.meta.*)
+# Load NDJSON (simplified, working version)
 docker exec neo4j44 cypher-shell -u neo4j -p password --encryption=false "
 WITH 'file:///artifacts/out/capsules.ndjson' AS URL
 CALL apoc.load.json(URL) YIELD value AS v0
@@ -205,46 +220,19 @@ WITH v0,
      toString(coalesce(v0.title,'')) AS title,
      toString(coalesce(v0.statement,'')) AS statement,
      toString(coalesce(v0.domain,'')) AS domain,
-     toString(coalesce(v0.version,'')) AS version
-CALL {
-  WITH v0
-  WITH coalesce(v0.assumption, v0.assumptions, []) AS A
-  WITH CASE WHEN A IS NULL THEN [] WHEN A IS STRING THEN [A] WHEN A IS LIST THEN A ELSE [A] END AS AA
-  UNWIND AA AS a
-  WITH CASE WHEN a IS MAP THEN a['@value'] ELSE a END AS ax
-  RETURN [x IN collect(toString(ax)) WHERE x <> ''] AS assumptions_list
-}
-CALL {
-  WITH v0
-  WITH coalesce(v0.pedagogy, []) AS P
-  WITH CASE WHEN P IS NULL THEN [] WHEN P IS STRING THEN [P] WHEN P IS LIST THEN P ELSE [P] END AS PP
-  UNWIND PP AS p
-  WITH
-    CASE WHEN p IS MAP THEN toString(p.kind) ELSE '' END AS kind,
-    CASE WHEN p IS MAP THEN toString(coalesce(p.text,p['@value'])) ELSE toString(p) END AS text
-  RETURN
-    [x IN collect(CASE WHEN kind='Socratic' AND text<>'' THEN text END) WHERE x IS NOT NULL] AS socratic_list,
-    [x IN collect(CASE WHEN kind='Aphorism' AND text<>'' THEN text END) WHERE x IS NOT NULL] AS aphorisms_list
-}
-CALL {
-  WITH v0
-  WITH coalesce(v0.hasWitness, []) AS W
-  WITH CASE WHEN W IS NULL THEN [] WHEN W IS LIST THEN W ELSE [W] END AS WW
-  UNWIND WW AS w
-  WITH CASE WHEN w IS MAP THEN w ELSE NULL END AS wmap
-  RETURN [x IN collect(wmap) WHERE x IS NOT NULL] AS witnesses
-}
+     toString(coalesce(v0.version,'')) AS version,
+     coalesce(v0.assumption, []) AS assumptions,
+     coalesce(v0.hasWitness, []) AS witnesses
 MERGE (c:Capsule {iri: iri})
   SET c.identifier  = identifier,
       c.title       = title,
       c.statement   = statement,
       c.domain      = domain,
       c.version     = version,
-      c.assumptions = assumptions_list,
-      c.socratic    = socratic_list,
-      c.aphorisms   = aphorisms_list
+      c.assumptions = [x IN assumptions WHERE x IS NOT NULL AND x <> '' | toString(x)]
 WITH c, witnesses
-UNWIND witnesses AS w
+UNWIND CASE WHEN size(witnesses) = 0 THEN [null] ELSE witnesses END AS w
+WITH c, w WHERE w IS NOT NULL
 MERGE (wNode:Witness {iri: toString(w['@id'])})
   SET wNode.language = toString(coalesce(w.language,'')),
       wNode.codeHash = toString(coalesce(w.codeHash,'')),
@@ -356,13 +344,15 @@ python scripts/compose_capsules_cli.py \
 
 ## 11) Troubleshooting
 
-* **“No capsules selected”**: `--capsule` needs **IDs**, not file paths.
+* **"No capsules selected"**: `--capsule` needs **IDs**, not file paths.
 * **Permission denied to artifacts/out**: `chmod -R u+rwX,go+rX artifacts/out`
 * **APOC not found**: Version mismatch or missing jar; check `RETURN apoc.version()`.
 * **`apoc.meta.*` sandboxed**: avoid `apoc.meta.type` unless unrestricted; use pure Cypher typing guards.
-* **“Collections containing collections”**: don’t set nested lists as properties; flatten to strings.
+* **"Expected exactly one statement" constraint error**: Split multi-statement queries into separate `cypher-shell` calls.
+* **"IS STRING/IS LIST/IS MAP" type errors**: Cypher doesn't support these operators; use `size()`, `IS NULL`, and filtering instead.
+* **"Collections containing collections"**: don't set nested lists as properties; flatten to strings.
 * **Bolt connection refused**: wait loop until `RETURN 1` succeeds before running queries.
-* **File URL errors**: confirm path is visible inside container (`/import/...` or `/var/lib/neo4j/import/...`), and plugin’s `*_import_file_enabled=true` if using APOC.
+* **File URL errors**: confirm path is visible inside container (`/import/...` or `/var/lib/neo4j/import/...`), and plugin's `*_import_file_enabled=true` if using APOC.
 
 ---
 
