@@ -9,10 +9,6 @@
     href="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='.8%20.8%2014.4%2014.4'%3e%3cpath%20d='M10%208.99a1%201%200%2000-.695%201.717l4.004%204a1%201%200%20101.414-1.414l-4.004-4A1%201%200%200010%208.99z'%20fill='%2380b0ff'%20stroke='%235D7FDDaa'%20stroke-width='.3'/%3e%3cpath%20d='M6.508%201C3.48%201%201.002%203.474%201.002%206.5S3.48%2012%206.508%2012s5.504-2.474%205.504-5.5S9.536%201%206.508%201zm0%202a3.486%203.486%200%20013.504%203.5c0%201.944-1.556%203.5-3.504%203.5a3.488%203.488%200%2001-3.506-3.5C3.002%204.556%204.56%203%206.508%203z'%20fill='%2380b0ff'%20stroke='%235D7FDDaa'%20stroke-width='.3'/%3e%3c/svg%3e">
   <!-- THEME + LAYOUT -->
   <style>
-    /* ============================
-   MODERN THEME  -  PREMIUM CUT
-   ============================ */
-
     /* ---- Tokens (Dark default) ---- */
     :root {
       /* Surfaces */
@@ -1321,7 +1317,56 @@
         --btn-h: 28px;
       }
     }
+
+    /* Make section headers clickable for collapse */
+    .section-block.collapsible .section-title { cursor: pointer; user-select: none; }
+
+    /* Keep a small visual gap when the previous collapsible is closed */
+    .section-block.collapsible.is-collapsed + .section-block { margin-top: 8px; }
+
+    /* When we decide to hide the Split.js gutter */
+    .gutter.gutter-vertical.is-hidden { display: none !important; }
+
+    /* 1) keep a small gap under the collapsed BUNDLES header */
+    .panel-collapsible { margin-bottom: 8px; }
+
+    /* 2) make the header sit above the Split.js gutter */
+    .panel-collapsible > summary.section-title { position: relative; z-index: 3; }
+
+    /* keep Split.js handle behind headers */
+    .gutter { z-index: 1 !important; }
+    .section-title { position: relative; z-index: 2; background: var(--surface); }
+
+    /* optional: add a touch of breathing room when a <details> is closed */
+    .panel-collapsible:not([open]) { margin-bottom: 8px; }
+
+    .modal[hidden] { display: none; }
+    .modal {
+      position: fixed; inset: 0; display: grid; place-items: center;
+      z-index: 1000; /* sits above Split.js gutter */
+    }
+    .modal-backdrop {
+      position: absolute; inset: 0;
+      background: color-mix(in oklab, var(--surface, #000), transparent 30%);
+      backdrop-filter: blur(2px);
+    }
+    .modal-card {
+      position: relative; max-width: 720px; width: min(96vw, 720px);
+      background: var(--panel); color: var(--text);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: 0 10px 40px rgba(0,0,0,.5);
+    }
+    .modal-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 14px; border-bottom: 1px solid var(--hairline, var(--border));
+    }
+    .modal-body { padding: 14px 16px; }
+    .modal-body h4 { margin: 12px 0 6px; font-size: 14px; opacity: .9; }
+    .modal-body ul { margin: 0 0 10px 18px; }
+
   </style>
+
+
 
 
   <!-- Prism / Split / Sortable -->
@@ -1406,6 +1451,7 @@
 
       <!-- Theme -->
       <button class="btn icon" id="themeBtn" title="Toggle theme" aria-label="Toggle color theme">🌙</button>
+      <button class="icon-btn" id="helpBtn" title="Help & Shortcuts">❓</button>
     </nav>
   </header>
 
@@ -1443,9 +1489,9 @@
           <div id="bundlesWrap" class="section-block">
             <div id="bundlesPanel" class="collapsible">
               <div class="collapsible-header">
-                <span class="section-title">BUNDLES (<span id="bundlesCount">0</span>)</span>
+                <span class="section-title">BUNDLES (<span id="bundlesCount">0</span>)</span><span class="small muted"> a collection of capsules</span>
                 <span class="domain-spacer"></span>
-                <button id="bundlesToggle" class="btn small" type="button" aria-expanded="true">Hide</button>
+                <!-- <button id="bundlesToggle" class="btn small" type="button" aria-expanded="true">Hide</button> -->
               </div>
               <div id="bundlesBody" class="collapsible-body">
                 <div id="bundles" class="list"></div>
@@ -1561,6 +1607,54 @@
     </div>
   </div>
 
+<div id="helpModal" class="modal" hidden aria-hidden="true">
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <header class="modal-head">
+      <h3 id="helpTitle">How to use this Viewer & Composer</h3>
+      <button class="icon-btn" title="Close" data-close aria-label="Close">✕</button>
+    </header>
+
+    <div class="modal-body">
+      <h4>Profiles</h4>
+      <ul>
+        <li>Pick a <em>Profile</em> to control how capsules are projected (what fields render, CI vs conversational tone).</li>
+        <li>The description under the dropdown explains what that profile does.</li>
+      </ul>
+
+      <h4>Bundles</h4>
+      <ul>
+        <li>Use the BUNDLES section to load an ordered kit of capsules.</li>
+        <li>Click a bundle’s checkbox to include/exclude it; expand to see contents.</li>
+      </ul>
+
+      <h4>Capsules</h4>
+      <ul>
+        <li>Filter with the search box (id, title, domain, statement).</li>
+        <li>Open a domain group and tick individual capsules. “View” previews details.</li>
+        <li>Use <strong>Expand all</strong> / <strong>Collapse all</strong> for all domains.</li>
+      </ul>
+
+      <h4>Compose & Export</h4>
+      <ul>
+        <li><strong>Compose</strong> builds the prompt from selected capsules (profile-aware).</li>
+        <li><strong>Copy Prompt</strong> copies the current projection to the clipboard.</li>
+      </ul>
+
+      <h4>Shortcuts</h4>
+      <ul>
+        <li><kbd>?</kbd> (or <kbd>Shift</kbd>+<kbd>/</kbd>) — Open Help</li>
+        <li><kbd>/</kbd> — Focus filter</li>
+        <li><kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>Enter</kbd> — Compose</li>
+        <li><kbd>E</kbd> — Expand all domains</li>
+        <li><kbd>C</kbd> — Collapse all domains</li>
+        <li><kbd>Esc</kbd> — Close modals</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
   <script id="tc-data" type="application/json">{{ data_json | replace("</script>","<\\ /script>") }}</script>
 
     <script>
@@ -1665,12 +1759,38 @@
           body.hidden = false;
           btn.textContent = 'Hide';
           btn.setAttribute('aria-expanded', 'true');
+          // restore previous height if we have it, else whatever Split already has
+          const last = Number(localStorage.getItem('tc_bundles_height') || '45');
+          if (window.__subsplit) {
+            const sizes = window.__subsplit.getSizes();
+            const target = isFinite(last) ? last : sizes[0];
+            const other = 100 - target;
+            window.__subsplit.setSizes([target, other]);
+            localStorage.setItem('tc_split_sub', JSON.stringify([target, other]));
+            }
         } else {
           body.hidden = true;
           btn.textContent = 'Show';
           btn.setAttribute('aria-expanded', 'false');
+          // remember current height, then collapse
+          if (window.__subsplit) {
+            const sizes = window.__subsplit.getSizes();   // [bundles%, capsules%]
+            localStorage.setItem('tc_bundles_height', String(sizes[0])); // remember bundles height
+            window.__subsplit.setSizes([0, 100]);
+            localStorage.setItem('tc_split_sub', JSON.stringify([0, 100]));
+            }          
         }
       }
+
+      const header = document.querySelector('#bundlesPanel .collapsible-header');
+      if (header) {
+        header.addEventListener('click', (e) => {
+          // don’t double-handle if the explicit Hide/Show button was clicked
+          if (e.target.closest('#bundlesToggle')) return;
+          setBundlesOpen(!STATE.bundlesOpen);
+        });
+      }
+
 
       function initBundlesCollapsibleSimple() {
         const btn = document.getElementById('bundlesToggle');
@@ -2974,12 +3094,127 @@ IFS=$'\\n\\t'
       Split(['#left', '#right'], { sizes: mainSizes, minSize: 240, gutterSize: 8, onDragEnd: s => localStorage.setItem('tc_split_main', JSON.stringify(s)) });
 
       const subSizes = JSON.parse(localStorage.getItem('tc_split_sub') || '[45,55]');
-      Split(['#bundlesWrap', '#capsulesWrap'], { direction: 'vertical', sizes: subSizes, minSize: [80, 120], gutterSize: 8, onDragEnd: s => localStorage.setItem('tc_split_sub', JSON.stringify(s)) });
-
+      window.__subsplit = Split(
+        ['#bundlesWrap', '#capsulesWrap'],
+        {
+          direction: 'vertical',
+          sizes: subSizes,
+          minSize: [0, 120],                // allow collapsing bundles pane to 0
+          gutterSize: 8,
+          onDragEnd: s => localStorage.setItem('tc_split_sub', JSON.stringify(s))
+        }
+      );
       // Remember profile + checkboxes
       $('profiles').addEventListener('change', () => localStorage.setItem('tc_profile', $('profiles').value));
       $('includePed').addEventListener('change', () => localStorage.setItem('tc_inc_ped', $('includePed').checked ? '1' : '0'));
       $('markdown').addEventListener('change', () => localStorage.setItem('tc_md', $('markdown').checked ? '1' : '0'));
+
+      function getGutter() {
+        // gutter sits between the two panes
+        return document.querySelector('#bundlesWrap + .gutter.gutter-vertical')
+            || document.querySelector('.gutter.gutter-vertical');
+      }
+
+      function updateGutterVisibility() {
+        if (!window.__subsplit) return;
+        const gutter = getGutter();
+        if (!gutter) return;
+        const [topPct, botPct] = window.__subsplit.getSizes();
+        const hidden = (topPct <= 0.5) || (botPct <= 0.5);
+        gutter.classList.toggle('is-hidden', hidden);
+      }
+
+      function setBundlesOpen(open, opts={}) {
+        const wrap = document.getElementById('bundlesWrap');
+        const other = document.getElementById('capsulesWrap');
+        if (!wrap || !other) return;
+
+        const last = Number(localStorage.getItem('tc_bundles_height') || '45'); // %
+        if (open) {
+          wrap.classList.remove('is-collapsed');
+          if (window.__subsplit) {
+            const target = Number.isFinite(last) ? Math.min(Math.max(last, 10), 90) : 45;
+            window.__subsplit.setSizes([target, 100 - target]);
+            localStorage.setItem('tc_split_sub', JSON.stringify([target, 100 - target]));
+          }
+          localStorage.setItem('tc_bundles_open', '1');
+        } else {
+          // remember then collapse to 0
+          if (window.__subsplit) {
+            const [curTop] = window.__subsplit.getSizes();
+            localStorage.setItem('tc_bundles_height', String(curTop));
+            window.__subsplit.setSizes([0, 100]);
+            localStorage.setItem('tc_split_sub', JSON.stringify([0, 100]));
+          }
+          wrap.classList.add('is-collapsed');
+          localStorage.setItem('tc_bundles_open', '0');
+        }
+        if (!opts.silent) updateGutterVisibility();
+      }
+
+      function setCapsulesOpen(open, opts={}) {
+        const wrap = document.getElementById('capsulesWrap');
+        if (!wrap) return;
+
+        // body = everything except the header row (keep header visible)
+        const bodyNodes = Array.from(wrap.children).filter(n => !n.classList.contains('section-title'));
+
+        const last = Number(localStorage.getItem('tc_capsules_height') || '55'); // %
+
+        if (open) {
+          wrap.classList.remove('is-collapsed');
+          bodyNodes.forEach(n => n.hidden = false);
+          if (window.__subsplit) {
+            const target = Number.isFinite(last) ? Math.min(Math.max(last, 10), 90) : 55;
+            window.__subsplit.setSizes([100 - target, target]);
+            localStorage.setItem('tc_split_sub', JSON.stringify([100 - target, target]));
+          }
+          localStorage.setItem('tc_capsules_open', '1');
+        } else {
+          // hide body and collapse bottom pane to 0
+          bodyNodes.forEach(n => n.hidden = true);
+          if (window.__subsplit) {
+            const [, curBot] = window.__subsplit.getSizes();
+            localStorage.setItem('tc_capsules_height', String(curBot));
+            window.__subsplit.setSizes([100, 0]);
+            localStorage.setItem('tc_split_sub', JSON.stringify([100, 0]));
+          }
+          wrap.classList.add('is-collapsed');
+          localStorage.setItem('tc_capsules_open', '0');
+        }
+        if (!opts.silent) updateGutterVisibility();
+      }
+
+      // Hook up header clicks
+      (function wireCollapsers() {
+        const bundlesHeader = document.querySelector('#bundlesWrap .section-title');
+        if (bundlesHeader) {
+          bundlesHeader.addEventListener('click', (e) => {
+            // ignore clicks on dedicated buttons if you have them
+            if (e.target.closest('#bundlesToggle')) return;
+            const open = localStorage.getItem('tc_bundles_open') !== '0';
+            setBundlesOpen(!open);
+          });
+        }
+
+        const capsulesHeader = document.querySelector('#capsulesWrap .section-title');
+        if (capsulesHeader) {
+          capsulesHeader.addEventListener('click', (e) => {
+            if (e.target.closest('#expandAllBtn, #collapseAllBtn')) return; // keep those working
+            const open = localStorage.getItem('tc_capsules_open') !== '0';
+            setCapsulesOpen(!open);
+          });
+        }
+
+        // Initial restore
+        const bundlesOpen = localStorage.getItem('tc_bundles_open') !== '0';
+        setBundlesOpen(bundlesOpen, {silent:true});
+        const capsulesOpen = localStorage.getItem('tc_capsules_open') !== '0';
+        setCapsulesOpen(capsulesOpen, {silent:true});
+        updateGutterVisibility();
+      })();
+
+
 
       window.addEventListener('load', () => {
         const p = localStorage.getItem('tc_profile'); if (p && DATA.profiles[p]) $('profiles').value = p;
@@ -3069,6 +3304,58 @@ IFS=$'\\n\\t'
         });
       })();
     </script>
+
+    <script>
+    (function () {
+      const $ = (id) => document.getElementById(id);
+      const modal = $('helpModal');
+      const btn   = $('helpBtn');
+
+      let lastFocus = null;
+
+      function openModal() {
+        lastFocus = document.activeElement;
+        modal.hidden = false;
+        modal.setAttribute('aria-hidden', 'false');
+        // focus first focusable inside
+        const first = modal.querySelector('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
+        (first || modal).focus();
+        document.addEventListener('keydown', onKey);
+        document.addEventListener('click', onOutside, true);
+      }
+
+      function closeModal() {
+        modal.hidden = true;
+        modal.setAttribute('aria-hidden', 'true');
+        document.removeEventListener('keydown', onKey);
+        document.removeEventListener('click', onOutside, true);
+        if (lastFocus) lastFocus.focus();
+      }
+
+      function onKey(e) {
+        if (e.key === 'Escape') closeModal();
+        if ((e.key === '?' ) || (e.key === '/' && e.shiftKey)) {
+          // prevent typing '?' in inputs from re-opening
+          const t = e.target;
+          if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+          e.preventDefault(); e.stopPropagation();
+          if (modal.hidden) openModal();
+        }
+      }
+
+      function onOutside(e) {
+        if (e.target.closest('[data-close]')) { e.preventDefault(); closeModal(); return; }
+        if (!e.target.closest('.modal-card') && !modal.hidden) closeModal();
+      }
+
+      // wire up
+      if (btn) btn.addEventListener('click', openModal);
+      // global '?' shortcut
+      document.addEventListener('keydown', onKey);
+    })();
+    </script>
+
+
 </body>
 
 </html>
