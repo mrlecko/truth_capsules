@@ -217,6 +217,7 @@ make sandbox-smoke
 * **Profiles Reference:** **docs/PROFILES_REFERENCE.md**
 * **Capsule Schema v1:** **docs/CAPSULE_SCHEMA_v1.md**
 * **Migration & Schema Updates:** **docs/MIGRATION_GUIDE.md**
+* **Test Workflows (Pre-Release Checklist):** **docs/TEST_WORKFLOWS.md**
 * **Witnesses Guide:** **docs/WITNESSES_GUIDE.md**
 * **Provenance & Signing:** **docs/PROVENANCE_SIGNING.md**
 * **Security & CSP:** **docs/SECURITY.md**
