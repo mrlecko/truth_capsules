@@ -5,663 +5,1143 @@
   <meta charset="utf-8" />
   <title>Truth Capsule Viewer & Prompt Composer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link
-    rel="shortcut icon"
-    href="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='.8%20.8%2014.4%2014.4'%3e%3cpath%20d='M10%208.99a1%201%200%2000-.695%201.717l4.004%204a1%201%200%20101.414-1.414l-4.004-4A1%201%200%200010%208.99z'%20fill='%2380b0ff'%20stroke='%235D7FDDaa'%20stroke-width='.3'/%3e%3cpath%20d='M6.508%201C3.48%201%201.002%203.474%201.002%206.5S3.48%2012%206.508%2012s5.504-2.474%205.504-5.5S9.536%201%206.508%201zm0%202a3.486%203.486%200%20013.504%203.5c0%201.944-1.556%203.5-3.504%203.5a3.488%203.488%200%2001-3.506-3.5C3.002%204.556%204.56%203%206.508%203z'%20fill='%2380b0ff'%20stroke='%235D7FDDaa'%20stroke-width='.3'/%3e%3c/svg%3e"
-  >
+  <link rel="shortcut icon"
+    href="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='.8%20.8%2014.4%2014.4'%3e%3cpath%20d='M10%208.99a1%201%200%2000-.695%201.717l4.004%204a1%201%200%20101.414-1.414l-4.004-4A1%201%200%200010%208.99z'%20fill='%2380b0ff'%20stroke='%235D7FDDaa'%20stroke-width='.3'/%3e%3cpath%20d='M6.508%201C3.48%201%201.002%203.474%201.002%206.5S3.48%2012%206.508%2012s5.504-2.474%205.504-5.5S9.536%201%206.508%201zm0%202a3.486%203.486%200%20013.504%203.5c0%201.944-1.556%203.5-3.504%203.5a3.488%203.488%200%2001-3.506-3.5C3.002%204.556%204.56%203%206.508%203z'%20fill='%2380b0ff'%20stroke='%235D7FDDaa'%20stroke-width='.3'/%3e%3c/svg%3e">
   <!-- THEME + LAYOUT -->
-<style>
-  /* ============================
-   MODERN THEME — PREMIUM CUT
+  <style>
+    /* ============================
+   MODERN THEME  -  PREMIUM CUT
    ============================ */
 
-/* ---- Tokens (Dark default) ---- */
-:root{
-  /* Surfaces */
-  --bg:            #0e1116;
-  --panel:         #151a21;
-  --panel-raise:   #171d24;   /* subtle elevated */
-  --panel-alt:     #1a212b;
-  --divider:       #232a36;   /* hairlines / separators */
-  --border:        #232a36;
+    /* ---- Tokens (Dark default) ---- */
+    :root {
+      /* Surfaces */
+      --bg: #0e1116;
+      --panel: #151a21;
+      --panel-raise: #171d24;
+      /* subtle elevated */
+      --panel-alt: #1a212b;
+      --divider: #232a36;
+      /* hairlines / separators */
+      --border: #232a36;
 
-  /* Text & accents */
-  --text:          #e8ecf2;
-  --muted:         #a6b0c2;
-  --accent:        #76a2ff;   /* link/brand */
-  --accent-strong: #4b86ff;
-  --ok:            #19e184;
-  --danger:        #ff6b6b;
-  --warn:          #ffae3a;
+      /* Text & accents */
+      --text: #e8ecf2;
+      --muted: #a6b0c2;
+      --accent: #76a2ff;
+      /* link/brand */
+      --accent-strong: #4b86ff;
+      --ok: #19e184;
+      --danger: #ff6b6b;
+      --warn: #ffae3a;
 
-  /* UI */
-  --chip:          #1f2632;
-  --chip-border:   #2a3444;
+      /* UI */
+      --chip: #1f2632;
+      --chip-border: #2a3444;
 
-  /* Controls */
-  --input-bg:      #0f141d;
-  --btn-bg:        #0f141d;
-  --btn-fg:        var(--text);
+      /* Controls */
+      --input-bg: #0f141d;
+      --btn-bg: #0f141d;
+      --btn-fg: var(--text);
 
-  /* Textareas (default, non-terminal) */
-  --textarea-bg:   var(--panel-alt);
-  --textarea-fg:   var(--text);
+      /* Textareas (default, non-terminal) */
+      --textarea-bg: var(--panel-alt);
+      --textarea-fg: var(--text);
 
-  /* Terminal (syscode) */
-  --code-bg:       #0f1117;
-  --code-fg:       #a9ffb8;
-  --code-border:   #1c2330;
+      /* Terminal (syscode) */
+      --code-bg: #0f1117;
+      --code-fg: #a9ffb8;
+      --code-border: #1c2330;
 
-  /* Shadows */
-  --shadow-sm:     0 1px 0 rgba(0,0,0,.04);
-  --shadow-md:     0 8px 24px rgba(0,0,0,.22);
-  --shadow-lg:     0 16px 48px rgba(0,0,0,.28);
+      /* Shadows */
+      --shadow-sm: 0 1px 0 rgba(0, 0, 0, .04);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, .22);
+      --shadow-lg: 0 16px 48px rgba(0, 0, 0, .28);
 
-  /* Motion & radii */
-  --radius:        12px;
-  --radius-sm:     10px;
-  --transition:    140ms cubic-bezier(.2,.8,.2,1);
+      /* Motion & radii */
+      --radius: 12px;
+      --radius-sm: 10px;
+      --transition: 140ms cubic-bezier(.2, .8, .2, 1);
 
-  /* Scroll & gutters */
-  --scroll-thumb:  #2a3546;
-  --scroll-track:  var(--bg);
-  --gutter-idle:   linear-gradient(to right, transparent, rgba(255,255,255,.08), transparent);
-  --gutter-hover:  linear-gradient(to right, transparent, rgba(118,162,255,.35), transparent);
-}
+      /* Scroll & gutters */
+      --scroll-thumb: #2a3546;
+      --scroll-track: var(--bg);
+      --gutter-idle: linear-gradient(to right, transparent, rgba(255, 255, 255, .08), transparent);
+      --gutter-hover: linear-gradient(to right, transparent, rgba(118, 162, 255, .35), transparent);
+    }
 
-/* Explicit light theme: override ALL tokens */
-html[data-theme="light"]{
-  color-scheme: light;
+    /* Explicit light theme: override ALL tokens */
+    html[data-theme="light"] {
+      color-scheme: light;
 
-  --bg:            #f6f8fc;
-  --panel:         #ffffff;
-  --panel-raise:   #ffffff;
-  --panel-alt:     #f4f7fd;
-  --divider:       #e8eef7;
-  --border:        #175cb7;
+      --bg: #f6f8fc;
+      --panel: #ffffff;
+      --panel-raise: #ffffff;
+      --panel-alt: #f4f7fd;
+      --divider: #e8eef7;
+      --border: #175cb7;
 
-  --text:          #0e1320;
-  --muted:         #5b6680;
-  --accent:        #265ff1;
-  --accent-strong: #1f55e6;
-  --ok:            #19e184;
-  --danger:        #d83a3a;
-  --warn:          #d48a14;
+      --text: #0e1320;
+      --muted: #5b6680;
+      --accent: #265ff1;
+      --accent-strong: #1f55e6;
+      --ok: #19e184;
+      --danger: #d83a3a;
+      --warn: #d48a14;
 
-  --chip:          #eef2fb;
-  --chip-border:   #d8e1f1;
+      --chip: #eef2fb;
+      --chip-border: #d8e1f1;
 
-  --input-bg:      #f1f5fb;
-  --btn-bg:        #c5c5c5;
-  --btn-fg:        var(--text);
+      --input-bg: #f1f5fb;
+      --btn-bg: #c5c5c5;
+      --btn-fg: var(--text);
 
-  /* Keep terminals dark in light mode for contrast */
-  --textarea-bg:   #f7f9ff;
-  --textarea-fg:   #0e1320;
+      /* Keep terminals dark in light mode for contrast */
+      --textarea-bg: #f7f9ff;
+      --textarea-fg: #0e1320;
 
-  --code-bg:       #0f1117;
-  --code-fg:       #a9ffb8;
-  --code-border:   #1c2330;
+      --code-bg: #0f1117;
+      --code-fg: #a9ffb8;
+      --code-border: #1c2330;
 
-  --shadow-sm:     0 1px 0 rgba(0,0,0,.05);
-  --shadow-md:     0 8px 28px rgba(12,26,54,.10);
-  --shadow-lg:     0 16px 52px rgba(12,26,54,.14);
+      --shadow-sm: 0 1px 0 rgba(0, 0, 0, .05);
+      --shadow-md: 0 8px 28px rgba(12, 26, 54, .10);
+      --shadow-lg: 0 16px 52px rgba(12, 26, 54, .14);
 
-  --scroll-thumb:  #c9d4e8;
-  --scroll-track:  var(--bg);
-  --gutter-idle:   linear-gradient(to right, transparent, rgba(13,26,49,.10), transparent);
-  --gutter-hover:  linear-gradient(to right, transparent, rgba(36,99,235,.35), transparent);
-}
+      --scroll-thumb: #c9d4e8;
+      --scroll-track: var(--bg);
+      --gutter-idle: linear-gradient(to right, transparent, rgba(13, 26, 49, .10), transparent);
+      --gutter-hover: linear-gradient(to right, transparent, rgba(36, 99, 235, .35), transparent);
+    }
 
-/* Optional: make an explicit dark theme switch also work */
-html[data-theme="dark"]{
-  color-scheme: dark;
-  /* (No token overrides needed since :root is already dark) */
-}
-
-
-/* Follow OS if no explicit theme attribute is set */
-@media (prefers-color-scheme: light){
-  html:not([data-theme]){
-    color-scheme: light;
-
-    --bg:            #f6f8fc;
-    --panel:         #ffffff;
-    --panel-raise:   #ffffff;
-    --panel-alt:     #f4f7fd;
-    --divider:       #e8eef7;
-    --border:        #dde6f2;
-
-    --text:          #0e1320;
-    --muted:         #5b6680;
-    --accent:        #265ff1;
-    --accent-strong: #1f55e6;
-
-    --chip:          #eef2fb;
-    --chip-border:   #d8e1f1;
-
-    --input-bg:      #f1f5fb;
-    --btn-bg:        #c5c5c5;
-    --btn-fg:        var(--text);
-
-    --textarea-bg:   #f7f9ff;
-    --textarea-fg:   #0e1320;
-
-    /* Keep terminal dark in light mode for contrast */
-    --code-bg:       #0f1117;
-    --code-fg:       #a9ffb8;
-    --code-border:   #1c2330;
-
-    --shadow-sm:     0 1px 0 rgba(0,0,0,.05);
-    --shadow-md:     0 8px 28px rgba(12,26,54,.10);
-    --shadow-lg:     0 16px 52px rgba(12,26,54,.14);
-
-    --scroll-thumb:  #c9d4e8;
-    --scroll-track:  var(--bg);
-    --gutter-idle:   linear-gradient(to right, transparent, rgba(13,26,49,.10), transparent);
-    --gutter-hover:  linear-gradient(to right, transparent, rgba(36,99,235,.35), transparent);
-  }
-}
-
-/* Explicit theme overrides */
-html[data-theme="dark"]{ color-scheme: dark; }
-html[data-theme="light"]{ color-scheme: light; }
-
-/* ---------- Light theme refinement ---------- */
-html[data-theme="light"]{
-  /* neutrals */
-  --bg:#f8fafc;
-  --panel:#ffffff;
-  --panel-alt:#f7f9fc;          /* less blue than before */
-  --text:#0f172a;
-  --muted:#64748b;
-
-  /* accents & structure */
-  --accent:#2563eb;
-  --border:#568fe0;             /* neutral, not saturated blue */
-  --border-strong:#d6dde7;      /* for separators/hover */
-  --chip:#f5f7fb;
-  --chip-border:#e4eaf4;
-
-  --input-bg:#f9fbfe;
-  --btn-bg:#ced3df;
-  --btn-fg:var(--text);
-
-  /* code stays dark in light mode */
-  --code-bg:#0f1117;
-  --code-fg:#c7ffcf;
-  --code-border:#1d2330;
-
-  /* rings & elevation */
-  --ring: color-mix(in oklab,var(--accent),white 70%);
-  --ring-strong: color-mix(in oklab,var(--accent),white 55%);
-  --shadow: 0 1px 2px rgba(17,24,39,.05), 0 2px 12px rgba(17,24,39,.08);
-}
-
-/* vertical separator between panes */
-#left { border-right:1px solid var(--border-strong); }
-
-/* cards/items: neutral frames, modern hover */
-.card, .item, .chip { border:1px solid var(--border); box-shadow:var(--shadow); }
-.item:hover, .card:hover { border-color:var(--border-strong);
-  box-shadow:0 1px 2px rgba(17,24,39,.06), 0 8px 20px rgba(17,24,39,.08); }
-
-.section-title { color:var(--muted); letter-spacing:.02em; font-weight:600; }
-
-/* inputs/selects */
-input[type="text"], select {
-  background:var(--input-bg); border:1px solid var(--border); color:var(--text);
-}
-input[type="text"]:focus, select:focus {
-  outline:none; border-color:var(--ring-strong); box-shadow:0 0 0 3px var(--ring);
-}
-
-/* text areas: use .code to get dark terminal treatment */
-textarea:not(.code), pre:not(.code) {
-  background:var(--panel-alt); color:var(--text); border-color:var(--border);
-}
-textarea.code, pre.code, .terminal {
-  background:var(--code-bg); color:var(--code-fg); border-color:var(--code-border);
-}
-
-/* buttons */
-.btn { background:var(--btn-bg); color:var(--btn-fg); border:1px solid var(--border); }
-.btn:hover { border-color:var(--ring-strong);
-  box-shadow:0 0 0 3px color-mix(in oklab,var(--accent),white 85%); }
-
-/* chips / badges */
-.chip { background:var(--chip); border-color:var(--chip-border); color:var(--muted); }
-.badge { background:#eef2f8; color:#3b4a6b; border:1px solid #d7deea; }
-.badge.ok { background:#eaf7f0; color:#166534; border-color:#cde8d9; }
-.badge.err { background:#fdecec; color:#7f1d1d; border-color:#f6b4b4; }
-
-/* softer, consistent focus across the app */
-:focus-visible {
-  outline:none; border-color:var(--ring-strong);
-  box-shadow:0 0 0 3px var(--ring); border-radius:var(--radius);
-}
+    /* Optional: make an explicit dark theme switch also work */
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      /* (No token overrides needed since :root is already dark) */
+    }
 
 
-/* ==============
+    /* Follow OS if no explicit theme attribute is set */
+    @media (prefers-color-scheme: light) {
+      html:not([data-theme]) {
+        color-scheme: light;
+
+        --bg: #f6f8fc;
+        --panel: #ffffff;
+        --panel-raise: #ffffff;
+        --panel-alt: #f4f7fd;
+        --divider: #e8eef7;
+        --border: #dde6f2;
+
+        --text: #0e1320;
+        --muted: #5b6680;
+        --accent: #265ff1;
+        --accent-strong: #1f55e6;
+
+        --chip: #eef2fb;
+        --chip-border: #d8e1f1;
+
+        --input-bg: #f1f5fb;
+        --btn-bg: #c5c5c5;
+        --btn-fg: var(--text);
+
+        --textarea-bg: #f7f9ff;
+        --textarea-fg: #0e1320;
+
+        /* Keep terminal dark in light mode for contrast */
+        --code-bg: #0f1117;
+        --code-fg: #a9ffb8;
+        --code-border: #1c2330;
+
+        --shadow-sm: 0 1px 0 rgba(0, 0, 0, .05);
+        --shadow-md: 0 8px 28px rgba(12, 26, 54, .10);
+        --shadow-lg: 0 16px 52px rgba(12, 26, 54, .14);
+
+        --scroll-thumb: #c9d4e8;
+        --scroll-track: var(--bg);
+        --gutter-idle: linear-gradient(to right, transparent, rgba(13, 26, 49, .10), transparent);
+        --gutter-hover: linear-gradient(to right, transparent, rgba(36, 99, 235, .35), transparent);
+      }
+    }
+
+    /* Explicit theme overrides */
+    html[data-theme="dark"] {
+      color-scheme: dark;
+    }
+
+    html[data-theme="light"] {
+      color-scheme: light;
+    }
+
+    /* ---------- Light theme refinement ---------- */
+    html[data-theme="light"] {
+      /* neutrals */
+      --bg: #f8fafc;
+      --panel: #ffffff;
+      --panel-alt: #f7f9fc;
+      /* less blue than before */
+      --text: #0f172a;
+      --muted: #64748b;
+
+      /* accents & structure */
+      --accent: #2563eb;
+      --border: #568fe0;
+      /* neutral, not saturated blue */
+      --border-strong: #d6dde7;
+      /* for separators/hover */
+      --chip: #f5f7fb;
+      --chip-border: #e4eaf4;
+
+      --input-bg: #f9fbfe;
+      --btn-bg: #ced3df;
+      --btn-fg: var(--text);
+
+      /* code stays dark in light mode */
+      --code-bg: #0f1117;
+      --code-fg: #c7ffcf;
+      --code-border: #1d2330;
+
+      /* rings & elevation */
+      --ring: color-mix(in oklab, var(--accent), white 70%);
+      --ring-strong: color-mix(in oklab, var(--accent), white 55%);
+      --shadow: 0 1px 2px rgba(17, 24, 39, .05), 0 2px 12px rgba(17, 24, 39, .08);
+    }
+
+    /* vertical separator between panes */
+    #left {
+      border-right: 1px solid var(--border-strong);
+    }
+
+    /* cards/items: neutral frames, modern hover */
+    .card,
+    .item,
+    .chip {
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .item:hover,
+    .card:hover {
+      border-color: var(--border-strong);
+      box-shadow: 0 1px 2px rgba(17, 24, 39, .06), 0 8px 20px rgba(17, 24, 39, .08);
+    }
+
+    .section-title {
+      color: var(--muted);
+      letter-spacing: .02em;
+      font-weight: 600;
+    }
+
+    /* inputs/selects */
+    input[type="text"],
+    select {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    input[type="text"]:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--ring-strong);
+      box-shadow: 0 0 0 3px var(--ring);
+    }
+
+    /* text areas: use .code to get dark terminal treatment */
+    textarea:not(.code),
+    pre:not(.code) {
+      background: var(--panel-alt);
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    textarea.code,
+    pre.code,
+    .terminal {
+      background: var(--code-bg);
+      color: var(--code-fg);
+      border-color: var(--code-border);
+    }
+
+    /* buttons */
+    .btn {
+      background: var(--btn-bg);
+      color: var(--btn-fg);
+      border: 1px solid var(--border);
+    }
+
+    .btn:hover {
+      border-color: var(--ring-strong);
+      box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent), white 85%);
+    }
+
+    /* chips / badges */
+    .chip {
+      background: var(--chip);
+      border-color: var(--chip-border);
+      color: var(--muted);
+    }
+
+    .badge {
+      background: #eef2f8;
+      color: #3b4a6b;
+      border: 1px solid #d7deea;
+    }
+
+    .badge.ok {
+      background: #eaf7f0;
+      color: #166534;
+      border-color: #cde8d9;
+    }
+
+    .badge.err {
+      background: #fdecec;
+      color: #7f1d1d;
+      border-color: #f6b4b4;
+    }
+
+    /* softer, consistent focus across the app */
+    :focus-visible {
+      outline: none;
+      border-color: var(--ring-strong);
+      box-shadow: 0 0 0 3px var(--ring);
+      border-radius: var(--radius);
+    }
+
+
+    /* ==============
    Base / Layout
    ============== */
-*{ box-sizing: border-box; }
-html,body{ height:100%; }
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font: 16px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Roboto, Arial, "Noto Sans";
-  letter-spacing:.01em;
-}
+    * {
+      box-sizing: border-box;
+    }
 
-/* Typographic scale */
-h1{ font-size:15px; font-weight:650; margin:0; letter-spacing:.02em; }
-h2.section-title{ font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:0 0 8px; }
+    html,
+    body {
+      height: 100%;
+    }
 
-/* Scrollbars (webkit) */
-*::-webkit-scrollbar{ width:12px; height:12px; }
-*::-webkit-scrollbar-thumb{ background:var(--scroll-thumb); border-radius:8px; border:2px solid var(--scroll-track); }
-*::-webkit-scrollbar-track{ background:var(--scroll-track); }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font: 16px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Roboto, Arial, "Noto Sans";
+      letter-spacing: .01em;
+    }
 
-/* Smooth theme transitions */
-html, body, .card, .item, header, section, textarea, pre, input, select, .chip, .badge, details, .collapsible,
-#gutter, .gutter { transition: background-color var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition); }
+    /* Typographic scale */
+    h1 {
+      font-size: 15px;
+      font-weight: 650;
+      margin: 0;
+      letter-spacing: .02em;
+    }
 
-/* Focus ring */
-:focus-visible{
-  outline: 2px solid color-mix(in oklab, var(--accent), transparent 30%);
-  outline-offset: 2px;
-  border-radius: calc(var(--radius-sm) - 2px);
-}
+    h2.section-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      margin: 0 0 8px;
+    }
 
-/* Header / App bar */
-header{
-  display:flex; align-items:center; gap:12px;
-  padding:12px 16px;
-  background:var(--panel-raise);
-  border-bottom:1px solid var(--divider);
-  position:sticky; top:0; z-index:50;
-  box-shadow: var(--shadow-sm);
-}
-header .small{ color:var(--muted); }
+    /* Scrollbars (webkit) */
+    *::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+    }
 
-/* Split layout */
-main{ height: calc(100vh - 54px); position:relative; }
-#split{ display:flex; height:100%; width:100%; }
-#left, #right{ overflow:hidden; }
-#left{
-  flex:0 0 auto; min-width:280px; max-width:42vw;
-  display:flex; flex-direction:column;
-  background:var(--panel);
-  /* Always-visible hairline on left panel edge in case gutter collapses */
-  box-shadow: inset -1px 0 0 var(--divider);
-}
-#right{ flex:1 1 auto; min-width:0; overflow:auto; background:var(--panel-raise); }
+    *::-webkit-scrollbar-thumb {
+      background: var(--scroll-thumb);
+      border-radius: 8px;
+      border: 2px solid var(--scroll-track);
+    }
 
-/* Visible vertical separator (Split.js gutter) */
-.gutter{
-  width:10px !important; cursor:col-resize;
-  background: var(--gutter-idle);
-}
-.gutter:hover{ background: var(--gutter-hover); }
-.gutter.gutter-vertical{
-  height:8px; cursor:row-resize;
-  width:100% !important;
-  background: var(--gutter-idle);
-}
-.gutter.gutter-vertical:hover{
-  background: linear-gradient(to bottom, transparent, rgba(118,162,255,.35), transparent);
-}
+    *::-webkit-scrollbar-track {
+      background: var(--scroll-track);
+    }
 
-/* Left panel internals */
-#leftTop{ padding:25px; border-bottom:1px solid var(--divider); background:var(--panel-raise); }
-#leftSplit{ flex:1; display:flex; flex-direction:column; min-height:0; }
-.section-block{ display:flex; flex-direction:column; padding:12px; min-height:0; gap:10px; }
-.section-title{ font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+    /* Smooth theme transitions */
+    html,
+    body,
+    .card,
+    .item,
+    header,
+    section,
+    textarea,
+    pre,
+    input,
+    select,
+    .chip,
+    .badge,
+    details,
+    .collapsible,
+    #gutter,
+    .gutter {
+      transition: background-color var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition);
+    }
 
-/* Lists */
-.list{ display:flex; flex-direction:column; gap:8px; overflow:auto; min-height:0; padding:2px; }
-.item{
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding:10px;
-  box-shadow: var(--shadow-sm), var(--shadow-md);
-}
-.item:hover{ border-color: color-mix(in oklab, var(--accent), transparent 70%); }
-.item.is-active{ border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent), transparent 82%); }
-.row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    /* Focus ring */
+    :focus-visible {
+      outline: 2px solid color-mix(in oklab, var(--accent), transparent 30%);
+      outline-offset: 2px;
+      border-radius: calc(var(--radius-sm) - 2px);
+    }
 
-.small,.muted{ color:var(--muted) !important; }
+    /* Header / App bar */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--panel-raise);
+      border-bottom: 1px solid var(--divider);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: var(--shadow-sm);
+    }
 
-/* Chips & badges */
-.chip{
-  background:var(--chip);
-  border:1px solid var(--chip-border);
-  color:var(--text);
-  border-radius:12px;
-  padding:4px 8px;
-  display:inline-flex; align-items:center; gap:6px;
-  font-size:12px; font-weight:550;
-  letter-spacing:.02em;
-}
-.chip:hover{ border-color:var(--accent); box-shadow:0 0 0 2px color-mix(in oklab, var(--accent), transparent 82%); transform:translateY(-1px); }
-.chip.domain{ background: color-mix(in oklab, var(--chip), var(--accent) 10%); }
-.chip.applies{ background: color-mix(in oklab, var(--chip), var(--ok) 10%); }
+    header .small {
+      color: var(--muted);
+    }
 
-.badge{
-  display:inline-block; padding:3px 7px; border-radius:999px;
-  background: color-mix(in oklab, var(--chip), #000 0%);
-  color: color-mix(in oklab, var(--text), #fff 0%);
-  font-size:12px; font-weight:600; letter-spacing:.02em;
-  border:1px solid var(--chip-border);
-}
-.badge.ok{ background: var(--ok); color: #000;}
-.badge.err{ background: color-mix(in oklab, var(--danger), #000 70%); color:#ffe0e0; border-color:#4a1b1b; }
-.badge.witnessed{ background: var(--warn); color:#fff4dd; }
+    /* Split layout */
+    main {
+      height: calc(100vh - 54px);
+      position: relative;
+    }
 
-/* Cards */
-section{ display:flex; flex-direction:column; gap:14px; padding:14px; }
-.card{
-  background: var(--panel);
-  border:1px solid var(--border);
-  border-radius: var(--radius);
-  padding:12px;
-  box-shadow: var(--shadow-sm), var(--shadow-md);
-}
+    #split {
+      display: flex;
+      height: 100%;
+      width: 100%;
+    }
 
-/* Buttons */
-.btn{
-  padding:7px 12px;
-  border:1px solid var(--border);
-  border-radius:10px;
-  background:var(--btn-bg);
-  color:var(--btn-fg);
-  cursor:pointer;
-  font-weight:600;
-  letter-spacing:.02em;
-  box-shadow: var(--shadow-sm);
-}
-.btn.small{ font-size:13px; padding:4px 9px; border-radius:9px; }
-.btn:hover{ border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in oklab, var(--accent), transparent 85%); transform: translateY(-1px); }
-.btn:active{ transform: translateY(0); }
-.btn.primary{ background: color-mix(in oklab, var(--accent), #000 80%); border-color: var(--accent); }
-.btn.warn{ background: color-mix(in oklab, var(--danger), #571d1d 80%); color:#ffdcdc; }
+    #left,
+    #right {
+      overflow: hidden;
+    }
 
-/* Inputs */
-select, input[type="text"]{
-  background:var(--input-bg);
-  border: 2px solid #444;
-  color:var(--text);
-  padding:8px 10px;
-  border-radius:10px;
-  font-size:14px;
-}
-input[type="checkbox"]{ accent-color: var(--accent); }
+    #left {
+      flex: 0 0 auto;
+      min-width: 280px;
+      max-width: 42vw;
+      display: flex;
+      flex-direction: column;
+      background: var(--panel);
+      /* Always-visible hairline on left panel edge in case gutter collapses */
+      box-shadow: inset -1px 0 0 var(--divider);
+    }
 
-/* Textareas & pre */
-textarea, pre{
-  width:100%; min-height:240px;
-  background:var(--textarea-bg);
-  color:var(--textarea-fg);
-  border:1px solid var(--border);
-  border-radius: var(--radius);
-  padding:12px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-  font-size:15.5px; line-height:1.55; tab-size:2;
-  white-space:pre-wrap; word-break:break-word;
-}
+    #right {
+      flex: 1 1 auto;
+      min-width: 0;
+      overflow: auto;
+      background: var(--panel-raise);
+    }
 
-/* Terminal-style (prompt + LLM output) */
-.syscode{
-  background:var(--code-bg) !important;
-  color:var(--code-fg) !important;
-  border:1px solid var(--code-border) !important;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
-  caret-color:var(--code-fg);
-}
-.syscode::selection{ background: rgba(122,162,255,.25); }
-textarea.syscode{ min-height:240px; resize:vertical; white-space:pre; overflow:auto; }
+    /* Visible vertical separator (Split.js gutter) */
+    .gutter {
+      width: 10px !important;
+      cursor: col-resize;
+      background: var(--gutter-idle);
+    }
 
-/* Details / collapsibles */
-details.domain-group{
-  border:1px solid var(--border);
-  border-radius:10px;
-  background:var(--panel);
-  box-shadow: var(--shadow-sm);
-  padding:6px 6px 8px;
-}
-details.domain-group + details.domain-group{ margin-top:8px; }
-details.domain-group > summary{
-  list-style:none; display:flex; align-items:center; gap:10px;
-  cursor:pointer; user-select:none;
-  padding:8px 10px;
-  border-radius:8px;
-  background:var(--panel-raise);
-  border:1px solid var(--border);
-}
-details.domain-group > summary::-webkit-details-marker{ display:none; }
-.domain-title{ font-weight:700; letter-spacing:.02em; }
-.domain-spacer{ flex:1; }
-.domain-body{ margin-top:8px; display:flex; flex-direction:column; gap:8px; }
+    .gutter:hover {
+      background: var(--gutter-hover);
+    }
 
-/* Collapsible content blocks (panels) */
-details.panel-collapsible{
-  display:flex; flex-direction:column; min-height:0; max-height:100%;
-  border:1px solid var(--border); border-radius:10px;
-  background:var(--panel);
-  box-shadow: var(--shadow-sm);
-}
-details.panel-collapsible > summary{
-  list-style:none; cursor:pointer; user-select:none;
-  padding:10px 12px;
-  border-bottom:1px solid var(--divider);
-  border-radius:10px; background:var(--panel-raise);
-  font-weight:650;
-}
-details.panel-collapsible > summary::-webkit-details-marker{ display:none; }
-details.panel-collapsible > .list{
-  flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden; padding:8px;
-}
+    .gutter.gutter-vertical {
+      height: 8px;
+      cursor: row-resize;
+      width: 100% !important;
+      background: var(--gutter-idle);
+    }
 
-/* Bundles wrap variants */
-#bundlesWrap details.panel-collapsible{ flex:1 1 0; }
-#bundlesWrap details.panel-collapsible > summary{ flex:0 0 auto; }
-#bundlesWrap details.panel-collapsible > .list{ flex:1 1 0; }
+    .gutter.gutter-vertical:hover {
+      background: linear-gradient(to bottom, transparent, rgba(118, 162, 255, .35), transparent);
+    }
 
-/* Non-<details> collapsible */
-#bundlesWrap .collapsible{
-  display:flex; flex-direction:column; flex:1 1 0; min-height:0;
-  border:1px solid var(--border);
-  border-radius:10px;
-  background:var(--panel);
-  box-shadow: var(--shadow-sm);
-}
-#bundlesWrap .collapsible-header{
-  display:flex; align-items:center; gap:8px;
-  padding:10px 12px;
-  background:var(--panel-raise);
-  border-bottom:1px solid var(--divider);
-  border-radius:10px 10px 0 0;
-  font-weight:650;
-}
-#bundlesWrap .collapsible-body{
-  display:flex; flex-direction:column; flex:1 1 0; min-height:0;
-  border-radius:0 0 10px 10px;
-}
-#bundlesWrap .collapsible-body[hidden]{ display:none; }
-#bundlesWrap #bundles.list{
-  display:flex; flex-direction:column; gap:8px;
-  flex:1 1 0; min-height:0; overflow-y:auto; overflow-x:hidden; padding:8px;
-}
+    /* Left panel internals */
+    #leftTop {
+      padding: 25px;
+      border-bottom: 1px solid var(--divider);
+      background: var(--panel-raise);
+    }
 
-/* Utility */
-.clamp-2{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-.row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    #leftSplit {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
 
-/* Modal */
-#modal, #llmModal{
-  position:fixed; inset:0; background:rgba(0,0,0,.48);
-  display:none; align-items:center; justify-content:center; z-index:100;
-  backdrop-filter: blur(2px);
-}
-#modal .modal-inner, #llmModal .modal-inner{
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:12px;
-  max-width:900px; width:92%;
-  max-height:80vh; overflow:auto; padding:14px;
-  box-shadow: var(--shadow-lg);
-}
-#llmModal .form-row{ display:flex; flex-direction:column; gap:8px; margin:12px 0; }
-#llmModal label{ font-weight:600; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
-#llmModal textarea{ min-height:120px; }
-#llmModal .hint{ font-size:12px; color:var(--muted); margin-top:4px; }
+    .section-block {
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+      min-height: 0;
+      gap: 10px;
+    }
 
-/* Toast */
-.toast{
-  position:fixed; bottom:20px; right:20px;
-  background:var(--panel-raise);
-  color:var(--text);
-  padding:10px 14px; border-radius:10px;
-  border:1px solid var(--border);
-  z-index:99; box-shadow: var(--shadow-md);
-}
+    .section-title {
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
 
-/* Hover affordances */
-.item:hover, .chip:hover, .btn:hover, details.panel-collapsible > summary:hover{
-  transform: translateY(-1px);
-}
+    /* Lists */
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow: auto;
+      min-height: 0;
+      padding: 2px;
+    }
 
-/* Normalize radii on interactive blocks */
-.item, .chip, .badge, .btn, .card, pre, textarea{
-  border-radius: var(--radius);
-}
+    .item {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      box-shadow: var(--shadow-sm), var(--shadow-md);
+    }
+
+    .item:hover {
+      border-color: color-mix(in oklab, var(--accent), transparent 70%);
+    }
+
+    .item.is-active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent), transparent 82%);
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .small,
+    .muted {
+      color: var(--muted) !important;
+    }
+
+    /* Chips & badges */
+    .chip {
+      background: var(--chip);
+      border: 1px solid var(--chip-border);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 4px 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 550;
+      letter-spacing: .02em;
+    }
+
+    .chip:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent), transparent 82%);
+      transform: translateY(-1px);
+    }
+
+    .chip.domain {
+      background: color-mix(in oklab, var(--chip), var(--accent) 10%);
+    }
+
+    .chip.applies {
+      background: color-mix(in oklab, var(--chip), var(--ok) 10%);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: color-mix(in oklab, var(--chip), #000 0%);
+      color: color-mix(in oklab, var(--text), #fff 0%);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .02em;
+      border: 1px solid var(--chip-border);
+    }
+
+    .badge.ok {
+      background: var(--ok);
+      color: #000;
+    }
+
+    .badge.err {
+      background: color-mix(in oklab, var(--danger), #000 70%);
+      color: #ffe0e0;
+      border-color: #4a1b1b;
+    }
+
+    .badge.witnessed {
+      background: var(--warn);
+      color: #fff4dd;
+    }
+
+    /* Cards */
+    section {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 14px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      box-shadow: var(--shadow-sm), var(--shadow-md);
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 7px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--btn-bg);
+      color: var(--btn-fg);
+      cursor: pointer;
+      font-weight: 600;
+      letter-spacing: .02em;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn.small {
+      font-size: 13px;
+      padding: 4px 9px;
+      border-radius: 9px;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent), transparent 85%);
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn.primary {
+      background: color-mix(in oklab, var(--accent), #000 80%);
+      border-color: var(--accent);
+    }
+
+    .btn.warn {
+      background: color-mix(in oklab, var(--danger), #571d1d 80%);
+      color: #ffdcdc;
+    }
+
+    /* Inputs */
+    select,
+    input[type="text"] {
+      background: var(--input-bg);
+      border: 2px solid #444;
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    input[type="checkbox"] {
+      accent-color: var(--accent);
+    }
+
+    /* Textareas & pre */
+    textarea,
+    pre {
+      width: 100%;
+      min-height: 240px;
+      background: var(--textarea-bg);
+      color: var(--textarea-fg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 15.5px;
+      line-height: 1.55;
+      tab-size: 2;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    /* Terminal-style (prompt + LLM output) */
+    .syscode {
+      background: var(--code-bg) !important;
+      color: var(--code-fg) !important;
+      border: 1px solid var(--code-border) !important;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .02);
+      caret-color: var(--code-fg);
+    }
+
+    .syscode::selection {
+      background: rgba(122, 162, 255, .25);
+    }
+
+    textarea.syscode {
+      min-height: 240px;
+      resize: vertical;
+      white-space: pre;
+      overflow: auto;
+    }
+
+    /* Details / collapsibles */
+    details.domain-group {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--panel);
+      box-shadow: var(--shadow-sm);
+      padding: 6px 6px 8px;
+    }
+
+    details.domain-group+details.domain-group {
+      margin-top: 8px;
+    }
+
+    details.domain-group>summary {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: var(--panel-raise);
+      border: 1px solid var(--border);
+    }
+
+    details.domain-group>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .domain-title {
+      font-weight: 700;
+      letter-spacing: .02em;
+    }
+
+    .domain-spacer {
+      flex: 1;
+    }
+
+    .domain-body {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Collapsible content blocks (panels) */
+    details.panel-collapsible {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      max-height: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--panel);
+      box-shadow: var(--shadow-sm);
+    }
+
+    details.panel-collapsible>summary {
+      list-style: none;
+      cursor: pointer;
+      user-select: none;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--divider);
+      border-radius: 10px;
+      background: var(--panel-raise);
+      font-weight: 650;
+    }
+
+    details.panel-collapsible>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.panel-collapsible>.list {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 8px;
+    }
+
+    /* Bundles wrap variants */
+    #bundlesWrap details.panel-collapsible {
+      flex: 1 1 0;
+    }
+
+    #bundlesWrap details.panel-collapsible>summary {
+      flex: 0 0 auto;
+    }
+
+    #bundlesWrap details.panel-collapsible>.list {
+      flex: 1 1 0;
+    }
+
+    /* Non-<details> collapsible */
+    #bundlesWrap .collapsible {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 0;
+      min-height: 0;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--panel);
+      box-shadow: var(--shadow-sm);
+    }
+
+    #bundlesWrap .collapsible-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      background: var(--panel-raise);
+      border-bottom: 1px solid var(--divider);
+      border-radius: 10px 10px 0 0;
+      font-weight: 650;
+    }
+
+    #bundlesWrap .collapsible-body {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 0;
+      min-height: 0;
+      border-radius: 0 0 10px 10px;
+    }
+
+    #bundlesWrap .collapsible-body[hidden] {
+      display: none;
+    }
+
+    #bundlesWrap #bundles.list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1 1 0;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 8px;
+    }
+
+    /* Utility */
+    .clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    /* Modal */
+    #modal,
+    #llmModal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .48);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      backdrop-filter: blur(2px);
+    }
+
+    #modal .modal-inner,
+    #llmModal .modal-inner {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      max-width: 900px;
+      width: 92%;
+      max-height: 80vh;
+      overflow: auto;
+      padding: 14px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    #llmModal .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    #llmModal label {
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    #llmModal textarea {
+      min-height: 120px;
+    }
+
+    #llmModal .hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--panel-raise);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      z-index: 99;
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Hover affordances */
+    .item:hover,
+    .chip:hover,
+    .btn:hover,
+    details.panel-collapsible>summary:hover {
+      transform: translateY(-1px);
+    }
+
+    /* Normalize radii on interactive blocks */
+    .item,
+    .chip,
+    .badge,
+    .btn,
+    .card,
+    pre,
+    textarea {
+      border-radius: var(--radius);
+    }
 
 
-.label-with-help{display:flex;align-items:center;gap:8px}
-.icon-btn{
-  border:1px solid var(--border);
-  background:var(--btn-bg);
-  color:var(--text);
-  width:28px;height:28px;line-height:26px;
-  border-radius:8px;text-align:center;cursor:pointer;
-}
-.icon-btn:hover{border-color:var(--accent);
-  box-shadow:0 0 0 3px color-mix(in oklab,var(--accent),transparent 85%)}
-#profileHelp .muted{color:var(--muted)}
-#profileDesc{margin-left:.5ch}
+    .label-with-help {
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
 
-.help-box{
-  margin-top:6px;
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  padding:8px 10px;
-}
-.help-box > summary{
-  list-style:none;
-  cursor:pointer;
-  font-weight:600;
-  color:var(--muted);
-  margin:-2px 0 4px 0;
-}
-.help-box[open] > summary{ margin-bottom:6px; }
+    .icon-btn {
+      border: 1px solid var(--border);
+      background: var(--btn-bg);
+      color: var(--text);
+      width: 28px;
+      height: 28px;
+      line-height: 26px;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+    }
 
-.icon-btn{
-  display:inline-flex; align-items:center; justify-content:center;
-  width:28px; height:28px; border-radius:8px; border:1px solid var(--border);
-  background:var(--btn-bg); color:var(--text); font-weight:700;
-  cursor:pointer; line-height:1; padding:0;
-}
-.icon-btn:hover{ border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in oklab, var(--accent), transparent 85%); }
+    .icon-btn:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent), transparent 85%)
+    }
 
-.help-box{
-  margin-top:8px; background:var(--panel); border:1px solid var(--border);
-  border-radius:var(--radius); padding:10px 12px;
-}
-.help-title{ font-weight:600; margin-bottom:6px; }
-.muted{ color:var(--muted); }
+    #profileHelp .muted {
+      color: var(--muted)
+    }
 
-/* Layout */
-.toolbar {
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-.toolbar .title-wrap { display:flex; flex-direction:column; }
-.toolbar-actions {
-  margin-left:auto;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-}
+    #profileDesc {
+      margin-left: .5ch
+    }
 
-/* Groups = compact button clusters */
-.group {
-  display:flex;
-  align-items:center;
-  gap:4px;
-  padding:2px;
-  border:1px solid var(--border, #3a3f55);
-  border-radius:10px;
-  background:var(--panel, rgba(127,127,127,0.08));
-}
+    .help-box {
+      margin-top: 6px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 8px 10px;
+    }
 
-/* Icon-sized buttons */
-.btn.icon { padding:6px 8px; min-width:auto; }
+    .help-box>summary {
+      list-style: none;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--muted);
+      margin: -2px 0 4px 0;
+    }
 
-/* Dropdown menu built from <details> */
-.menu { position:relative; }
-.menu > summary { list-style:none; cursor:pointer; }
-.menu > summary::-webkit-details-marker { display:none; }
-.menu[open] .menu-list { display:block; }
+    .help-box[open]>summary {
+      margin-bottom: 6px;
+    }
 
-.menu-list{
-  display:none;
-  position:absolute;
-  top:100%;
-  right:0;
-  margin-top:6px;
-  padding:6px;
-  background:var(--bgElevated, var(--bg));
-  border:1px solid var(--border, #3a3f55);
-  border-radius:12px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.35);
-  z-index:1000;
-  min-width:220px;
-}
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--btn-bg);
+      color: var(--text);
+      font-weight: 700;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0;
+    }
 
-.menu-item{
-  display:block;
-  width:100%;
-  padding:8px 10px;
-  text-align:left;
-  background:none;
-  border:0;
-  font:inherit;
-  color:inherit;
-  cursor:pointer;
-}
-.menu-item:hover{ background:rgba(127,127,127,0.12); border-radius:8px; }
-.menu-item.warn{ color:var(--danger, #e06c75); }
+    .icon-btn:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent), transparent 85%);
+    }
 
-.menu-field{ padding:4px 6px 8px; }
-.menu-row{ display:flex; gap:6px; padding:4px 6px; }
-.menu-sep{
-  border:0; height:1px; margin:6px 0;
-  background:linear-gradient(to right, transparent, var(--border, #3a3f55), transparent);
-}
+    .help-box {
+      margin-top: 8px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+    }
 
-/* Small muted label */
-.small.muted{ opacity:0.7; font-size:12px; }
+    .help-title {
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
 
+    .muted {
+      color: var(--muted);
+    }
 
-</style>
+    /* Layout */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .toolbar .title-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .toolbar-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Groups = compact button clusters */
+    .group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px;
+      border: 1px solid var(--border, #3a3f55);
+      border-radius: 10px;
+      background: var(--panel, rgba(127, 127, 127, 0.08));
+    }
+
+    /* Icon-sized buttons */
+    .btn.icon {
+      padding: 6px 8px;
+      min-width: auto;
+    }
+
+    /* Dropdown menu built from <details> */
+    .menu {
+      position: relative;
+    }
+
+    .menu>summary {
+      list-style: none;
+      cursor: pointer;
+    }
+
+    .menu>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .menu[open] .menu-list {
+      display: block;
+    }
+
+    .menu-list {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 6px;
+      padding: 6px;
+      background: var(--bgElevated, var(--bg));
+      border: 1px solid var(--border, #3a3f55);
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      z-index: 1000;
+      min-width: 220px;
+    }
+
+    .menu-item {
+      display: block;
+      width: 100%;
+      padding: 8px 10px;
+      text-align: left;
+      background: none;
+      border: 0;
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .menu-item:hover {
+      background: rgba(127, 127, 127, 0.12);
+      border-radius: 8px;
+    }
+
+    .menu-item.warn {
+      color: var(--danger, #e06c75);
+    }
+
+    .menu-field {
+      padding: 4px 6px 8px;
+    }
+
+    .menu-row {
+      display: flex;
+      gap: 6px;
+      padding: 4px 6px;
+    }
+
+    .menu-sep {
+      border: 0;
+      height: 1px;
+      margin: 6px 0;
+      background: linear-gradient(to right, transparent, var(--border, #3a3f55), transparent);
+    }
+
+    /* Small muted label */
+    .small.muted {
+      opacity: 0.7;
+      font-size: 12px;
+    }
+  </style>
 
 
   <!-- Prism / Split / Sortable -->
@@ -674,13 +1154,13 @@ details.panel-collapsible > .list{
   <!-- split_js: sha256={{ digests['split_js'] }} -->
   <!-- sortable_js: sha256={{ digests['sortable_js'] }} -->
 
-  <style>{{ prism_css_inline | safe }}</style>
-  
-  <script>{{ prism_core_inline | safe }}</script>
-  <script>{{ prism_yaml_inline | safe }}</script>
-  <script>{{ prism_json_inline | safe }}</script>
-  <script>{{ split_js_inline | safe }}</script>
-  <script>{{ sortable_js_inline | safe }}</script>
+  <style>{{prism_css_inline | safe}}</style>
+
+  <script>{{prism_core_inline | safe}}</script>
+  <script>{{prism_yaml_inline | safe}}</script>
+  <script>{{prism_json_inline | safe}}</script>
+  <script>{{split_js_inline | safe}}</script>
+  <script>{{sortable_js_inline | safe}}</script>
   {% else %}
   <!-- CDN fallback (deterministic, pinned) -->
   <link rel="stylesheet" href="{{ cdn_urls['prism_css'] }}">
@@ -694,59 +1174,60 @@ details.panel-collapsible > .list{
 </head>
 
 <body>
-<header class="toolbar">
-  <div class="title-wrap">
-    <h1>Truth Capsule Viewer & Prompt Composer</h1>
-    <div class="small" style="font-size:12px;margin-top:4px;">Generated {{ generated_at }}</div>
-  </div>
-
-  <nav class="toolbar-actions">
-
-    <!-- Group 1: Prompt (primary = Copy; extras in dropdown) -->
-    <div class="group">
-      <button style="display:none;" class="btn" id="composeBtn" title="Compose (Ctrl/Cmd+Enter)">🟢 Compose</button>
-      <button class="btn" id="copyBtn" title="Copy prompt">📋 Copy</button>
-      <details class="menu">
-        <summary class="btn icon" title="More prompt actions">▾</summary>
-        <div class="menu-list">
-          <button class="menu-item" id="dlBtn" title="Download prompt">⬇️ Download Prompt</button>
-          <button class="menu-item" id="copyLlmBtn" title="Copy LLM command">💻 Copy LLM Bash</button>
-          <button class="menu-item" id="shareLinkBtn" title="Copy shareable link">🔗 Share Deeplink</button>
-        </div>
-      </details>
+  <header class="toolbar">
+    <div class="title-wrap">
+      <h1>Truth Capsule Viewer & Prompt Composer</h1>
+      <div class="small" style="font-size:12px;margin-top:4px;">Generated {{ generated_at }}</div>
     </div>
 
-    <!-- Group 2: Manifests (primary = Save; dropdown holds Select, Load, Delete, JSON I/O) -->
-    <div class="group">
-      <button class="btn" id="manifestSaveBtn" title="Save manifest to this browser">💾 Save</button>
-      <details class="menu">
-        <summary class="btn icon" title="More manifest actions">▾</summary>
-        <div class="menu-list" style="min-width:280px">
-          <div class="menu-field">
-            <label class="small muted" for="manifestSelect" style="display:block;margin-bottom:4px;">Saved manifests</label>
-            <select id="manifestSelect" title="Saved manifests" style="width:100%"></select>
+    <nav class="toolbar-actions">
+
+      <!-- Group 1: Prompt (primary = Copy; extras in dropdown) -->
+      <div class="group">
+        <button style="display:none;" class="btn" id="composeBtn" title="Compose (Ctrl/Cmd+Enter)">🟢 Compose</button>
+        <button class="btn" id="copyBtn" title="Copy prompt">📋 Copy</button>
+        <details class="menu">
+          <summary class="btn icon" title="More prompt actions">▾</summary>
+          <div class="menu-list">
+            <button class="menu-item" id="dlBtn" title="Download prompt">⬇️ Download Prompt</button>
+            <button class="menu-item" id="copyLlmBtn" title="Copy LLM command">💻 Copy LLM Bash</button>
+            <button class="menu-item" id="shareLinkBtn" title="Copy shareable link">🔗 Share Deeplink</button>
           </div>
-          <div class="menu-row">
-            <button class="menu-item" id="manifestLoadBtn" title="Load selected manifest">📂 Load</button>
-            <button class="menu-item warn" id="manifestDeleteBtn" title="Delete selected manifest">🗑️ Delete</button>
+        </details>
+      </div>
+
+      <!-- Group 2: Manifests (primary = Save; dropdown holds Select, Load, Delete, JSON I/O) -->
+      <div class="group">
+        <button class="btn" id="manifestSaveBtn" title="Save manifest to this browser">💾 Save</button>
+        <details class="menu">
+          <summary class="btn icon" title="More manifest actions">▾</summary>
+          <div class="menu-list" style="min-width:280px">
+            <div class="menu-field">
+              <label class="small muted" for="manifestSelect" style="display:block;margin-bottom:4px;">Saved
+                manifests</label>
+              <select id="manifestSelect" title="Saved manifests" style="width:100%"></select>
+            </div>
+            <div class="menu-row">
+              <button class="menu-item" id="manifestLoadBtn" title="Load selected manifest">📂 Load</button>
+              <button class="menu-item warn" id="manifestDeleteBtn" title="Delete selected manifest">🗑️ Delete</button>
+            </div>
+            <hr class="menu-sep">
+            <button class="menu-item" id="dlJsonBtn" title="Download manifest JSON">⬇️ Download JSON Manifest</button>
+            <button class="menu-item" id="loadJsonBtn" title="Load manifest JSON">⬆️ Load JSON Manifest</button>
           </div>
-          <hr class="menu-sep">
-          <button class="menu-item" id="dlJsonBtn" title="Download manifest JSON">⬇️ Download JSON Manifest</button>
-          <button class="menu-item" id="loadJsonBtn" title="Load manifest JSON">⬆️ Load JSON Manifest</button>
-        </div>
-      </details>
-    </div>
+        </details>
+      </div>
 
-    <!-- Group 3: Tools (quick actions) -->
-    <div class="group">
-      <button class="btn icon" id="validateAllBtn" title="Validate digests for selected">🔐</button>
-      <button class="btn icon warn" id="clearBtn" title="Clear selection">🧹</button>
-    </div>
+      <!-- Group 3: Tools (quick actions) -->
+      <div class="group">
+        <button class="btn icon" id="validateAllBtn" title="Validate digests for selected">🔐</button>
+        <button class="btn icon warn" id="clearBtn" title="Clear selection">🧹</button>
+      </div>
 
-    <!-- Theme -->
-    <button class="btn icon" id="themeBtn" title="Toggle theme" aria-label="Toggle color theme">🌙</button>
-  </nav>
-</header>
+      <!-- Theme -->
+      <button class="btn icon" id="themeBtn" title="Toggle theme" aria-label="Toggle color theme">🌙</button>
+    </nav>
+  </header>
 
 
   <main>
@@ -754,29 +1235,27 @@ details.panel-collapsible > .list{
       <!-- LEFT COLUMN -->
       <aside id="left">
         <div id="leftTop">
-  <input id="search" type="text" placeholder="Filter loaded capsules by id/title/domain/statement…" style="width:100%">
 
-<div class="row" style="margin-top:10px; align-items:center; gap:8px">
-  <label for="profiles" class="section-title">PROFILES</label>
-  <button id="profileInfo" class="icon-btn" type="button" aria-haspopup="dialog" aria-expanded="false" title="What are Profiles?">?</button>
-  <select id="profiles"></select>
-</div>
+          <div class="row" style="margin-top:10px; align-items:center; gap:8px">
+            <label for="profiles" class="section-title">PROFILES</label>
+            <button id="profileInfo" class="icon-btn" type="button" aria-haspopup="dialog" aria-expanded="false"
+              title="What are Profiles?">?</button>
+            <select id="profiles"></select>
+          </div>
 
-<div id="profileDesc" class="small muted" style="margin-top:4px"></div>
+          <div id="profileDesc" class="small" style="margin-top:4px"></div>
 
-<div id="profileHelp" class="help-box" hidden>
-  <div class="help-title">What are Profiles?</div>
-  <p class="small">
-    Profiles are presets for a specific use-case (e.g., CI Judge, Code Patch, PR Review).
-    A profile sets the basic <em>system prompt</em> and which <em>capsule properties/policies</em> are applied (visible).
-    Switching profiles does not modify your capsule library; it only changes the composed rules for this run.
-  </p>
-</div>
+          <div id="profileHelp" class="help-box" hidden>
+            <div class="help-title">What are Profiles?</div>
+            <p class="small">
+              Profiles are presets for a specific use-case (e.g., CI Judge, Code Patch, PR Review).
+              A profile sets the basic <em>system prompt</em> and which <em>capsule properties/policies</em> are applied
+              (visible).
+              Switching profiles does not modify your capsule library; it only changes the composed rules for this run.
+            </p>
+          </div>
 
-</div>
-
-
-
+        </div>
 
         <!-- RESIZABLE HORIZONTAL SPLIT: Bundles ⟷ Capsules -->
         <div id="leftSplit">
@@ -793,8 +1272,6 @@ details.panel-collapsible > .list{
             </div>
           </div>
 
-
-
           <div id="capsulesWrap" class="section-block">
             <div style="padding-left:12px; padding-right:12px;" class="section-title">
               CAPSULES (<span id="capsulesCount">0</span>)
@@ -803,6 +1280,8 @@ details.panel-collapsible > .list{
                 <button class="btn small" id="collapseAllBtn">Collapse all</button>
               </span>
             </div>
+            <input id="search" type="text" placeholder="Filter loaded capsules by id/title/domain/statement…"
+            style="margin-left: 12px; max-width:432px; width:100%">
             <div id="capsules" class="list"></div>
           </div>
         </div>
@@ -886,7 +1365,8 @@ details.panel-collapsible > .list{
       </div>
 
       <div class="form-row">
-        <label for="llm_preview">Generated shell command: (⚠️ <u>always sanity check what you execute in your shell!</u>)</label>
+        <label for="llm_preview">Generated shell command: (⚠️ <u>always sanity check what you execute in your
+            shell!</u>)</label>
         <textarea id="llm_preview" readonly
           style="min-height:200px;font-family:monospace;font-size:12px;background:var(--bg);color:var(--text)"></textarea>
         <div class="hint">This is what will be copied to your clipboard</div>
@@ -928,49 +1408,49 @@ details.panel-collapsible > .list{
 
 
 
-        // ---- Theme Controller ----
-        (function themeController() {
-          const STORAGE_KEY = 'tc_theme'; // 'light' | 'dark'
-          const root = document.documentElement;
+      // ---- Theme Controller ----
+      (function themeController() {
+        const STORAGE_KEY = 'tc_theme'; // 'light' | 'dark'
+        const root = document.documentElement;
 
-          function apply(theme) {
-            if (theme === 'light') {
-              root.setAttribute('data-theme', 'light');
-              $('themeBtn').textContent = '☀️';
-              $('themeBtn').setAttribute('aria-label', 'Switch to dark mode');
-            } else {
-              root.setAttribute('data-theme', 'dark');
-              $('themeBtn').textContent = '🌙';
-              $('themeBtn').setAttribute('aria-label', 'Switch to light mode');
-            }
-          }
-
-          // initial theme: saved → system → dark fallback
-          const saved = localStorage.getItem(STORAGE_KEY);
-          if (saved === 'light' || saved === 'dark') {
-            apply(saved);
+        function apply(theme) {
+          if (theme === 'light') {
+            root.setAttribute('data-theme', 'light');
+            $('themeBtn').textContent = '☀️';
+            $('themeBtn').setAttribute('aria-label', 'Switch to dark mode');
           } else {
-            const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            apply(systemDark ? 'dark' : 'light');
+            root.setAttribute('data-theme', 'dark');
+            $('themeBtn').textContent = '🌙';
+            $('themeBtn').setAttribute('aria-label', 'Switch to light mode');
           }
+        }
 
-          // respond to future system changes if user hasn't chosen
-          const mql = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
-          if (!saved && mql && mql.addEventListener) {
-            mql.addEventListener('change', e => apply(e.matches ? 'dark' : 'light'));
-          }
+        // initial theme: saved → system → dark fallback
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved === 'light' || saved === 'dark') {
+          apply(saved);
+        } else {
+          const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          apply(systemDark ? 'dark' : 'light');
+        }
 
-          // wire up button
-          window.addEventListener('DOMContentLoaded', () => {
-            const btn = document.getElementById('themeBtn');
-            if (!btn) return;
-            btn.addEventListener('click', () => {
-              const next = (root.getAttribute('data-theme') === 'dark') ? 'light' : 'dark';
-              localStorage.setItem(STORAGE_KEY, next);
-              apply(next);
-            });
+        // respond to future system changes if user hasn't chosen
+        const mql = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+        if (!saved && mql && mql.addEventListener) {
+          mql.addEventListener('change', e => apply(e.matches ? 'dark' : 'light'));
+        }
+
+        // wire up button
+        window.addEventListener('DOMContentLoaded', () => {
+          const btn = document.getElementById('themeBtn');
+          if (!btn) return;
+          btn.addEventListener('click', () => {
+            const next = (root.getAttribute('data-theme') === 'dark') ? 'light' : 'dark';
+            localStorage.setItem(STORAGE_KEY, next);
+            apply(next);
           });
-        })();
+        });
+      })();
 
       // persist domain open/closed state across renders + reloads
       STATE.domainOpen = JSON.parse(localStorage.getItem('tc_domain_open') || '{}');
@@ -993,30 +1473,30 @@ details.panel-collapsible > .list{
       // Bundles open/closed state
       STATE.bundlesOpen = (localStorage.getItem('tc_bundles_open') !== '0'); // default open
 
-      function setBundlesOpen(open){
+      function setBundlesOpen(open) {
         STATE.bundlesOpen = !!open;
         localStorage.setItem('tc_bundles_open', STATE.bundlesOpen ? '1' : '0');
         const body = document.getElementById('bundlesBody');
-        const btn  = document.getElementById('bundlesToggle');
+        const btn = document.getElementById('bundlesToggle');
         if (!body || !btn) return;
-        if (STATE.bundlesOpen){
+        if (STATE.bundlesOpen) {
           body.hidden = false;
           btn.textContent = 'Hide';
-          btn.setAttribute('aria-expanded','true');
+          btn.setAttribute('aria-expanded', 'true');
         } else {
           body.hidden = true;
           btn.textContent = 'Show';
-          btn.setAttribute('aria-expanded','false');
+          btn.setAttribute('aria-expanded', 'false');
         }
       }
 
-      function initBundlesCollapsibleSimple(){
+      function initBundlesCollapsibleSimple() {
         const btn = document.getElementById('bundlesToggle');
         if (!btn) return;
         setBundlesOpen(STATE.bundlesOpen);      // apply initial state
         btn.onclick = () => setBundlesOpen(!STATE.bundlesOpen);
       }
-    
+
 
       /* Toast */
       function toast(msg) {
@@ -1116,50 +1596,50 @@ details.panel-collapsible > .list{
 
       /* ------------ Renderers ------------ */
       function renderProfiles() {
-  const sel    = $('profiles');
-  const descEl = $('profileDesc');
-  const pmap   = DATA.profiles || {};
-  const keys   = Object.keys(pmap).sort();
+        const sel = $('profiles');
+        const descEl = $('profileDesc');
+        const pmap = DATA.profiles || {};
+        const keys = Object.keys(pmap).sort();
 
-  // rebuild options
-  sel.textContent = '';
-  for (const k of keys) {
-    const p = pmap[k] || {};
-    const o = document.createElement('option');
-    o.value = k;
-    o.textContent = (p.title || k) + ' (' + (p.version || '1.0.0') + ')';
-    o.dataset.desc = p.description || '';
-    sel.appendChild(o);
-  }
+        // rebuild options
+        sel.textContent = '';
+        for (const k of keys) {
+          const p = pmap[k] || {};
+          const o = document.createElement('option');
+          o.value = k;
+          o.textContent = (p.title || k) + ' (' + (p.version || '1.0.0') + ')';
+          o.dataset.desc = p.description || '';
+          sel.appendChild(o);
+        }
 
-  // Choose target — IMPORTANT: prefer STATE.profile (e.g., set by importState)
-  const saved = localStorage.getItem('tc_profile');
-  let target =
-    (STATE.profile && pmap[STATE.profile]) ? STATE.profile :
-    (saved && pmap[saved]) ? saved :
-    (sel.value && pmap[sel.value]) ? sel.value :
-    (keys[0] || '');
+        // Choose target  -  IMPORTANT: prefer STATE.profile (e.g., set by importState)
+        const saved = localStorage.getItem('tc_profile');
+        let target =
+          (STATE.profile && pmap[STATE.profile]) ? STATE.profile :
+            (saved && pmap[saved]) ? saved :
+              (sel.value && pmap[sel.value]) ? sel.value :
+                (keys[0] || '');
 
-  sel.value = target;
-  STATE.profile = target;
+        sel.value = target;
+        STATE.profile = target;
 
-  // description
-  if (descEl) {
-    const p0 = pmap[target] || {};
-    descEl.textContent = p0.description ? ('— ' + p0.description) : '';
-  }
+        // description
+        if (descEl) {
+          const p0 = pmap[target] || {};
+          descEl.textContent = p0.description ? (' -  ' + p0.description) : '';
+        }
 
-  // change handler (unchanged)
-  sel.onchange = () => {
-    STATE.profile = sel.value;
-    const p = pmap[STATE.profile] || {};
-    if (descEl) descEl.textContent = p.description ? ('— ' + p.description) : '';
-    if (typeof compose === 'function') compose();
-  };
+        // change handler (unchanged)
+        sel.onchange = () => {
+          STATE.profile = sel.value;
+          const p = pmap[STATE.profile] || {};
+          if (descEl) descEl.textContent = p.description ? (' -  ' + p.description) : '';
+          if (typeof compose === 'function') compose();
+        };
 
-  // Fire one change event to initialize downstream (no fake toggle)
-  sel.dispatchEvent(new Event('change', { bubbles: true }));
-}
+        // Fire one change event to initialize downstream (no fake toggle)
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+      }
 
 
       function capsuleRow(c, id, opts = {}) {
@@ -1387,7 +1867,7 @@ details.panel-collapsible > .list{
           const handle = document.createElement('span'); handle.className = 'chip drag'; handle.textContent = '☰'; row.appendChild(handle);
           const ttl = document.createElement('div');
           ttl.className = 'title';
-          ttl.innerHTML = esc(c.title || id) + ' <span class="muted">— ' + esc(c.domain || '') + '</span>';
+          ttl.innerHTML = esc(c.title || id) + ' <span class="muted"> -  ' + esc(c.domain || '') + '</span>';
           row.appendChild(ttl);
 
           const btn = document.createElement('button'); btn.className = 'btn small'; btn.textContent = 'View'; btn.onclick = () => openModal(c.title || id, c); row.appendChild(btn);
@@ -1532,250 +2012,250 @@ details.panel-collapsible > .list{
       /* ------------ Manifest + share ------------ */
       /* ------------ Manifest + share ------------ */
 
-/* Namespace for LocalStorage manifests */
-const MANIFEST_NS = 'tc_manifests_v1'; // value: { [name: string]: Manifest }
+      /* Namespace for LocalStorage manifests */
+      const MANIFEST_NS = 'tc_manifests_v1'; // value: { [name: string]: Manifest }
 
-/* Helpers */
-function readAllManifests() {
-  try { return JSON.parse(localStorage.getItem(MANIFEST_NS) || '{}'); }
-  catch { return {}; }
-}
-function writeAllManifests(obj) {
-  localStorage.setItem(MANIFEST_NS, JSON.stringify(obj || {}));
-}
-function listManifestNames() {
-  return Object.keys(readAllManifests()).sort((a, b) => a.localeCompare(b));
-}
-
-/* Filename-ish, human friendly */
-function tsCompact(d = new Date()) {
-  const p2 = n => String(n).padStart(2, '0');
-  return [
-    d.getFullYear(),
-    p2(d.getMonth() + 1),
-    p2(d.getDate()),
-    '_',
-    p2(d.getHours()),
-    p2(d.getMinutes()),
-    p2(d.getSeconds())
-  ].join('');
-}
-function suggestedManifestName() {
-  const prof = STATE.profile || 'default';
-  const nCaps = STATE.order.filter(id => STATE.selectedCaps.has(id)).length;
-  return `${tsCompact()}__${prof}__n${nCaps}`;
-}
-
-/* Build a complete, safe-to-JSON manifest (includes the composed system prompt) */
-function buildManifest() {
-  return {
-    schema: 'tc.manifest.v1',
-    ts: new Date().toISOString(),
-    profile: STATE.profile,
-    bundles: [...STATE.selectedBundles],
-    order: STATE.order.filter(id => STATE.selectedCaps.has(id)),
-    includePed: $('includePed').checked ? 1 : 0,
-    markdown: $('markdown').checked ? 1 : 0,
-    // Save the current composed system prompt WITHOUT markdown fences
-    prompt: getCurrentSystemPrompt()
-  };
-}
-
-/* Export-only (for URL deeplinks) */
-function exportState() {
-  return {
-    profile: STATE.profile,
-    bundles: [...STATE.selectedBundles],
-    order: STATE.order.filter(id => STATE.selectedCaps.has(id))
-  };
-}
-
-/* Share-link (does not include prompt; keeps links light) */
-function encodeStateToUrl() {
-  const s = btoa(unescape(encodeURIComponent(JSON.stringify(exportState()))));
-  const url = new URL(window.location.href);
-  url.searchParams.set('s', s);
-  return url.toString();
-}
-
-/* Import state/manifest (from file or LocalStorage). Also applies prompt after render. */
-function importState(obj) {
-  if (!obj) return;
-
-  // Choose a valid profile (fallback to first available)
-  const prof = (obj.profile && DATA.profiles[obj.profile]) ? obj.profile
-               : (Object.keys(DATA.profiles || {})[0] || null);
-
-  STATE.profile = prof;
-  STATE.selectedBundles = new Set();
-  STATE.selectedCaps = new Set();
-  STATE.manualCaps = new Set();
-  STATE.order = [];
-
-  // Bundles → selectedCaps/ORDER
-  (obj.bundles || []).forEach(b => { if (DATA.bundles[b]) STATE.selectedBundles.add(b); });
-  STATE.selectedBundles.forEach(b => {
-    const caps = (DATA.bundles[b] && DATA.bundles[b].capsules) || [];
-    caps.forEach(cid => {
-      if (DATA.capsules[cid]) {
-        STATE.selectedCaps.add(cid);
-        if (!STATE.order.includes(cid)) STATE.order.push(cid);
+      /* Helpers */
+      function readAllManifests() {
+        try { return JSON.parse(localStorage.getItem(MANIFEST_NS) || '{}'); }
+        catch { return {}; }
       }
-    });
-  });
+      function writeAllManifests(obj) {
+        localStorage.setItem(MANIFEST_NS, JSON.stringify(obj || {}));
+      }
+      function listManifestNames() {
+        return Object.keys(readAllManifests()).sort((a, b) => a.localeCompare(b));
+      }
 
-  // Manual order/caps (explicit)
-  (obj.order || []).forEach(cid => {
-    if (DATA.capsules[cid]) {
-      if (!STATE.order.includes(cid)) STATE.order.push(cid);
-      STATE.selectedCaps.add(cid);
-    }
-  });
+      /* Filename-ish, human friendly */
+      function tsCompact(d = new Date()) {
+        const p2 = n => String(n).padStart(2, '0');
+        return [
+          d.getFullYear(),
+          p2(d.getMonth() + 1),
+          p2(d.getDate()),
+          '_',
+          p2(d.getHours()),
+          p2(d.getMinutes()),
+          p2(d.getSeconds())
+        ].join('');
+      }
+      function suggestedManifestName() {
+        const prof = STATE.profile || 'default';
+        const nCaps = STATE.order.filter(id => STATE.selectedCaps.has(id)).length;
+        return `${tsCompact()}__${prof}__n${nCaps}`;
+      }
 
-  // Render everything (this will call compose(), which would normally overwrite #out)
-  render();
+      /* Build a complete, safe-to-JSON manifest (includes the composed system prompt) */
+      function buildManifest() {
+        return {
+          schema: 'tc.manifest.v1',
+          ts: new Date().toISOString(),
+          profile: STATE.profile,
+          bundles: [...STATE.selectedBundles],
+          order: STATE.order.filter(id => STATE.selectedCaps.has(id)),
+          includePed: $('includePed').checked ? 1 : 0,
+          markdown: $('markdown').checked ? 1 : 0,
+          // Save the current composed system prompt WITHOUT markdown fences
+          prompt: getCurrentSystemPrompt()
+        };
+      }
 
-  // Restore checkboxes from the manifest (optional, but nice to have)
-  if (Object.prototype.hasOwnProperty.call(obj, 'includePed')) {
-    $('includePed').checked = !!obj.includePed;
-  }
-  if (Object.prototype.hasOwnProperty.call(obj, 'markdown')) {
-    $('markdown').checked = !!obj.markdown;
-  }
+      /* Export-only (for URL deeplinks) */
+      function exportState() {
+        return {
+          profile: STATE.profile,
+          bundles: [...STATE.selectedBundles],
+          order: STATE.order.filter(id => STATE.selectedCaps.has(id))
+        };
+      }
 
-  // Apply prompt AFTER render/compose so the loaded prompt wins on load
-  if (typeof obj.prompt === 'string') {
-    $('out').value = obj.prompt;
-  }
+      /* Share-link (does not include prompt; keeps links light) */
+      function encodeStateToUrl() {
+        const s = btoa(unescape(encodeURIComponent(JSON.stringify(exportState()))));
+        const url = new URL(window.location.href);
+        url.searchParams.set('s', s);
+        return url.toString();
+      }
 
-  // Update the profile select’s remembered value for future sessions
-  if (STATE.profile) localStorage.setItem('tc_profile', STATE.profile);
-}
+      /* Import state/manifest (from file or LocalStorage). Also applies prompt after render. */
+      function importState(obj) {
+        if (!obj) return;
 
-/* Hydrate state from ?s=... link */
-function tryHydrateFromUrl() {
-  const url = new URL(window.location.href);
-  const s = url.searchParams.get('s');
-  if (!s) return;
-  try {
-    const json = decodeURIComponent(escape(atob(s)));
-    importState(JSON.parse(json));
-  } catch (e) {
-    console.error('bad s param', e);
-  }
-}
+        // Choose a valid profile (fallback to first available)
+        const prof = (obj.profile && DATA.profiles[obj.profile]) ? obj.profile
+          : (Object.keys(DATA.profiles || {})[0] || null);
 
-/* LocalStorage manifests – UI binding */
-function refreshManifestSelect() {
-  const sel = $('manifestSelect');
-  if (!sel) return;
-  sel.innerHTML = '';
-  const names = listManifestNames();
-  if (names.length === 0) {
-    const opt = document.createElement('option');
-    opt.value = '';
-    opt.textContent = '(no saved manifests)';
-    sel.appendChild(opt);
-    sel.disabled = true;
-  } else {
-    sel.disabled = false;
-    names.forEach(n => {
-      const opt = document.createElement('option');
-      opt.value = n;
-      opt.textContent = n;
-      sel.appendChild(opt);
-    });
-  }
-}
+        STATE.profile = prof;
+        STATE.selectedBundles = new Set();
+        STATE.selectedCaps = new Set();
+        STATE.manualCaps = new Set();
+        STATE.order = [];
 
-function saveManifestToLocalStorage() {
-  const manifest = buildManifest();
-  const defaultName = suggestedManifestName();
-  const name = prompt('Save manifest as:', defaultName);
-  if (!name) return;
+        // Bundles → selectedCaps/ORDER
+        (obj.bundles || []).forEach(b => { if (DATA.bundles[b]) STATE.selectedBundles.add(b); });
+        STATE.selectedBundles.forEach(b => {
+          const caps = (DATA.bundles[b] && DATA.bundles[b].capsules) || [];
+          caps.forEach(cid => {
+            if (DATA.capsules[cid]) {
+              STATE.selectedCaps.add(cid);
+              if (!STATE.order.includes(cid)) STATE.order.push(cid);
+            }
+          });
+        });
 
-  const all = readAllManifests();
-  const exists = Object.prototype.hasOwnProperty.call(all, name);
-  if (exists) {
-    const ok = confirm(`A manifest named "${name}" already exists. Overwrite?`);
-    if (!ok) return;
-  }
+        // Manual order/caps (explicit)
+        (obj.order || []).forEach(cid => {
+          if (DATA.capsules[cid]) {
+            if (!STATE.order.includes(cid)) STATE.order.push(cid);
+            STATE.selectedCaps.add(cid);
+          }
+        });
 
-  all[name] = manifest;
-  writeAllManifests(all);
-  refreshManifestSelect();
-  // Preselect the saved item
-  const sel = $('manifestSelect');
-  if (sel && !sel.disabled) sel.value = name;
-  toast(`Saved manifest "${name}"`);
-}
+        // Render everything (this will call compose(), which would normally overwrite #out)
+        render();
 
-function loadSelectedManifestFromLocalStorage() {
-  const sel = $('manifestSelect');
-  if (!sel || sel.disabled || !sel.value) {
-    toast('No saved manifest selected'); 
-    return;
-  }
-  const all = readAllManifests();
-  const m = all[sel.value];
-  if (!m) { toast('Manifest not found'); return; }
-  importState(m);
-  toast(`Loaded "${sel.value}"`);
-}
+        // Restore checkboxes from the manifest (optional, but nice to have)
+        if (Object.prototype.hasOwnProperty.call(obj, 'includePed')) {
+          $('includePed').checked = !!obj.includePed;
+        }
+        if (Object.prototype.hasOwnProperty.call(obj, 'markdown')) {
+          $('markdown').checked = !!obj.markdown;
+        }
 
-function deleteSelectedManifestFromLocalStorage() {
-  const sel = $('manifestSelect');
-  if (!sel || sel.disabled || !sel.value) {
-    toast('No saved manifest selected');
-    return;
-  }
-  const name = sel.value;
-  const ok = confirm(`Delete saved manifest "${name}"? This cannot be undone.`);
-  if (!ok) return;
+        // Apply prompt AFTER render/compose so the loaded prompt wins on load
+        if (typeof obj.prompt === 'string') {
+          $('out').value = obj.prompt;
+        }
 
-  const all = readAllManifests();
-  delete all[name];
-  writeAllManifests(all);
-  refreshManifestSelect();
-  toast(`Deleted "${name}"`);
-}
+        // Update the profile select’s remembered value for future sessions
+        if (STATE.profile) localStorage.setItem('tc_profile', STATE.profile);
+      }
 
-/* Wire buttons (file import already exists, we keep it) */
-$('dlJsonBtn').addEventListener('click', () => {
-  const blob = new Blob([JSON.stringify(buildManifest(), null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'system_prompt.manifest.json';
-  a.click();
-});
+      /* Hydrate state from ?s=... link */
+      function tryHydrateFromUrl() {
+        const url = new URL(window.location.href);
+        const s = url.searchParams.get('s');
+        if (!s) return;
+        try {
+          const json = decodeURIComponent(escape(atob(s)));
+          importState(JSON.parse(json));
+        } catch (e) {
+          console.error('bad s param', e);
+        }
+      }
 
-$('loadJsonBtn').addEventListener('click', () => {
-  const inp = document.createElement('input');
-  inp.type = 'file';
-  inp.accept = 'application/json';
-  inp.onchange = async () => {
-    const f = inp.files[0];
-    if (!f) return;
-    try {
-      const txt = await f.text();
-      const obj = JSON.parse(txt);
-      importState(obj);
-      toast('Manifest loaded from file');
-    } catch (e) {
-      console.error(e);
-      toast('Invalid JSON manifest');
-    }
-  };
-  inp.click();
-});
+      /* LocalStorage manifests – UI binding */
+      function refreshManifestSelect() {
+        const sel = $('manifestSelect');
+        if (!sel) return;
+        sel.innerHTML = '';
+        const names = listManifestNames();
+        if (names.length === 0) {
+          const opt = document.createElement('option');
+          opt.value = '';
+          opt.textContent = '(no saved manifests)';
+          sel.appendChild(opt);
+          sel.disabled = true;
+        } else {
+          sel.disabled = false;
+          names.forEach(n => {
+            const opt = document.createElement('option');
+            opt.value = n;
+            opt.textContent = n;
+            sel.appendChild(opt);
+          });
+        }
+      }
 
-/* New LS controls */
-$('manifestSaveBtn').addEventListener('click', saveManifestToLocalStorage);
-$('manifestLoadBtn').addEventListener('click', loadSelectedManifestFromLocalStorage);
-$('manifestDeleteBtn').addEventListener('click', deleteSelectedManifestFromLocalStorage);
+      function saveManifestToLocalStorage() {
+        const manifest = buildManifest();
+        const defaultName = suggestedManifestName();
+        const name = prompt('Save manifest as:', defaultName);
+        if (!name) return;
 
-/* Populate the manifest list on load */
-window.addEventListener('load', refreshManifestSelect);
+        const all = readAllManifests();
+        const exists = Object.prototype.hasOwnProperty.call(all, name);
+        if (exists) {
+          const ok = confirm(`A manifest named "${name}" already exists. Overwrite?`);
+          if (!ok) return;
+        }
+
+        all[name] = manifest;
+        writeAllManifests(all);
+        refreshManifestSelect();
+        // Preselect the saved item
+        const sel = $('manifestSelect');
+        if (sel && !sel.disabled) sel.value = name;
+        toast(`Saved manifest "${name}"`);
+      }
+
+      function loadSelectedManifestFromLocalStorage() {
+        const sel = $('manifestSelect');
+        if (!sel || sel.disabled || !sel.value) {
+          toast('No saved manifest selected');
+          return;
+        }
+        const all = readAllManifests();
+        const m = all[sel.value];
+        if (!m) { toast('Manifest not found'); return; }
+        importState(m);
+        toast(`Loaded "${sel.value}"`);
+      }
+
+      function deleteSelectedManifestFromLocalStorage() {
+        const sel = $('manifestSelect');
+        if (!sel || sel.disabled || !sel.value) {
+          toast('No saved manifest selected');
+          return;
+        }
+        const name = sel.value;
+        const ok = confirm(`Delete saved manifest "${name}"? This cannot be undone.`);
+        if (!ok) return;
+
+        const all = readAllManifests();
+        delete all[name];
+        writeAllManifests(all);
+        refreshManifestSelect();
+        toast(`Deleted "${name}"`);
+      }
+
+      /* Wire buttons (file import already exists, we keep it) */
+      $('dlJsonBtn').addEventListener('click', () => {
+        const blob = new Blob([JSON.stringify(buildManifest(), null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'system_prompt.manifest.json';
+        a.click();
+      });
+
+      $('loadJsonBtn').addEventListener('click', () => {
+        const inp = document.createElement('input');
+        inp.type = 'file';
+        inp.accept = 'application/json';
+        inp.onchange = async () => {
+          const f = inp.files[0];
+          if (!f) return;
+          try {
+            const txt = await f.text();
+            const obj = JSON.parse(txt);
+            importState(obj);
+            toast('Manifest loaded from file');
+          } catch (e) {
+            console.error(e);
+            toast('Invalid JSON manifest');
+          }
+        };
+        inp.click();
+      });
+
+      /* New LS controls */
+      $('manifestSaveBtn').addEventListener('click', saveManifestToLocalStorage);
+      $('manifestLoadBtn').addEventListener('click', loadSelectedManifestFromLocalStorage);
+      $('manifestDeleteBtn').addEventListener('click', deleteSelectedManifestFromLocalStorage);
+
+      /* Populate the manifest list on load */
+      window.addEventListener('load', refreshManifestSelect);
 
 
       /* ------------ LLM Command Composition ------------ */
@@ -2094,29 +2574,29 @@ IFS=$'\\n\\t'
         $('markdown').checked = localStorage.getItem('tc_md') === '1';
       });
 
-      (function profileHelp(){
-        const sel   = document.getElementById('profiles');
-        const desc  = document.getElementById('profileDesc');
-        const help  = document.getElementById('profileHelp');
-        const btn   = document.getElementById('profileInfo');
+      (function profileHelp() {
+        const sel = document.getElementById('profiles');
+        const desc = document.getElementById('profileDesc');
+        const help = document.getElementById('profileHelp');
+        const btn = document.getElementById('profileInfo');
 
         // Always show the selected profile's description (from <option data-desc="...">)
-        function renderDesc(){
+        function renderDesc() {
           if (!sel || !desc) return;
           const opt = sel.options[sel.selectedIndex];
-          const d   = opt && opt.dataset ? (opt.dataset.desc || '').trim() : '';
-          desc.textContent = d ? `— ${d}` : '';   // always visible, empty if none
+          const d = opt && opt.dataset ? (opt.dataset.desc || '').trim() : '';
+          desc.textContent = d ? ` -  ${d}` : '';   // always visible, empty if none
         }
 
         // Wire events (guarded)
-        if (sel){
+        if (sel) {
           sel.addEventListener('change', renderDesc);
           // Schedule initial render after options are populated by your code
           requestAnimationFrame(renderDesc);
         }
 
         // Help button toggles the explanatory panel (general concept of profiles)
-        if (btn && help){
+        if (btn && help) {
           btn.addEventListener('click', () => {
             const hidden = help.hasAttribute('hidden');
             if (hidden) help.removeAttribute('hidden'); else help.setAttribute('hidden', '');
@@ -2126,10 +2606,10 @@ IFS=$'\\n\\t'
       })();
 
       /* Close <details.menu> when clicking elsewhere, Esc, or when another opens */
-      (function menuCloser(){
+      (function menuCloser() {
         const menus = () => Array.from(document.querySelectorAll('details.menu'));
 
-        function closeAll(except = null){
+        function closeAll(except = null) {
           menus().forEach(d => { if (d !== except) d.removeAttribute('open'); });
         }
 

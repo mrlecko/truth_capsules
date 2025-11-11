@@ -1,0 +1,168 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Truth Capsule v1.1",
+  "description": "Schema for an individual Truth Capsule (policy + runnable witnesses + provenance).",
+  "type": "object",
+  "required": ["id", "version", "domain", "title", "statement", "witnesses", "provenance", "applies_to", "security"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Canonical capsule ID with domain prefix and version suffix, e.g. ci.secrets_in_build_env_v1",
+      "pattern": "^[a-z0-9]+(?:\\.[a-z0-9_.-]+)?_v\\d+$"
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "domain": {
+      "type": "string",
+      "description": "Capsule domain (e.g., ci, llm)",
+      "pattern": "^[a-z0-9_]+$"
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable title"
+    },
+    "statement": {
+      "type": "string",
+      "description": "Policy/claim being asserted and tested by the witnesses (free-form text)"
+    },
+    "witnesses": {
+      "type": "array",
+      "description": "Runnable checks that evaluate the statement",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "language", "entrypoint", "args", "env", "timeout_ms", "memory_mb", "net", "fs_mode", "code"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Unique witness name within this capsule",
+            "pattern": "^[a-z0-9_]+$"
+          },
+          "language": {
+            "type": "string",
+            "description": "Primary runtime language",
+            "enum": ["python", "bash", "node", "ruby", "go", "lua", "r", "powershell"]
+          },
+          "entrypoint": {
+            "type": "string",
+            "description": "Executable to invoke (e.g., python3)"
+          },
+          "args": {
+            "type": "array",
+            "description": "CLI arguments to pass to the entrypoint",
+            "items": { "type": "string" }
+          },
+          "env": {
+            "type": "object",
+            "description": "Environment variables provided to the witness",
+            "additionalProperties": { "type": "string" }
+          },
+          "timeout_ms": {
+            "type": "integer",
+            "description": "Execution timeout in milliseconds",
+            "minimum": 1,
+            "maximum": 600000
+          },
+          "memory_mb": {
+            "type": "integer",
+            "description": "Memory limit in MiB",
+            "minimum": 32,
+            "maximum": 32768
+          },
+          "net": {
+            "type": "boolean",
+            "description": "Whether network access is allowed",
+            "default": false
+          },
+          "fs_mode": {
+            "type": "string",
+            "description": "Filesystem access mode",
+            "enum": ["ro", "rw"],
+            "default": "ro"
+          },
+          "code": {
+            "type": "string",
+            "description": "Source code to execute (inline)"
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Authorship, licensing, review, and signing metadata",
+      "required": ["schema", "author", "org", "license", "source_url", "created", "updated", "review", "signing"],
+      "properties": {
+        "schema": {
+          "type": "string",
+          "description": "Provenance schema identifier",
+          "pattern": "^[a-z0-9_.-]+\\.v\\d+$"
+        },
+        "author": { "type": "string" },
+        "org": { "type": "string" },
+        "license": { "type": "string" },
+        "source_url": { "type": "string", "format": "uri" },
+        "created": { "type": "string", "format": "date-time" },
+        "updated": { "type": "string", "format": "date-time" },
+        "review": {
+          "type": "object",
+          "required": ["status", "reviewers", "last_reviewed"],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": ["draft", "in_review", "approved", "rejected", "archived", "deprecated"]
+            },
+            "reviewers": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "last_reviewed": {
+              "type": ["string", "null"],
+              "format": "date-time",
+              "description": "Nullable date-time"
+            }
+          }
+        },
+        "signing": {
+          "type": "object",
+          "required": ["method", "key_id", "pubkey", "digest", "signature"],
+          "properties": {
+            "method": {
+              "type": "string",
+              "enum": ["none", "ed25519", "rsa_pss_sha256", "ecdsa_p256_sha256"]
+            },
+            "key_id": { "type": ["string", "null"] },
+            "pubkey": { "type": ["string", "null"] },
+            "digest": { "type": ["string", "null"] },
+            "signature": { "type": ["string", "null"] }
+          }
+        }
+      }
+    },
+    "applies_to": {
+      "type": "array",
+      "description": "Contexts where this capsule is applicable",
+      "minItems": 1,
+      "items": { "type": "string", "pattern": "^[a-z0-9_]+$" }
+    },
+    "security": {
+      "type": "object",
+      "description": "Security sensitivity and notes",
+      "required": ["sensitivity"],
+      "properties": {
+        "sensitivity": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"]
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "description": "Optional tags for search/filtering",
+      "items": { "type": "string" }
+    }
+  }
+}

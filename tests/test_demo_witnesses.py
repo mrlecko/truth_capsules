@@ -187,7 +187,6 @@ def test_dev_enforce_todo_ticket(all_green):
     assert _status(data) == ("GREEN" if all_green else "RED")
     if not all_green:
         # Demo scenario: we expect RED (TODO without ticket)
-        import pytest
         if data[0].get("status") != "RED":
             pytest.fail(f"Expected RED demo, got {data[0].get('status')}")
         pytest.xfail("Intentional RED demo when ALL_GREEN=0 (TODO missing ticket).")
