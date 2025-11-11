@@ -843,6 +843,7 @@
     .clamp-2 {
       display: -webkit-box;
       -webkit-line-clamp: 2;
+      line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
@@ -3298,7 +3299,7 @@ Prism.languages.js = Prism.languages.javascript;
   <header class="toolbar">
     <div class="title-wrap">
       <h1>Truth Capsule Viewer & Prompt Composer</h1>
-      <div class="small" style="font-size:12px;margin-top:4px;">Generated 2025-11-11T03:01:27.049532Z</div>
+      <div class="small" style="font-size:12px;margin-top:4px;">Generated 2025-11-11T03:16:23.787095Z</div>
     </div>
 
     <nav class="toolbar-actions">
@@ -6808,7 +6809,7 @@ Prism.languages.js = Prism.languages.javascript;
 
       // persist domain open/closed state across renders + reloads
       STATE.domainOpen = JSON.parse(localStorage.getItem('tc_domain_open') || '{}');
-      const DOMAIN_DEFAULT_OPEN = true; // first render behavior
+      const DOMAIN_DEFAULT_OPEN = false; // first render behavior
 
       function setDomainOpen(domain, open) {
         const key = String(domain || 'misc').toLowerCase();
@@ -7148,10 +7149,10 @@ Prism.languages.js = Prism.languages.javascript;
           // Group container
           const group = document.createElement('details');
           group.className = 'domain-group';
-          group.open = getDomainOpen(domain);          // ← use saved state
-          group.addEventListener('toggle', () => {     // ← save when user opens/closes
-            setDomainOpen(domain, group.open);
-          });
+          group.dataset.domain = domain;             // allow global toggles to persist state
+          group.open = getDomainOpen(domain);
+          group.addEventListener('toggle', () => { setDomainOpen(domain, group.open); });
+
 
           // Summary header
           const sum = document.createElement('summary');
@@ -8142,7 +8143,7 @@ IFS=$'\\n\\t'
       initBundlesCollapsibleSimple();
 
       // Remember splits
-      const mainSizes = JSON.parse(localStorage.getItem('tc_split_main') || '[30,70]');
+      const mainSizes = JSON.parse(localStorage.getItem('tc_split_main') || '[40,60]');
       Split(['#left', '#right'], { sizes: mainSizes, minSize: 240, gutterSize: 8, onDragEnd: s => localStorage.setItem('tc_split_main', JSON.stringify(s)) });
 
       const subSizes = JSON.parse(localStorage.getItem('tc_split_sub') || '[45,55]');
@@ -8189,6 +8190,20 @@ IFS=$'\\n\\t'
           });
         }
       })();
+
+      function toggleAllDomainGroups(open) {
+        document.querySelectorAll('#capsules details.domain-group').forEach(d => {
+          d.open = open;
+          const dom =
+            d.dataset.domain ||
+            (d.querySelector('.domain-title')?.textContent || 'misc');
+          setDomainOpen(dom, open);
+        });
+      }
+
+      $('expandAllBtn').addEventListener('click', () => toggleAllDomainGroups(true));
+      $('collapseAllBtn').addEventListener('click', () => toggleAllDomainGroups(false));
+
 
       /* Close <details.menu> when clicking elsewhere, Esc, or when another opens */
       (function menuCloser() {
