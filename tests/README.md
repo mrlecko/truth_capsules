@@ -23,9 +23,10 @@ pytest tests/test_capsules_validate.py
 ```
 tests/
 ├── test_capsules_validate.py  # Schema validation tests
-├── fixtures/                   # Test data
+├── test_demo_witnesses.py     # Validation tests for provided capsules w/ witnesses
+├── fixtures/                  # Test data
 │   └── capsules/              # Sample capsules for testing
-└── README.md                   # This file
+└── README.md                  # This file
 ```
 
 ## What's Tested
@@ -46,10 +47,7 @@ When adding new tests:
 
 ## Future Tests
 
-Planned for v1.1+:
-
 - SHACL validation integration tests
 - Composition workflow tests
-- Witness execution sandbox tests
 - Signature verification tests
 - CI workflow smoke tests

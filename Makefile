@@ -3,7 +3,7 @@
         scaffold run-witness witness-pass witness-fail witness-skip freeze sandbox-image sandbox-smoke \
 		keygen-dev key-fingerprint guard-no-privkeys \
         demo-cite-green demo-cite-red verify-witness-latest pages-on-docs \
-		mint-profile
+		mint-profile migrate migrate-bundle migrate-dir lint-schema
 
 # --- Paths & tools -----------------------------------------------------------
 PY        ?= python3
@@ -41,6 +41,10 @@ help:
 	@echo "  make setup              - Create venv and install dependencies"
 	@echo "  make lint               - Lint capsules and bundles"
 	@echo "  make lint-strict        - Lint with strict mode"
+	@echo "  make lint-schema        - Lint with JSON Schema validation (SCHEMA=path/to/schema.json)"
+	@echo "  make migrate            - Migrate capsule(s) (TARGET=..., FROM_VERSION=..., TO_VERSION=...)"
+	@echo "  make migrate-dir        - Migrate directory (DIR=..., FROM_VERSION=..., TO_VERSION=...)"
+	@echo "  make migrate-bundle     - Migrate bundle capsules (BUNDLE=..., FROM_VERSION=..., TO_VERSION=...)"
 	@echo "  make test               - Run tests"
 	@echo "  make digest             - Build $(NDJSON) from capsules"
 	@echo "  make digest-verify      - Rebuild + verify digests"
@@ -208,18 +212,60 @@ witness-sandbox:
 	exit $$rc
 
 # --- Quality -----------------------------------------------------------------
+SCHEMA ?=
+
 lint: $(PYBIN)
 	$(PYBIN) scripts/capsule_linter.py capsules
 	$(PYBIN) scripts/bundle_linter.py bundles
-	
+
 
 lint-strict: $(PYBIN)
 	$(PYBIN) scripts/capsule_linter.py capsules --strict
 	$(PYBIN) scripts/bundle_linter.py bundles --strict
-	
+
+
+lint-schema: $(PYBIN)
+	@test -n "$(SCHEMA)" || (echo "Error: set SCHEMA=path/to/schema.json"; exit 2)
+	@test -f "$(SCHEMA)" || (echo "Error: schema file $(SCHEMA) not found"; exit 2)
+	$(PYBIN) scripts/capsule_linter.py capsules --schema $(SCHEMA)
+	@echo "✓ Linted with schema: $(SCHEMA)"
 
 test: $(PYBIN)
 	$(PYBIN) -m pytest -q tests
+
+# --- Migration ---------------------------------------------------------------
+TARGET       ?=
+FROM_VERSION ?=
+TO_VERSION   ?=
+FROM_SCHEMA  ?=
+TO_SCHEMA    ?=
+MIGRATION_RULES ?=
+DRY_RUN      ?= 0
+
+migrate: $(PYBIN)
+	@test -n "$(TARGET)" || (echo "Error: set TARGET=<file|dir|bundle.yaml>"; exit 2)
+	@test -n "$(FROM_VERSION)" || test -n "$(FROM_SCHEMA)" || (echo "Error: set FROM_VERSION or FROM_SCHEMA"; exit 2)
+	@test -n "$(TO_VERSION)" || test -n "$(TO_SCHEMA)" || (echo "Error: set TO_VERSION or TO_SCHEMA"; exit 2)
+	$(PYBIN) scripts/capsule_migrator.py $(TARGET) \
+		$(if $(FROM_VERSION),--from-version $(FROM_VERSION),) \
+		$(if $(TO_VERSION),--to-version $(TO_VERSION),) \
+		$(if $(FROM_SCHEMA),--from-schema $(FROM_SCHEMA),) \
+		$(if $(TO_SCHEMA),--to-schema $(TO_SCHEMA),) \
+		$(if $(MIGRATION_RULES),--rules $(MIGRATION_RULES),) \
+		$(if $(filter 1 true yes,$(DRY_RUN)),--dry-run,)
+	@echo "✓ Migration complete"
+
+migrate-dir: $(PYBIN)
+	@test -n "$(DIR)" || (echo "Error: set DIR=<directory>"; exit 2)
+	$(MAKE) migrate TARGET=$(DIR) FROM_VERSION="$(FROM_VERSION)" TO_VERSION="$(TO_VERSION)" \
+		FROM_SCHEMA="$(FROM_SCHEMA)" TO_SCHEMA="$(TO_SCHEMA)" \
+		MIGRATION_RULES="$(MIGRATION_RULES)" DRY_RUN="$(DRY_RUN)"
+
+migrate-bundle: $(PYBIN)
+	@test -n "$(BUNDLE)" || (echo "Error: set BUNDLE=<bundle_file.yaml>"; exit 2)
+	$(MAKE) migrate TARGET=$(BUNDLE) FROM_VERSION="$(FROM_VERSION)" TO_VERSION="$(TO_VERSION)" \
+		FROM_SCHEMA="$(FROM_SCHEMA)" TO_SCHEMA="$(TO_SCHEMA)" \
+		MIGRATION_RULES="$(MIGRATION_RULES)" DRY_RUN="$(DRY_RUN)"
 
 # --- Digests & signatures ----------------------------------------------------
 digest: $(PYBIN)

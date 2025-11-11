@@ -1,0 +1,150 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Truth Capsules Profile v1.0",
+  "description": "Schema for a Truth Capsules profile that configures how capsules and bundles are composed and rendered for LLM prompts.",
+  "type": "object",
+  "required": ["kind", "id", "title", "version", "description", "response"],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "description": "Resource type identifier",
+      "const": "profile"
+    },
+    "id": {
+      "type": "string",
+      "description": "Canonical profile ID with version suffix, e.g. profile.macgyver_v1",
+      "pattern": "^profile\\.[a-z0-9_.]+_v\\d+$"
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable profile title"
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "description": {
+      "type": "string",
+      "description": "Profile purpose and behavior summary"
+    },
+    "response": {
+      "type": "object",
+      "description": "Response formatting and composition configuration",
+      "properties": {
+        "format": {
+          "type": "string",
+          "description": "Output format style",
+          "enum": ["natural", "structured", "json", "markdown"]
+        },
+        "override_compose_defaults": {
+          "type": "boolean",
+          "description": "Whether to override default composition behavior",
+          "default": false
+        },
+        "force_pedagogy": {
+          "type": "boolean",
+          "description": "Force inclusion of pedagogical elements (Socratic questions, aphorisms)",
+          "default": false
+        },
+        "markdown_wrap_default": {
+          "type": "boolean",
+          "description": "Wrap output in markdown code blocks by default",
+          "default": false
+        },
+        "policy": {
+          "type": "string",
+          "description": "Behavioral policy text for the model"
+        },
+        "system_block": {
+          "type": "string",
+          "description": "System-level instructions block"
+        },
+        "capsules_heading": {
+          "type": "string",
+          "description": "Header text for capsule sections"
+        },
+        "footer": {
+          "type": "string",
+          "description": "Footer text appended to composed prompts"
+        },
+        "fragments": {
+          "type": "array",
+          "description": "Prompt fragments to include in composition",
+          "items": {
+            "type": "object",
+            "required": ["id", "kind", "include"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Fragment identifier",
+                "pattern": "^[a-z0-9_]+$"
+              },
+              "kind": {
+                "type": "string",
+                "description": "Fragment type",
+                "enum": ["system", "fragment", "user", "assistant"]
+              },
+              "include": {
+                "type": "boolean",
+                "description": "Whether to include this fragment in composition"
+              },
+              "content": {
+                "type": "string",
+                "description": "Fragment text content"
+              }
+            }
+          }
+        },
+        "projection": {
+          "type": "object",
+          "description": "Capsule projection and rendering configuration",
+          "properties": {
+            "include": {
+              "type": "array",
+              "description": "List of capsule/bundle IDs or patterns to include",
+              "items": { "type": "string" }
+            },
+            "force_pedagogy": {
+              "type": "boolean",
+              "description": "Force pedagogical rendering for included capsules"
+            },
+            "render": {
+              "type": "object",
+              "description": "Rendering templates for capsule elements",
+              "properties": {
+                "capsule_header": {
+                  "type": "string",
+                  "description": "Template for capsule headers (supports {id}, {title}, {version}, {domain}, {statement} placeholders)"
+                },
+                "socratic_bullet": {
+                  "type": "string",
+                  "description": "Template for Socratic questions (supports {text} placeholder)"
+                },
+                "aphorism_bullet": {
+                  "type": "string",
+                  "description": "Template for aphorisms (supports {text} placeholder)"
+                },
+                "enforcement_footer": {
+                  "type": "string",
+                  "description": "Template for enforcement/policy footers"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "download": {
+      "type": "object",
+      "description": "Download/export settings",
+      "properties": {
+        "suggested_ext": {
+          "type": "string",
+          "description": "Suggested file extension for exports",
+          "pattern": "^[a-z0-9]+$"
+        }
+      }
+    }
+  }
+}

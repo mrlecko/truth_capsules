@@ -4,6 +4,8 @@ Truth Capsule Linter - Schema validation for capsule YAML files.
 
 Validates required fields, provenance structure, pedagogy format, and detects
 common issues like unicode escape sequences in YAML source.
+
+Can optionally validate against a JSON Schema file for stricter validation.
 """
 import sys
 import os
@@ -11,7 +13,14 @@ import json
 import argparse
 import yaml
 import re
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
+
+try:
+    import jsonschema
+    from jsonschema import Draft7Validator
+    JSONSCHEMA_AVAILABLE = True
+except ImportError:
+    JSONSCHEMA_AVAILABLE = False
 
 # Schema constants
 REQUIRED_KEYS = ["id", "version", "domain", "statement"]
@@ -56,17 +65,38 @@ def load_capsules(path: str) -> List[Dict]:
     return items
 
 
-def lint_capsule(capsule: Dict, strict: bool = False) -> Tuple[List[str], List[str]]:
+def lint_capsule(capsule: Dict, strict: bool = False, schema: Optional[Dict] = None) -> Tuple[List[str], List[str]]:
     """Validate a single capsule.
 
     Args:
         capsule: Parsed capsule dict with __raw__ key
         strict: If True, enforce stricter checks (e.g., provenance.review.status)
+        schema: Optional JSON Schema dict to validate against
 
     Returns:
         (errors, warnings) tuple of message lists
     """
     errs, warns = [], []
+
+    # Validate against JSON Schema if provided
+    if schema is not None:
+        if not JSONSCHEMA_AVAILABLE:
+            warns.append(
+                "JSON Schema validation requested but jsonschema package not installed. "
+                "Install with: pip install jsonschema"
+            )
+        else:
+            # Create a clean copy without metadata fields
+            clean_capsule = {k: v for k, v in capsule.items()
+                           if not k.startswith("__")}
+
+            validator = Draft7Validator(schema)
+            schema_errors = sorted(validator.iter_errors(clean_capsule),
+                                 key=lambda e: e.path)
+
+            for error in schema_errors:
+                path = ".".join(str(p) for p in error.path) if error.path else "root"
+                errs.append(f"JSON Schema violation at {path}: {error.message}")
 
     # Check for unicode escape sequences in raw YAML (indicates bad encoding)
     raw = capsule.get("__raw__", "")
@@ -255,11 +285,29 @@ def main():
         action="store_true",
         help="Enforce strict checks (e.g., require review.status=approved)"
     )
+    ap.add_argument(
+        "--schema",
+        type=str,
+        help="Path to JSON Schema file for validation (e.g., schemas/capsule.schema.v1.json)"
+    )
     args = ap.parse_args()
 
     if not os.path.isdir(args.path):
         print(f"ERROR: {args.path} is not a directory", file=sys.stderr)
         sys.exit(2)
+
+    # Load JSON Schema if provided
+    schema = None
+    if args.schema:
+        if not os.path.isfile(args.schema):
+            print(f"ERROR: Schema file {args.schema} not found", file=sys.stderr)
+            sys.exit(2)
+        try:
+            with open(args.schema, "r", encoding="utf-8") as f:
+                schema = json.load(f)
+        except Exception as e:
+            print(f"ERROR: Failed to load schema file: {e}", file=sys.stderr)
+            sys.exit(2)
 
     # Load and lint all capsules
     capsules = load_capsules(args.path)
@@ -277,7 +325,7 @@ def main():
                 "warnings": []
             }
         else:
-            errors, warnings = lint_capsule(capsule, strict=args.strict)
+            errors, warnings = lint_capsule(capsule, strict=args.strict, schema=schema)
             entry = {
                 "file": capsule.get("__file__"),
                 "id": capsule.get("id"),

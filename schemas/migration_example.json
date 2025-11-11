@@ -1,0 +1,55 @@
+{
+  "description": "Example migration rules from schema v1.0 to v1.1",
+  "from_version": "v1.0",
+  "to_version": "v1.1",
+  "rules": [
+    {
+      "type": "set_default",
+      "params": {
+        "path": "applies_to",
+        "value": ["conversation"]
+      }
+    },
+    {
+      "type": "set_default",
+      "params": {
+        "path": "security.sensitivity",
+        "value": "low"
+      }
+    },
+    {
+      "type": "set_default",
+      "params": {
+        "path": "security.notes",
+        "value": ""
+      }
+    },
+    {
+      "type": "rename_field",
+      "params": {
+        "old_path": "old_field_name",
+        "new_path": "new_field_name"
+      }
+    },
+    {
+      "type": "transform_field",
+      "params": {
+        "path": "some_field",
+        "transform": "to_list"
+      }
+    },
+    {
+      "type": "add_field",
+      "params": {
+        "path": "new_section.new_field",
+        "value": "default_value"
+      }
+    },
+    {
+      "type": "remove_field",
+      "params": {
+        "path": "deprecated_field"
+      }
+    }
+  ]
+}

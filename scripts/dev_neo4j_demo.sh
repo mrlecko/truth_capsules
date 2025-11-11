@@ -173,12 +173,63 @@ MERGE (wNode:Witness {iri: toString(w['@id'])})
 MERGE (c)-[:HAS_WITNESS]->(wNode);
 "
 
+# --- Load Bundles and Profiles ------------------------------------------------
+say "Loading bundles and profiles from $FILE_URL …"
+cypher "
+WITH 'file:///artifacts/out/capsules.ndjson' AS URL
+CALL apoc.load.json(URL) YIELD value AS v0
+WITH v0,
+     CASE
+       WHEN v0['@type'] = 'Bundle' THEN 'Bundle'
+       WHEN v0['@type'] = 'Profile' THEN 'Profile'
+       ELSE 'Other'
+     END AS nodeType
+
+// Handle Bundles
+FOREACH (x IN CASE WHEN nodeType = 'Bundle' THEN [1] ELSE [] END |
+  MERGE (b:Bundle {iri: toString(v0['@id'])})
+    SET b.identifier = toString(coalesce(v0.identifier, '')),
+        b.name       = toString(coalesce(v0.name, v0.identifier, ''))
+)
+
+// Handle Profiles
+FOREACH (x IN CASE WHEN nodeType = 'Profile' THEN [1] ELSE [] END |
+  MERGE (p:Profile {iri: toString(v0['@id'])})
+    SET p.identifier     = toString(coalesce(v0.identifier, '')),
+        p.title          = toString(coalesce(v0.title, '')),
+        p.description    = toString(coalesce(v0.description, '')),
+        p.version        = toString(coalesce(v0.version, '')),
+        p.kind           = toString(coalesce(v0.kind, '')),
+        p.responseFormat = toString(coalesce(v0.responseFormat, ''))
+);
+"
+
+# --- Create Profile->Capsule relationships -----------------------------------
+say "Creating Profile->Capsule relationships…"
+cypher "
+WITH 'file:///artifacts/out/capsules.ndjson' AS URL
+CALL apoc.load.json(URL) YIELD value AS v0
+WHERE v0['@type'] = 'Profile'
+MATCH (p:Profile {iri: toString(v0['@id'])})
+WITH p, coalesce(v0.includesCapsule, []) AS capsuleRefs
+UNWIND capsuleRefs AS cref
+WITH p, toString(cref) AS capsulePattern
+// Try to match capsules by ID pattern (e.g., 'pedagogy.socratic' matches capsules with that prefix)
+MATCH (c:Capsule)
+WHERE c.identifier CONTAINS capsulePattern OR c.identifier = capsulePattern
+MERGE (p)-[:INCLUDES_CAPSULE]->(c);
+"
+
 # --- Sanity queries -----------------------------------------------------------
 say "Sanity: counts"
 cypher "MATCH (c:Capsule) RETURN count(c) AS capsules"
+cypher "MATCH (b:Bundle) RETURN count(b) AS bundles"
+cypher "MATCH (p:Profile) RETURN count(p) AS profiles"
 cypher "MATCH (:Capsule)-[r:HAS_WITNESS]->(:Witness) RETURN count(r) AS witness_edges"
+cypher "MATCH (:Profile)-[r:INCLUDES_CAPSULE]->(:Capsule) RETURN count(r) AS profile_capsule_edges"
 
-say "Sample capsules (iri, title)"
-cypher "MATCH (c:Capsule) RETURN c.iri AS iri, c.title AS title ORDER BY c.iri LIMIT 5"
+say "Sample nodes"
+cypher "MATCH (c:Capsule) RETURN c.iri AS iri, c.title AS title ORDER BY c.iri LIMIT 3"
+cypher "MATCH (p:Profile) RETURN p.iri AS iri, p.title AS title ORDER BY p.iri LIMIT 3"
 
 say "Done. Open http://localhost:7474 (user=$NEO4J_USER / pass=$NEO4J_PASS)."

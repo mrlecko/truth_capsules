@@ -2,7 +2,7 @@
 """
 Truth Capsules Knowledge Graph Exporter
 
-Converts YAML capsules and bundles to RDF (Turtle) and NDJSON-LD for knowledge graph integration.
+Converts YAML capsules, bundles, and profiles to RDF (Turtle) and NDJSON-LD for knowledge graph integration.
 
 Outputs:
   - artifacts/out/capsules.ttl: RDF/Turtle format for SPARQL querying
@@ -24,6 +24,7 @@ from rdflib.namespace import RDF, RDFS, DCTERMS, XSD
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 CAPS = ROOT / "capsules"
 BUNDLES = ROOT / "bundles"
+PROFILES = ROOT / "profiles"
 OUT = ROOT / "artifacts" / "out"
 OUT.mkdir(parents=True, exist_ok=True)
 
@@ -158,10 +159,21 @@ for yml in sorted(BUNDLES.glob("*.yaml")):
         g.add((b_iri, RDF.type, TC.Bundle))
         g.add((b_iri, DCTERMS.identifier, Literal(bname)))
 
+        capsule_ids = []
         for cid in bdoc.get("capsules", []):
             c_iri = URIRef(f"https://w3id.org/tc/capsule/{cid}")
             # Represent membership via tc:inBundle on Capsule
             g.add((c_iri, TC.inBundle, b_iri))
+            capsule_ids.append(cid)
+
+        # NDJSON-LD record
+        ndjson.append({
+            "@id": str(b_iri),
+            "@type": "Bundle",
+            "identifier": bname,
+            "name": bdoc.get("name"),
+            "capsules": capsule_ids
+        })
 
         bundle_count += 1
 
@@ -169,6 +181,70 @@ for yml in sorted(BUNDLES.glob("*.yaml")):
         print(f"[KG] WARNING: Skipping {yml.name}: {e}", file=sys.stderr)
 
 print(f"[KG] Processed {bundle_count} bundles")
+
+# --- Export Profiles ---
+print("[KG] Loading profiles from:", PROFILES)
+profile_count = 0
+
+for yml in sorted(PROFILES.glob("*.yaml")):
+    try:
+        pdoc = yaml.safe_load(yml.read_text(encoding="utf-8"))
+        pid = pdoc.get("id") or yml.stem
+        p_iri = URIRef(f"https://w3id.org/tc/profile/{pid}")
+
+        # RDF triples
+        g.add((p_iri, RDF.type, TC.Profile))
+        g.add((p_iri, DCTERMS.identifier, Literal(pid)))
+
+        # Basic fields
+        if title := pdoc.get("title"):
+            g.add((p_iri, DCTERMS.title, Literal(title)))
+        if desc := pdoc.get("description"):
+            g.add((p_iri, DCTERMS.description, Literal(desc)))
+        if ver := pdoc.get("version"):
+            g.add((p_iri, URIRef("http://schema.org/version"), Literal(ver)))
+        if kind := pdoc.get("kind"):
+            g.add((p_iri, TC.kind, Literal(kind)))
+
+        # Response configuration
+        resp = pdoc.get("response", {})
+        if fmt := resp.get("format"):
+            g.add((p_iri, TC.responseFormat, Literal(fmt)))
+        if policy := resp.get("policy"):
+            g.add((p_iri, TC.policy, Literal(policy)))
+        if sys_block := resp.get("system_block"):
+            g.add((p_iri, TC.systemBlock, Literal(sys_block)))
+        if footer := resp.get("footer"):
+            g.add((p_iri, TC.footer, Literal(footer)))
+
+        # Projection - capsule references
+        proj = resp.get("projection", {})
+        included_capsules = []
+        for cref in proj.get("include", []):
+            # Create relationship to capsules/bundles referenced in projection
+            # These might be capsule IDs or patterns like "pedagogy.socratic"
+            g.add((p_iri, TC.includesCapsule, Literal(cref)))
+            included_capsules.append(cref)
+
+        # NDJSON-LD record
+        ndjson.append({
+            "@id": str(p_iri),
+            "@type": "Profile",
+            "identifier": pid,
+            "title": pdoc.get("title"),
+            "description": pdoc.get("description"),
+            "version": pdoc.get("version"),
+            "kind": pdoc.get("kind"),
+            "responseFormat": resp.get("format"),
+            "includesCapsule": included_capsules
+        })
+
+        profile_count += 1
+
+    except Exception as e:
+        print(f"[KG] WARNING: Skipping {yml.name}: {e}", file=sys.stderr)
+
+print(f"[KG] Processed {profile_count} profiles")
 
 # --- Write outputs ---
 ttl_path = OUT / "capsules.ttl"
@@ -185,6 +261,7 @@ with open(ndj_path, "w", encoding="utf-8") as f:
 print(f"\n[KG] ✅ Export complete!")
 print(f"     Capsules: {capsule_count}")
 print(f"     Bundles: {bundle_count}")
+print(f"     Profiles: {profile_count}")
 print(f"     RDF triples: {len(g)}")
 print(f"     Output:")
 print(f"       - {ttl_path}")
