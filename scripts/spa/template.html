@@ -843,6 +843,7 @@
     .clamp-2 {
       display: -webkit-box;
       -webkit-line-clamp: 2;
+      line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
@@ -1335,11 +1336,11 @@
 
   <style>{{prism_css_inline | safe}}</style>
 
-  <script>{ { prism_core_inline | safe } }</script>
-  <script>{ { prism_yaml_inline | safe } }</script>
-  <script>{ { prism_json_inline | safe } }</script>
-  <script>{ { split_js_inline | safe } }</script>
-  <script>{ { sortable_js_inline | safe } }</script>
+  <script>{{prism_core_inline | safe}}</script>
+  <script>{{prism_yaml_inline | safe}}</script>
+  <script>{{prism_json_inline | safe}}</script>
+  <script>{{split_js_inline | safe}}</script>
+  <script>{{sortable_js_inline | safe}}</script>
   {% else %}
   <!-- CDN fallback (deterministic, pinned) -->
   <link rel="stylesheet" href="{{ cdn_urls['prism_css'] }}">
@@ -3053,8 +3054,6 @@ IFS=$'\\n\\t'
           if (d) setTimeout(() => d.removeAttribute('open'), 0);
         });
       })();
-
-
     </script>
 </body>
 
