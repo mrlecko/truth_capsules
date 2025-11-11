@@ -1038,7 +1038,7 @@
     .toolbar .title-wrap {
       display: flex;
       flex-direction: column;
-      padding-left:30px;
+      padding-left: 30px;
     }
 
     .toolbar-actions {
@@ -1047,7 +1047,7 @@
       align-items: center;
       gap: 10px;
       flex-wrap: wrap;
-      margin-right:30px;
+      margin-right: 30px;
     }
 
     /* Groups = compact button clusters */
@@ -1144,140 +1144,182 @@
       font-size: 12px;
     }
 
-/* === Modern ghost pills (borderless groups) === */
-:root{
-  --btn-h: 30px;
-  --btn-r: 12px;
-  --hairline: color-mix(in oklab, var(--border), transparent 35%);
-  --hover:   color-mix(in oklab, var(--accent), transparent 88%);
-  --press:   color-mix(in oklab, var(--accent), transparent 70%);
-}
+    /* === Modern ghost pills (borderless groups) === */
+    :root {
+      --btn-h: 30px;
+      --btn-r: 12px;
+      --hairline: color-mix(in oklab, var(--border), transparent 35%);
+      --hover: color-mix(in oklab, var(--accent), transparent 88%);
+      --press: color-mix(in oklab, var(--accent), transparent 70%);
+    }
 
-.toolbar { gap: 10px; padding: 6px 0; }
-.toolbar-actions { gap: 8px; }
+    .toolbar {
+      gap: 10px;
+      padding: 6px 0;
+    }
 
-/* No chrome around clusters */
-.group{
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  border-radius: 0;
-}
-/* kill any old highlight rings */
-.group:has(.menu[open]){ box-shadow: none; }
+    .toolbar-actions {
+      gap: 8px;
+    }
 
-/* Pills */
-.btn{
-  -webkit-appearance: none;
-  appearance: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  height: var(--btn-h);
-  padding: 0 12px;
-  border-radius: var(--btn-r);
-  border: 1px solid var(--hairline);         /* hairline, not heavy */
-  background: color-mix(in oklab, var(--btn-bg), transparent 10%);
-  color: var(--text);
-  font-weight: 600;
-  line-height: 1;
-  cursor: pointer;
-  transition: background .15s ease, border-color .15s ease,
-              box-shadow .15s ease, transform .04s ease;
-}
+    /* No chrome around clusters */
+    .group {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      border-radius: 0;
+    }
 
-.btn:hover{
-  background: var(--hover);
-  border-color: color-mix(in oklab, var(--border), var(--accent) 40%);
-  box-shadow: 0 2px 10px rgba(0,0,0,.12);
-}
+    /* kill any old highlight rings */
+    .group:has(.menu[open]) {
+      box-shadow: none;
+    }
 
-.btn:active{
-  background: var(--press);
-  transform: translateY(1px);
-  box-shadow: 0 1px 4px rgba(0,0,0,.18) inset;
-}
+    /* Pills */
+    .btn {
+      -webkit-appearance: none;
+      appearance: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: var(--btn-h);
+      padding: 0 12px;
+      border-radius: var(--btn-r);
+      border: 1px solid var(--hairline);
+      /* hairline, not heavy */
+      background: color-mix(in oklab, var(--btn-bg), transparent 10%);
+      color: var(--text);
+      font-weight: 600;
+      line-height: 1;
+      cursor: pointer;
+      transition: background .15s ease, border-color .15s ease,
+        box-shadow .15s ease, transform .04s ease;
+    }
 
-/* Subtle, accessible focus */
-.btn:focus{ outline: none; }
-.btn:focus-visible{
-  outline: 2px solid color-mix(in oklab, var(--accent), transparent 60%);
-  outline-offset: 2px;
-  box-shadow: none;
-}
+    .btn:hover {
+      background: var(--hover);
+      border-color: color-mix(in oklab, var(--border), var(--accent) 40%);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, .12);
+    }
 
-/* Icon-only = circular ghost */
-.btn.icon{
-  width: var(--btn-h);
-  min-width: var(--btn-h);
-  padding: 0;
-  border-radius: 999px;
-}
+    .btn:active {
+      background: var(--press);
+      transform: translateY(1px);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .18) inset;
+    }
 
-/* Caution tone stays ghost (no filled red blob) */
-.btn.warn{
-  color: var(--danger, #e06c75);
-  background: color-mix(in oklab, var(--btn-bg), transparent 6%);
-  border-color: color-mix(in oklab, var(--danger, #e06c75), var(--border) 75%);
-}
+    /* Subtle, accessible focus */
+    .btn:focus {
+      outline: none;
+    }
 
-/* Details/summary dropdown matches pills */
-.menu{ position: relative; }
-.menu > summary{ list-style: none; cursor: pointer; }
-.menu > summary::-webkit-details-marker{ display: none; }
+    .btn:focus-visible {
+      outline: 2px solid color-mix(in oklab, var(--accent), transparent 60%);
+      outline-offset: 2px;
+      box-shadow: none;
+    }
 
-/* Panel */
-.menu[open] .menu-list{ display: block; }
-.menu-list{
-  display: none;
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  min-width: 220px;
-  padding: 8px;
-  background: var(--bgElevated, var(--bg));
-  border: 1px solid var(--hairline);
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.35);
-  z-index: 1000;
-}
+    /* Icon-only = circular ghost */
+    .btn.icon {
+      width: var(--btn-h);
+      min-width: var(--btn-h);
+      padding: 0;
+      border-radius: 999px;
+    }
 
-.menu-item{
-  display: block;
-  width: 100%;
-  padding: 8px 10px;
-  text-align: left;
-  background: none;
-  border: 0;
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-  border-radius: 8px;
-}
-.menu-item:hover{
-  background: color-mix(in oklab, var(--panel), var(--text) 4%);
-}
-.menu-item.warn{ color: var(--danger, #e06c75); }
+    /* Caution tone stays ghost (no filled red blob) */
+    .btn.warn {
+      color: var(--danger, #e06c75);
+      background: color-mix(in oklab, var(--btn-bg), transparent 6%);
+      border-color: color-mix(in oklab, var(--danger, #e06c75), var(--border) 75%);
+    }
 
-.menu-field{ padding: 6px 6px 8px; }
-.menu-row{ display: flex; gap: 6px; padding: 4px 6px; }
-.menu-row .menu-item{ flex: 1; text-align: center; }
+    /* Details/summary dropdown matches pills */
+    .menu {
+      position: relative;
+    }
 
-.menu-sep{
-  border: 0; height: 1px; margin: 6px 0;
-  background: linear-gradient(to right, transparent, var(--hairline), transparent);
-}
+    .menu>summary {
+      list-style: none;
+      cursor: pointer;
+    }
 
-/* Tiny screen tweak */
-@media (max-width: 900px){
-  :root{ --btn-h: 28px; }
-}
+    .menu>summary::-webkit-details-marker {
+      display: none;
+    }
 
-    
+    /* Panel */
+    .menu[open] .menu-list {
+      display: block;
+    }
+
+    .menu-list {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 220px;
+      padding: 8px;
+      background: var(--bgElevated, var(--bg));
+      border: 1px solid var(--hairline);
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+      z-index: 1000;
+    }
+
+    .menu-item {
+      display: block;
+      width: 100%;
+      padding: 8px 10px;
+      text-align: left;
+      background: none;
+      border: 0;
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+
+    .menu-item:hover {
+      background: color-mix(in oklab, var(--panel), var(--text) 4%);
+    }
+
+    .menu-item.warn {
+      color: var(--danger, #e06c75);
+    }
+
+    .menu-field {
+      padding: 6px 6px 8px;
+    }
+
+    .menu-row {
+      display: flex;
+      gap: 6px;
+      padding: 4px 6px;
+    }
+
+    .menu-row .menu-item {
+      flex: 1;
+      text-align: center;
+    }
+
+    .menu-sep {
+      border: 0;
+      height: 1px;
+      margin: 6px 0;
+      background: linear-gradient(to right, transparent, var(--hairline), transparent);
+    }
+
+    /* Tiny screen tweak */
+    @media (max-width: 900px) {
+      :root {
+        --btn-h: 28px;
+      }
+    }
   </style>
 
 
@@ -1293,1961 +1335,11 @@
 
   <style>code[class*=language-],pre[class*=language-]{color:#ccc;background:0 0;font-family:Consolas,Monaco,'Andale Mono','Ubuntu Mono',monospace;font-size:1em;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:1em;margin:.5em 0;overflow:auto}:not(pre)>code[class*=language-],pre[class*=language-]{background:#2d2d2d}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em;white-space:normal}.token.block-comment,.token.cdata,.token.comment,.token.doctype,.token.prolog{color:#999}.token.punctuation{color:#ccc}.token.attr-name,.token.deleted,.token.namespace,.token.tag{color:#e2777a}.token.function-name{color:#6196cc}.token.boolean,.token.function,.token.number{color:#f08d49}.token.class-name,.token.constant,.token.property,.token.symbol{color:#f8c555}.token.atrule,.token.builtin,.token.important,.token.keyword,.token.selector{color:#cc99cd}.token.attr-value,.token.char,.token.regex,.token.string,.token.variable{color:#7ec699}.token.entity,.token.operator,.token.url{color:#67cdcc}.token.bold,.token.important{font-weight:700}.token.italic{font-style:italic}.token.entity{cursor:help}.token.inserted{color:green}</style>
 
-  <script>
-/* **********************************************
-     Begin prism-core.js
-********************************************** */
-
-/// <reference lib="WebWorker"/>
-
-var _self = (typeof window !== 'undefined')
-	? window   // if in browser
-	: (
-		(typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope)
-			? self // if in worker
-			: {}   // if in node js
-	);
-
-/**
- * Prism: Lightweight, robust, elegant syntax highlighting
- *
- * @license MIT <https://opensource.org/licenses/MIT>
- * @author Lea Verou <https://lea.verou.me>
- * @namespace
- * @public
- */
-var Prism = (function (_self) {
-
-	// Private helper vars
-	var lang = /(?:^|\s)lang(?:uage)?-([\w-]+)(?=\s|$)/i;
-	var uniqueId = 0;
-
-	// The grammar object for plaintext
-	var plainTextGrammar = {};
-
-
-	var _ = {
-		/**
-		 * By default, Prism will attempt to highlight all code elements (by calling {@link Prism.highlightAll}) on the
-		 * current page after the page finished loading. This might be a problem if e.g. you wanted to asynchronously load
-		 * additional languages or plugins yourself.
-		 *
-		 * By setting this value to `true`, Prism will not automatically highlight all code elements on the page.
-		 *
-		 * You obviously have to change this value before the automatic highlighting started. To do this, you can add an
-		 * empty Prism object into the global scope before loading the Prism script like this:
-		 *
-		 * ```js
-		 * window.Prism = window.Prism || {};
-		 * Prism.manual = true;
-		 * // add a new <script> to load Prism's script
-		 * ```
-		 *
-		 * @default false
-		 * @type {boolean}
-		 * @memberof Prism
-		 * @public
-		 */
-		manual: _self.Prism && _self.Prism.manual,
-		/**
-		 * By default, if Prism is in a web worker, it assumes that it is in a worker it created itself, so it uses
-		 * `addEventListener` to communicate with its parent instance. However, if you're using Prism manually in your
-		 * own worker, you don't want it to do this.
-		 *
-		 * By setting this value to `true`, Prism will not add its own listeners to the worker.
-		 *
-		 * You obviously have to change this value before Prism executes. To do this, you can add an
-		 * empty Prism object into the global scope before loading the Prism script like this:
-		 *
-		 * ```js
-		 * window.Prism = window.Prism || {};
-		 * Prism.disableWorkerMessageHandler = true;
-		 * // Load Prism's script
-		 * ```
-		 *
-		 * @default false
-		 * @type {boolean}
-		 * @memberof Prism
-		 * @public
-		 */
-		disableWorkerMessageHandler: _self.Prism && _self.Prism.disableWorkerMessageHandler,
-
-		/**
-		 * A namespace for utility methods.
-		 *
-		 * All function in this namespace that are not explicitly marked as _public_ are for __internal use only__ and may
-		 * change or disappear at any time.
-		 *
-		 * @namespace
-		 * @memberof Prism
-		 */
-		util: {
-			encode: function encode(tokens) {
-				if (tokens instanceof Token) {
-					return new Token(tokens.type, encode(tokens.content), tokens.alias);
-				} else if (Array.isArray(tokens)) {
-					return tokens.map(encode);
-				} else {
-					return tokens.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\u00a0/g, ' ');
-				}
-			},
-
-			/**
-			 * Returns the name of the type of the given value.
-			 *
-			 * @param {any} o
-			 * @returns {string}
-			 * @example
-			 * type(null)      === 'Null'
-			 * type(undefined) === 'Undefined'
-			 * type(123)       === 'Number'
-			 * type('foo')     === 'String'
-			 * type(true)      === 'Boolean'
-			 * type([1, 2])    === 'Array'
-			 * type({})        === 'Object'
-			 * type(String)    === 'Function'
-			 * type(/abc+/)    === 'RegExp'
-			 */
-			type: function (o) {
-				return Object.prototype.toString.call(o).slice(8, -1);
-			},
-
-			/**
-			 * Returns a unique number for the given object. Later calls will still return the same number.
-			 *
-			 * @param {Object} obj
-			 * @returns {number}
-			 */
-			objId: function (obj) {
-				if (!obj['__id']) {
-					Object.defineProperty(obj, '__id', { value: ++uniqueId });
-				}
-				return obj['__id'];
-			},
-
-			/**
-			 * Creates a deep clone of the given object.
-			 *
-			 * The main intended use of this function is to clone language definitions.
-			 *
-			 * @param {T} o
-			 * @param {Record<number, any>} [visited]
-			 * @returns {T}
-			 * @template T
-			 */
-			clone: function deepClone(o, visited) {
-				visited = visited || {};
-
-				var clone; var id;
-				switch (_.util.type(o)) {
-					case 'Object':
-						id = _.util.objId(o);
-						if (visited[id]) {
-							return visited[id];
-						}
-						clone = /** @type {Record<string, any>} */ ({});
-						visited[id] = clone;
-
-						for (var key in o) {
-							if (o.hasOwnProperty(key)) {
-								clone[key] = deepClone(o[key], visited);
-							}
-						}
-
-						return /** @type {any} */ (clone);
-
-					case 'Array':
-						id = _.util.objId(o);
-						if (visited[id]) {
-							return visited[id];
-						}
-						clone = [];
-						visited[id] = clone;
-
-						(/** @type {Array} */(/** @type {any} */(o))).forEach(function (v, i) {
-							clone[i] = deepClone(v, visited);
-						});
-
-						return /** @type {any} */ (clone);
-
-					default:
-						return o;
-				}
-			},
-
-			/**
-			 * Returns the Prism language of the given element set by a `language-xxxx` or `lang-xxxx` class.
-			 *
-			 * If no language is set for the element or the element is `null` or `undefined`, `none` will be returned.
-			 *
-			 * @param {Element} element
-			 * @returns {string}
-			 */
-			getLanguage: function (element) {
-				while (element) {
-					var m = lang.exec(element.className);
-					if (m) {
-						return m[1].toLowerCase();
-					}
-					element = element.parentElement;
-				}
-				return 'none';
-			},
-
-			/**
-			 * Sets the Prism `language-xxxx` class of the given element.
-			 *
-			 * @param {Element} element
-			 * @param {string} language
-			 * @returns {void}
-			 */
-			setLanguage: function (element, language) {
-				// remove all `language-xxxx` classes
-				// (this might leave behind a leading space)
-				element.className = element.className.replace(RegExp(lang, 'gi'), '');
-
-				// add the new `language-xxxx` class
-				// (using `classList` will automatically clean up spaces for us)
-				element.classList.add('language-' + language);
-			},
-
-			/**
-			 * Returns the script element that is currently executing.
-			 *
-			 * This does __not__ work for line script element.
-			 *
-			 * @returns {HTMLScriptElement | null}
-			 */
-			currentScript: function () {
-				if (typeof document === 'undefined') {
-					return null;
-				}
-				if ('currentScript' in document && 1 < 2 /* hack to trip TS' flow analysis */) {
-					return /** @type {any} */ (document.currentScript);
-				}
-
-				// IE11 workaround
-				// we'll get the src of the current script by parsing IE11's error stack trace
-				// this will not work for inline scripts
-
-				try {
-					throw new Error();
-				} catch (err) {
-					// Get file src url from stack. Specifically works with the format of stack traces in IE.
-					// A stack will look like this:
-					//
-					// Error
-					//    at _.util.currentScript (http://localhost/components/prism-core.js:119:5)
-					//    at Global code (http://localhost/components/prism-core.js:606:1)
-
-					var src = (/at [^(\r\n]*\((.*):[^:]+:[^:]+\)$/i.exec(err.stack) || [])[1];
-					if (src) {
-						var scripts = document.getElementsByTagName('script');
-						for (var i in scripts) {
-							if (scripts[i].src == src) {
-								return scripts[i];
-							}
-						}
-					}
-					return null;
-				}
-			},
-
-			/**
-			 * Returns whether a given class is active for `element`.
-			 *
-			 * The class can be activated if `element` or one of its ancestors has the given class and it can be deactivated
-			 * if `element` or one of its ancestors has the negated version of the given class. The _negated version_ of the
-			 * given class is just the given class with a `no-` prefix.
-			 *
-			 * Whether the class is active is determined by the closest ancestor of `element` (where `element` itself is
-			 * closest ancestor) that has the given class or the negated version of it. If neither `element` nor any of its
-			 * ancestors have the given class or the negated version of it, then the default activation will be returned.
-			 *
-			 * In the paradoxical situation where the closest ancestor contains __both__ the given class and the negated
-			 * version of it, the class is considered active.
-			 *
-			 * @param {Element} element
-			 * @param {string} className
-			 * @param {boolean} [defaultActivation=false]
-			 * @returns {boolean}
-			 */
-			isActive: function (element, className, defaultActivation) {
-				var no = 'no-' + className;
-
-				while (element) {
-					var classList = element.classList;
-					if (classList.contains(className)) {
-						return true;
-					}
-					if (classList.contains(no)) {
-						return false;
-					}
-					element = element.parentElement;
-				}
-				return !!defaultActivation;
-			}
-		},
-
-		/**
-		 * This namespace contains all currently loaded languages and the some helper functions to create and modify languages.
-		 *
-		 * @namespace
-		 * @memberof Prism
-		 * @public
-		 */
-		languages: {
-			/**
-			 * The grammar for plain, unformatted text.
-			 */
-			plain: plainTextGrammar,
-			plaintext: plainTextGrammar,
-			text: plainTextGrammar,
-			txt: plainTextGrammar,
-
-			/**
-			 * Creates a deep copy of the language with the given id and appends the given tokens.
-			 *
-			 * If a token in `redef` also appears in the copied language, then the existing token in the copied language
-			 * will be overwritten at its original position.
-			 *
-			 * ## Best practices
-			 *
-			 * Since the position of overwriting tokens (token in `redef` that overwrite tokens in the copied language)
-			 * doesn't matter, they can technically be in any order. However, this can be confusing to others that trying to
-			 * understand the language definition because, normally, the order of tokens matters in Prism grammars.
-			 *
-			 * Therefore, it is encouraged to order overwriting tokens according to the positions of the overwritten tokens.
-			 * Furthermore, all non-overwriting tokens should be placed after the overwriting ones.
-			 *
-			 * @param {string} id The id of the language to extend. This has to be a key in `Prism.languages`.
-			 * @param {Grammar} redef The new tokens to append.
-			 * @returns {Grammar} The new language created.
-			 * @public
-			 * @example
-			 * Prism.languages['css-with-colors'] = Prism.languages.extend('css', {
-			 *     // Prism.languages.css already has a 'comment' token, so this token will overwrite CSS' 'comment' token
-			 *     // at its original position
-			 *     'comment': { ... },
-			 *     // CSS doesn't have a 'color' token, so this token will be appended
-			 *     'color': /\b(?:red|green|blue)\b/
-			 * });
-			 */
-			extend: function (id, redef) {
-				var lang = _.util.clone(_.languages[id]);
-
-				for (var key in redef) {
-					lang[key] = redef[key];
-				}
-
-				return lang;
-			},
-
-			/**
-			 * Inserts tokens _before_ another token in a language definition or any other grammar.
-			 *
-			 * ## Usage
-			 *
-			 * This helper method makes it easy to modify existing languages. For example, the CSS language definition
-			 * not only defines CSS highlighting for CSS documents, but also needs to define highlighting for CSS embedded
-			 * in HTML through `<style>` elements. To do this, it needs to modify `Prism.languages.markup` and add the
-			 * appropriate tokens. However, `Prism.languages.markup` is a regular JavaScript object literal, so if you do
-			 * this:
-			 *
-			 * ```js
-			 * Prism.languages.markup.style = {
-			 *     // token
-			 * };
-			 * ```
-			 *
-			 * then the `style` token will be added (and processed) at the end. `insertBefore` allows you to insert tokens
-			 * before existing tokens. For the CSS example above, you would use it like this:
-			 *
-			 * ```js
-			 * Prism.languages.insertBefore('markup', 'cdata', {
-			 *     'style': {
-			 *         // token
-			 *     }
-			 * });
-			 * ```
-			 *
-			 * ## Special cases
-			 *
-			 * If the grammars of `inside` and `insert` have tokens with the same name, the tokens in `inside`'s grammar
-			 * will be ignored.
-			 *
-			 * This behavior can be used to insert tokens after `before`:
-			 *
-			 * ```js
-			 * Prism.languages.insertBefore('markup', 'comment', {
-			 *     'comment': Prism.languages.markup.comment,
-			 *     // tokens after 'comment'
-			 * });
-			 * ```
-			 *
-			 * ## Limitations
-			 *
-			 * The main problem `insertBefore` has to solve is iteration order. Since ES2015, the iteration order for object
-			 * properties is guaranteed to be the insertion order (except for integer keys) but some browsers behave
-			 * differently when keys are deleted and re-inserted. So `insertBefore` can't be implemented by temporarily
-			 * deleting properties which is necessary to insert at arbitrary positions.
-			 *
-			 * To solve this problem, `insertBefore` doesn't actually insert the given tokens into the target object.
-			 * Instead, it will create a new object and replace all references to the target object with the new one. This
-			 * can be done without temporarily deleting properties, so the iteration order is well-defined.
-			 *
-			 * However, only references that can be reached from `Prism.languages` or `insert` will be replaced. I.e. if
-			 * you hold the target object in a variable, then the value of the variable will not change.
-			 *
-			 * ```js
-			 * var oldMarkup = Prism.languages.markup;
-			 * var newMarkup = Prism.languages.insertBefore('markup', 'comment', { ... });
-			 *
-			 * assert(oldMarkup !== Prism.languages.markup);
-			 * assert(newMarkup === Prism.languages.markup);
-			 * ```
-			 *
-			 * @param {string} inside The property of `root` (e.g. a language id in `Prism.languages`) that contains the
-			 * object to be modified.
-			 * @param {string} before The key to insert before.
-			 * @param {Grammar} insert An object containing the key-value pairs to be inserted.
-			 * @param {Object<string, any>} [root] The object containing `inside`, i.e. the object that contains the
-			 * object to be modified.
-			 *
-			 * Defaults to `Prism.languages`.
-			 * @returns {Grammar} The new grammar object.
-			 * @public
-			 */
-			insertBefore: function (inside, before, insert, root) {
-				root = root || /** @type {any} */ (_.languages);
-				var grammar = root[inside];
-				/** @type {Grammar} */
-				var ret = {};
-
-				for (var token in grammar) {
-					if (grammar.hasOwnProperty(token)) {
-
-						if (token == before) {
-							for (var newToken in insert) {
-								if (insert.hasOwnProperty(newToken)) {
-									ret[newToken] = insert[newToken];
-								}
-							}
-						}
-
-						// Do not insert token which also occur in insert. See #1525
-						if (!insert.hasOwnProperty(token)) {
-							ret[token] = grammar[token];
-						}
-					}
-				}
-
-				var old = root[inside];
-				root[inside] = ret;
-
-				// Update references in other language definitions
-				_.languages.DFS(_.languages, function (key, value) {
-					if (value === old && key != inside) {
-						this[key] = ret;
-					}
-				});
-
-				return ret;
-			},
-
-			// Traverse a language definition with Depth First Search
-			DFS: function DFS(o, callback, type, visited) {
-				visited = visited || {};
-
-				var objId = _.util.objId;
-
-				for (var i in o) {
-					if (o.hasOwnProperty(i)) {
-						callback.call(o, i, o[i], type || i);
-
-						var property = o[i];
-						var propertyType = _.util.type(property);
-
-						if (propertyType === 'Object' && !visited[objId(property)]) {
-							visited[objId(property)] = true;
-							DFS(property, callback, null, visited);
-						} else if (propertyType === 'Array' && !visited[objId(property)]) {
-							visited[objId(property)] = true;
-							DFS(property, callback, i, visited);
-						}
-					}
-				}
-			}
-		},
-
-		plugins: {},
-
-		/**
-		 * This is the most high-level function in Prism’s API.
-		 * It fetches all the elements that have a `.language-xxxx` class and then calls {@link Prism.highlightElement} on
-		 * each one of them.
-		 *
-		 * This is equivalent to `Prism.highlightAllUnder(document, async, callback)`.
-		 *
-		 * @param {boolean} [async=false] Same as in {@link Prism.highlightAllUnder}.
-		 * @param {HighlightCallback} [callback] Same as in {@link Prism.highlightAllUnder}.
-		 * @memberof Prism
-		 * @public
-		 */
-		highlightAll: function (async, callback) {
-			_.highlightAllUnder(document, async, callback);
-		},
-
-		/**
-		 * Fetches all the descendants of `container` that have a `.language-xxxx` class and then calls
-		 * {@link Prism.highlightElement} on each one of them.
-		 *
-		 * The following hooks will be run:
-		 * 1. `before-highlightall`
-		 * 2. `before-all-elements-highlight`
-		 * 3. All hooks of {@link Prism.highlightElement} for each element.
-		 *
-		 * @param {ParentNode} container The root element, whose descendants that have a `.language-xxxx` class will be highlighted.
-		 * @param {boolean} [async=false] Whether each element is to be highlighted asynchronously using Web Workers.
-		 * @param {HighlightCallback} [callback] An optional callback to be invoked on each element after its highlighting is done.
-		 * @memberof Prism
-		 * @public
-		 */
-		highlightAllUnder: function (container, async, callback) {
-			var env = {
-				callback: callback,
-				container: container,
-				selector: 'code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code'
-			};
-
-			_.hooks.run('before-highlightall', env);
-
-			env.elements = Array.prototype.slice.apply(env.container.querySelectorAll(env.selector));
-
-			_.hooks.run('before-all-elements-highlight', env);
-
-			for (var i = 0, element; (element = env.elements[i++]);) {
-				_.highlightElement(element, async === true, env.callback);
-			}
-		},
-
-		/**
-		 * Highlights the code inside a single element.
-		 *
-		 * The following hooks will be run:
-		 * 1. `before-sanity-check`
-		 * 2. `before-highlight`
-		 * 3. All hooks of {@link Prism.highlight}. These hooks will be run by an asynchronous worker if `async` is `true`.
-		 * 4. `before-insert`
-		 * 5. `after-highlight`
-		 * 6. `complete`
-		 *
-		 * Some the above hooks will be skipped if the element doesn't contain any text or there is no grammar loaded for
-		 * the element's language.
-		 *
-		 * @param {Element} element The element containing the code.
-		 * It must have a class of `language-xxxx` to be processed, where `xxxx` is a valid language identifier.
-		 * @param {boolean} [async=false] Whether the element is to be highlighted asynchronously using Web Workers
-		 * to improve performance and avoid blocking the UI when highlighting very large chunks of code. This option is
-		 * [disabled by default](https://prismjs.com/faq.html#why-is-asynchronous-highlighting-disabled-by-default).
-		 *
-		 * Note: All language definitions required to highlight the code must be included in the main `prism.js` file for
-		 * asynchronous highlighting to work. You can build your own bundle on the
-		 * [Download page](https://prismjs.com/download.html).
-		 * @param {HighlightCallback} [callback] An optional callback to be invoked after the highlighting is done.
-		 * Mostly useful when `async` is `true`, since in that case, the highlighting is done asynchronously.
-		 * @memberof Prism
-		 * @public
-		 */
-		highlightElement: function (element, async, callback) {
-			// Find language
-			var language = _.util.getLanguage(element);
-			var grammar = _.languages[language];
-
-			// Set language on the element, if not present
-			_.util.setLanguage(element, language);
-
-			// Set language on the parent, for styling
-			var parent = element.parentElement;
-			if (parent && parent.nodeName.toLowerCase() === 'pre') {
-				_.util.setLanguage(parent, language);
-			}
-
-			var code = element.textContent;
-
-			var env = {
-				element: element,
-				language: language,
-				grammar: grammar,
-				code: code
-			};
-
-			function insertHighlightedCode(highlightedCode) {
-				env.highlightedCode = highlightedCode;
-
-				_.hooks.run('before-insert', env);
-
-				env.element.innerHTML = env.highlightedCode;
-
-				_.hooks.run('after-highlight', env);
-				_.hooks.run('complete', env);
-				callback && callback.call(env.element);
-			}
-
-			_.hooks.run('before-sanity-check', env);
-
-			// plugins may change/add the parent/element
-			parent = env.element.parentElement;
-			if (parent && parent.nodeName.toLowerCase() === 'pre' && !parent.hasAttribute('tabindex')) {
-				parent.setAttribute('tabindex', '0');
-			}
-
-			if (!env.code) {
-				_.hooks.run('complete', env);
-				callback && callback.call(env.element);
-				return;
-			}
-
-			_.hooks.run('before-highlight', env);
-
-			if (!env.grammar) {
-				insertHighlightedCode(_.util.encode(env.code));
-				return;
-			}
-
-			if (async && _self.Worker) {
-				var worker = new Worker(_.filename);
-
-				worker.onmessage = function (evt) {
-					insertHighlightedCode(evt.data);
-				};
-
-				worker.postMessage(JSON.stringify({
-					language: env.language,
-					code: env.code,
-					immediateClose: true
-				}));
-			} else {
-				insertHighlightedCode(_.highlight(env.code, env.grammar, env.language));
-			}
-		},
-
-		/**
-		 * Low-level function, only use if you know what you’re doing. It accepts a string of text as input
-		 * and the language definitions to use, and returns a string with the HTML produced.
-		 *
-		 * The following hooks will be run:
-		 * 1. `before-tokenize`
-		 * 2. `after-tokenize`
-		 * 3. `wrap`: On each {@link Token}.
-		 *
-		 * @param {string} text A string with the code to be highlighted.
-		 * @param {Grammar} grammar An object containing the tokens to use.
-		 *
-		 * Usually a language definition like `Prism.languages.markup`.
-		 * @param {string} language The name of the language definition passed to `grammar`.
-		 * @returns {string} The highlighted HTML.
-		 * @memberof Prism
-		 * @public
-		 * @example
-		 * Prism.highlight('var foo = true;', Prism.languages.javascript, 'javascript');
-		 */
-		highlight: function (text, grammar, language) {
-			var env = {
-				code: text,
-				grammar: grammar,
-				language: language
-			};
-			_.hooks.run('before-tokenize', env);
-			if (!env.grammar) {
-				throw new Error('The language "' + env.language + '" has no grammar.');
-			}
-			env.tokens = _.tokenize(env.code, env.grammar);
-			_.hooks.run('after-tokenize', env);
-			return Token.stringify(_.util.encode(env.tokens), env.language);
-		},
-
-		/**
-		 * This is the heart of Prism, and the most low-level function you can use. It accepts a string of text as input
-		 * and the language definitions to use, and returns an array with the tokenized code.
-		 *
-		 * When the language definition includes nested tokens, the function is called recursively on each of these tokens.
-		 *
-		 * This method could be useful in other contexts as well, as a very crude parser.
-		 *
-		 * @param {string} text A string with the code to be highlighted.
-		 * @param {Grammar} grammar An object containing the tokens to use.
-		 *
-		 * Usually a language definition like `Prism.languages.markup`.
-		 * @returns {TokenStream} An array of strings and tokens, a token stream.
-		 * @memberof Prism
-		 * @public
-		 * @example
-		 * let code = `var foo = 0;`;
-		 * let tokens = Prism.tokenize(code, Prism.languages.javascript);
-		 * tokens.forEach(token => {
-		 *     if (token instanceof Prism.Token && token.type === 'number') {
-		 *         console.log(`Found numeric literal: ${token.content}`);
-		 *     }
-		 * });
-		 */
-		tokenize: function (text, grammar) {
-			var rest = grammar.rest;
-			if (rest) {
-				for (var token in rest) {
-					grammar[token] = rest[token];
-				}
-
-				delete grammar.rest;
-			}
-
-			var tokenList = new LinkedList();
-			addAfter(tokenList, tokenList.head, text);
-
-			matchGrammar(text, tokenList, grammar, tokenList.head, 0);
-
-			return toArray(tokenList);
-		},
-
-		/**
-		 * @namespace
-		 * @memberof Prism
-		 * @public
-		 */
-		hooks: {
-			all: {},
-
-			/**
-			 * Adds the given callback to the list of callbacks for the given hook.
-			 *
-			 * The callback will be invoked when the hook it is registered for is run.
-			 * Hooks are usually directly run by a highlight function but you can also run hooks yourself.
-			 *
-			 * One callback function can be registered to multiple hooks and the same hook multiple times.
-			 *
-			 * @param {string} name The name of the hook.
-			 * @param {HookCallback} callback The callback function which is given environment variables.
-			 * @public
-			 */
-			add: function (name, callback) {
-				var hooks = _.hooks.all;
-
-				hooks[name] = hooks[name] || [];
-
-				hooks[name].push(callback);
-			},
-
-			/**
-			 * Runs a hook invoking all registered callbacks with the given environment variables.
-			 *
-			 * Callbacks will be invoked synchronously and in the order in which they were registered.
-			 *
-			 * @param {string} name The name of the hook.
-			 * @param {Object<string, any>} env The environment variables of the hook passed to all callbacks registered.
-			 * @public
-			 */
-			run: function (name, env) {
-				var callbacks = _.hooks.all[name];
-
-				if (!callbacks || !callbacks.length) {
-					return;
-				}
-
-				for (var i = 0, callback; (callback = callbacks[i++]);) {
-					callback(env);
-				}
-			}
-		},
-
-		Token: Token
-	};
-	_self.Prism = _;
-
-
-	// Typescript note:
-	// The following can be used to import the Token type in JSDoc:
-	//
-	//   @typedef {InstanceType<import("./prism-core")["Token"]>} Token
-
-	/**
-	 * Creates a new token.
-	 *
-	 * @param {string} type See {@link Token#type type}
-	 * @param {string | TokenStream} content See {@link Token#content content}
-	 * @param {string|string[]} [alias] The alias(es) of the token.
-	 * @param {string} [matchedStr=""] A copy of the full string this token was created from.
-	 * @class
-	 * @global
-	 * @public
-	 */
-	function Token(type, content, alias, matchedStr) {
-		/**
-		 * The type of the token.
-		 *
-		 * This is usually the key of a pattern in a {@link Grammar}.
-		 *
-		 * @type {string}
-		 * @see GrammarToken
-		 * @public
-		 */
-		this.type = type;
-		/**
-		 * The strings or tokens contained by this token.
-		 *
-		 * This will be a token stream if the pattern matched also defined an `inside` grammar.
-		 *
-		 * @type {string | TokenStream}
-		 * @public
-		 */
-		this.content = content;
-		/**
-		 * The alias(es) of the token.
-		 *
-		 * @type {string|string[]}
-		 * @see GrammarToken
-		 * @public
-		 */
-		this.alias = alias;
-		// Copy of the full string this token was created from
-		this.length = (matchedStr || '').length | 0;
-	}
-
-	/**
-	 * A token stream is an array of strings and {@link Token Token} objects.
-	 *
-	 * Token streams have to fulfill a few properties that are assumed by most functions (mostly internal ones) that process
-	 * them.
-	 *
-	 * 1. No adjacent strings.
-	 * 2. No empty strings.
-	 *
-	 *    The only exception here is the token stream that only contains the empty string and nothing else.
-	 *
-	 * @typedef {Array<string | Token>} TokenStream
-	 * @global
-	 * @public
-	 */
-
-	/**
-	 * Converts the given token or token stream to an HTML representation.
-	 *
-	 * The following hooks will be run:
-	 * 1. `wrap`: On each {@link Token}.
-	 *
-	 * @param {string | Token | TokenStream} o The token or token stream to be converted.
-	 * @param {string} language The name of current language.
-	 * @returns {string} The HTML representation of the token or token stream.
-	 * @memberof Token
-	 * @static
-	 */
-	Token.stringify = function stringify(o, language) {
-		if (typeof o == 'string') {
-			return o;
-		}
-		if (Array.isArray(o)) {
-			var s = '';
-			o.forEach(function (e) {
-				s += stringify(e, language);
-			});
-			return s;
-		}
-
-		var env = {
-			type: o.type,
-			content: stringify(o.content, language),
-			tag: 'span',
-			classes: ['token', o.type],
-			attributes: {},
-			language: language
-		};
-
-		var aliases = o.alias;
-		if (aliases) {
-			if (Array.isArray(aliases)) {
-				Array.prototype.push.apply(env.classes, aliases);
-			} else {
-				env.classes.push(aliases);
-			}
-		}
-
-		_.hooks.run('wrap', env);
-
-		var attributes = '';
-		for (var name in env.attributes) {
-			attributes += ' ' + name + '="' + (env.attributes[name] || '').replace(/"/g, '&quot;') + '"';
-		}
-
-		return '<' + env.tag + ' class="' + env.classes.join(' ') + '"' + attributes + '>' + env.content + '</' + env.tag + '>';
-	};
-
-	/**
-	 * @param {RegExp} pattern
-	 * @param {number} pos
-	 * @param {string} text
-	 * @param {boolean} lookbehind
-	 * @returns {RegExpExecArray | null}
-	 */
-	function matchPattern(pattern, pos, text, lookbehind) {
-		pattern.lastIndex = pos;
-		var match = pattern.exec(text);
-		if (match && lookbehind && match[1]) {
-			// change the match to remove the text matched by the Prism lookbehind group
-			var lookbehindLength = match[1].length;
-			match.index += lookbehindLength;
-			match[0] = match[0].slice(lookbehindLength);
-		}
-		return match;
-	}
-
-	/**
-	 * @param {string} text
-	 * @param {LinkedList<string | Token>} tokenList
-	 * @param {any} grammar
-	 * @param {LinkedListNode<string | Token>} startNode
-	 * @param {number} startPos
-	 * @param {RematchOptions} [rematch]
-	 * @returns {void}
-	 * @private
-	 *
-	 * @typedef RematchOptions
-	 * @property {string} cause
-	 * @property {number} reach
-	 */
-	function matchGrammar(text, tokenList, grammar, startNode, startPos, rematch) {
-		for (var token in grammar) {
-			if (!grammar.hasOwnProperty(token) || !grammar[token]) {
-				continue;
-			}
-
-			var patterns = grammar[token];
-			patterns = Array.isArray(patterns) ? patterns : [patterns];
-
-			for (var j = 0; j < patterns.length; ++j) {
-				if (rematch && rematch.cause == token + ',' + j) {
-					return;
-				}
-
-				var patternObj = patterns[j];
-				var inside = patternObj.inside;
-				var lookbehind = !!patternObj.lookbehind;
-				var greedy = !!patternObj.greedy;
-				var alias = patternObj.alias;
-
-				if (greedy && !patternObj.pattern.global) {
-					// Without the global flag, lastIndex won't work
-					var flags = patternObj.pattern.toString().match(/[imsuy]*$/)[0];
-					patternObj.pattern = RegExp(patternObj.pattern.source, flags + 'g');
-				}
-
-				/** @type {RegExp} */
-				var pattern = patternObj.pattern || patternObj;
-
-				for ( // iterate the token list and keep track of the current token/string position
-					var currentNode = startNode.next, pos = startPos;
-					currentNode !== tokenList.tail;
-					pos += currentNode.value.length, currentNode = currentNode.next
-				) {
-
-					if (rematch && pos >= rematch.reach) {
-						break;
-					}
-
-					var str = currentNode.value;
-
-					if (tokenList.length > text.length) {
-						// Something went terribly wrong, ABORT, ABORT!
-						return;
-					}
-
-					if (str instanceof Token) {
-						continue;
-					}
-
-					var removeCount = 1; // this is the to parameter of removeBetween
-					var match;
-
-					if (greedy) {
-						match = matchPattern(pattern, pos, text, lookbehind);
-						if (!match || match.index >= text.length) {
-							break;
-						}
-
-						var from = match.index;
-						var to = match.index + match[0].length;
-						var p = pos;
-
-						// find the node that contains the match
-						p += currentNode.value.length;
-						while (from >= p) {
-							currentNode = currentNode.next;
-							p += currentNode.value.length;
-						}
-						// adjust pos (and p)
-						p -= currentNode.value.length;
-						pos = p;
-
-						// the current node is a Token, then the match starts inside another Token, which is invalid
-						if (currentNode.value instanceof Token) {
-							continue;
-						}
-
-						// find the last node which is affected by this match
-						for (
-							var k = currentNode;
-							k !== tokenList.tail && (p < to || typeof k.value === 'string');
-							k = k.next
-						) {
-							removeCount++;
-							p += k.value.length;
-						}
-						removeCount--;
-
-						// replace with the new match
-						str = text.slice(pos, p);
-						match.index -= pos;
-					} else {
-						match = matchPattern(pattern, 0, str, lookbehind);
-						if (!match) {
-							continue;
-						}
-					}
-
-					// eslint-disable-next-line no-redeclare
-					var from = match.index;
-					var matchStr = match[0];
-					var before = str.slice(0, from);
-					var after = str.slice(from + matchStr.length);
-
-					var reach = pos + str.length;
-					if (rematch && reach > rematch.reach) {
-						rematch.reach = reach;
-					}
-
-					var removeFrom = currentNode.prev;
-
-					if (before) {
-						removeFrom = addAfter(tokenList, removeFrom, before);
-						pos += before.length;
-					}
-
-					removeRange(tokenList, removeFrom, removeCount);
-
-					var wrapped = new Token(token, inside ? _.tokenize(matchStr, inside) : matchStr, alias, matchStr);
-					currentNode = addAfter(tokenList, removeFrom, wrapped);
-
-					if (after) {
-						addAfter(tokenList, currentNode, after);
-					}
-
-					if (removeCount > 1) {
-						// at least one Token object was removed, so we have to do some rematching
-						// this can only happen if the current pattern is greedy
-
-						/** @type {RematchOptions} */
-						var nestedRematch = {
-							cause: token + ',' + j,
-							reach: reach
-						};
-						matchGrammar(text, tokenList, grammar, currentNode.prev, pos, nestedRematch);
-
-						// the reach might have been extended because of the rematching
-						if (rematch && nestedRematch.reach > rematch.reach) {
-							rematch.reach = nestedRematch.reach;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * @typedef LinkedListNode
-	 * @property {T} value
-	 * @property {LinkedListNode<T> | null} prev The previous node.
-	 * @property {LinkedListNode<T> | null} next The next node.
-	 * @template T
-	 * @private
-	 */
-
-	/**
-	 * @template T
-	 * @private
-	 */
-	function LinkedList() {
-		/** @type {LinkedListNode<T>} */
-		var head = { value: null, prev: null, next: null };
-		/** @type {LinkedListNode<T>} */
-		var tail = { value: null, prev: head, next: null };
-		head.next = tail;
-
-		/** @type {LinkedListNode<T>} */
-		this.head = head;
-		/** @type {LinkedListNode<T>} */
-		this.tail = tail;
-		this.length = 0;
-	}
-
-	/**
-	 * Adds a new node with the given value to the list.
-	 *
-	 * @param {LinkedList<T>} list
-	 * @param {LinkedListNode<T>} node
-	 * @param {T} value
-	 * @returns {LinkedListNode<T>} The added node.
-	 * @template T
-	 */
-	function addAfter(list, node, value) {
-		// assumes that node != list.tail && values.length >= 0
-		var next = node.next;
-
-		var newNode = { value: value, prev: node, next: next };
-		node.next = newNode;
-		next.prev = newNode;
-		list.length++;
-
-		return newNode;
-	}
-	/**
-	 * Removes `count` nodes after the given node. The given node will not be removed.
-	 *
-	 * @param {LinkedList<T>} list
-	 * @param {LinkedListNode<T>} node
-	 * @param {number} count
-	 * @template T
-	 */
-	function removeRange(list, node, count) {
-		var next = node.next;
-		for (var i = 0; i < count && next !== list.tail; i++) {
-			next = next.next;
-		}
-		node.next = next;
-		next.prev = node;
-		list.length -= i;
-	}
-	/**
-	 * @param {LinkedList<T>} list
-	 * @returns {T[]}
-	 * @template T
-	 */
-	function toArray(list) {
-		var array = [];
-		var node = list.head.next;
-		while (node !== list.tail) {
-			array.push(node.value);
-			node = node.next;
-		}
-		return array;
-	}
-
-
-	if (!_self.document) {
-		if (!_self.addEventListener) {
-			// in Node.js
-			return _;
-		}
-
-		if (!_.disableWorkerMessageHandler) {
-			// In worker
-			_self.addEventListener('message', function (evt) {
-				var message = JSON.parse(evt.data);
-				var lang = message.language;
-				var code = message.code;
-				var immediateClose = message.immediateClose;
-
-				_self.postMessage(_.highlight(code, _.languages[lang], lang));
-				if (immediateClose) {
-					_self.close();
-				}
-			}, false);
-		}
-
-		return _;
-	}
-
-	// Get current script and highlight
-	var script = _.util.currentScript();
-
-	if (script) {
-		_.filename = script.src;
-
-		if (script.hasAttribute('data-manual')) {
-			_.manual = true;
-		}
-	}
-
-	function highlightAutomaticallyCallback() {
-		if (!_.manual) {
-			_.highlightAll();
-		}
-	}
-
-	if (!_.manual) {
-		// If the document state is "loading", then we'll use DOMContentLoaded.
-		// If the document state is "interactive" and the prism.js script is deferred, then we'll also use the
-		// DOMContentLoaded event because there might be some plugins or languages which have also been deferred and they
-		// might take longer one animation frame to execute which can create a race condition where only some plugins have
-		// been loaded when Prism.highlightAll() is executed, depending on how fast resources are loaded.
-		// See https://github.com/PrismJS/prism/issues/2102
-		var readyState = document.readyState;
-		if (readyState === 'loading' || readyState === 'interactive' && script && script.defer) {
-			document.addEventListener('DOMContentLoaded', highlightAutomaticallyCallback);
-		} else {
-			if (window.requestAnimationFrame) {
-				window.requestAnimationFrame(highlightAutomaticallyCallback);
-			} else {
-				window.setTimeout(highlightAutomaticallyCallback, 16);
-			}
-		}
-	}
-
-	return _;
-
-}(_self));
-
-if (typeof module !== 'undefined' && module.exports) {
-	module.exports = Prism;
-}
-
-// hack for components to work correctly in node.js
-if (typeof global !== 'undefined') {
-	global.Prism = Prism;
-}
-
-// some additional documentation/types
-
-/**
- * The expansion of a simple `RegExp` literal to support additional properties.
- *
- * @typedef GrammarToken
- * @property {RegExp} pattern The regular expression of the token.
- * @property {boolean} [lookbehind=false] If `true`, then the first capturing group of `pattern` will (effectively)
- * behave as a lookbehind group meaning that the captured text will not be part of the matched text of the new token.
- * @property {boolean} [greedy=false] Whether the token is greedy.
- * @property {string|string[]} [alias] An optional alias or list of aliases.
- * @property {Grammar} [inside] The nested grammar of this token.
- *
- * The `inside` grammar will be used to tokenize the text value of each token of this kind.
- *
- * This can be used to make nested and even recursive language definitions.
- *
- * Note: This can cause infinite recursion. Be careful when you embed different languages or even the same language into
- * each another.
- * @global
- * @public
- */
-
-/**
- * @typedef Grammar
- * @type {Object<string, RegExp | GrammarToken | Array<RegExp | GrammarToken>>}
- * @property {Grammar} [rest] An optional grammar object that will be appended to this grammar.
- * @global
- * @public
- */
-
-/**
- * A function which will invoked after an element was successfully highlighted.
- *
- * @callback HighlightCallback
- * @param {Element} element The element successfully highlighted.
- * @returns {void}
- * @global
- * @public
- */
-
-/**
- * @callback HookCallback
- * @param {Object<string, any>} env The environment variables of the hook.
- * @returns {void}
- * @global
- * @public
- */
-
-
-/* **********************************************
-     Begin prism-markup.js
-********************************************** */
-
-Prism.languages.markup = {
-	'comment': {
-		pattern: /<!--(?:(?!<!--)[\s\S])*?-->/,
-		greedy: true
-	},
-	'prolog': {
-		pattern: /<\?[\s\S]+?\?>/,
-		greedy: true
-	},
-	'doctype': {
-		// https://www.w3.org/TR/xml/#NT-doctypedecl
-		pattern: /<!DOCTYPE(?:[^>"'[\]]|"[^"]*"|'[^']*')+(?:\[(?:[^<"'\]]|"[^"]*"|'[^']*'|<(?!!--)|<!--(?:[^-]|-(?!->))*-->)*\]\s*)?>/i,
-		greedy: true,
-		inside: {
-			'internal-subset': {
-				pattern: /(^[^\[]*\[)[\s\S]+(?=\]>$)/,
-				lookbehind: true,
-				greedy: true,
-				inside: null // see below
-			},
-			'string': {
-				pattern: /"[^"]*"|'[^']*'/,
-				greedy: true
-			},
-			'punctuation': /^<!|>$|[[\]]/,
-			'doctype-tag': /^DOCTYPE/i,
-			'name': /[^\s<>'"]+/
-		}
-	},
-	'cdata': {
-		pattern: /<!\[CDATA\[[\s\S]*?\]\]>/i,
-		greedy: true
-	},
-	'tag': {
-		pattern: /<\/?(?!\d)[^\s>\/=$<%]+(?:\s(?:\s*[^\s>\/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s'">=]+(?=[\s>]))|(?=[\s/>])))+)?\s*\/?>/,
-		greedy: true,
-		inside: {
-			'tag': {
-				pattern: /^<\/?[^\s>\/]+/,
-				inside: {
-					'punctuation': /^<\/?/,
-					'namespace': /^[^\s>\/:]+:/
-				}
-			},
-			'special-attr': [],
-			'attr-value': {
-				pattern: /=\s*(?:"[^"]*"|'[^']*'|[^\s'">=]+)/,
-				inside: {
-					'punctuation': [
-						{
-							pattern: /^=/,
-							alias: 'attr-equals'
-						},
-						{
-							pattern: /^(\s*)["']|["']$/,
-							lookbehind: true
-						}
-					]
-				}
-			},
-			'punctuation': /\/?>/,
-			'attr-name': {
-				pattern: /[^\s>\/]+/,
-				inside: {
-					'namespace': /^[^\s>\/:]+:/
-				}
-			}
-
-		}
-	},
-	'entity': [
-		{
-			pattern: /&[\da-z]{1,8};/i,
-			alias: 'named-entity'
-		},
-		/&#x?[\da-f]{1,8};/i
-	]
-};
-
-Prism.languages.markup['tag'].inside['attr-value'].inside['entity'] =
-	Prism.languages.markup['entity'];
-Prism.languages.markup['doctype'].inside['internal-subset'].inside = Prism.languages.markup;
-
-// Plugin to make entity title show the real entity, idea by Roman Komarov
-Prism.hooks.add('wrap', function (env) {
-
-	if (env.type === 'entity') {
-		env.attributes['title'] = env.content.replace(/&amp;/, '&');
-	}
-});
-
-Object.defineProperty(Prism.languages.markup.tag, 'addInlined', {
-	/**
-	 * Adds an inlined language to markup.
-	 *
-	 * An example of an inlined language is CSS with `<style>` tags.
-	 *
-	 * @param {string} tagName The name of the tag that contains the inlined language. This name will be treated as
-	 * case insensitive.
-	 * @param {string} lang The language key.
-	 * @example
-	 * addInlined('style', 'css');
-	 */
-	value: function addInlined(tagName, lang) {
-		var includedCdataInside = {};
-		includedCdataInside['language-' + lang] = {
-			pattern: /(^<!\[CDATA\[)[\s\S]+?(?=\]\]>$)/i,
-			lookbehind: true,
-			inside: Prism.languages[lang]
-		};
-		includedCdataInside['cdata'] = /^<!\[CDATA\[|\]\]>$/i;
-
-		var inside = {
-			'included-cdata': {
-				pattern: /<!\[CDATA\[[\s\S]*?\]\]>/i,
-				inside: includedCdataInside
-			}
-		};
-		inside['language-' + lang] = {
-			pattern: /[\s\S]+/,
-			inside: Prism.languages[lang]
-		};
-
-		var def = {};
-		def[tagName] = {
-			pattern: RegExp(/(<__[^>]*>)(?:<!\[CDATA\[(?:[^\]]|\](?!\]>))*\]\]>|(?!<!\[CDATA\[)[\s\S])*?(?=<\/__>)/.source.replace(/__/g, function () { return tagName; }), 'i'),
-			lookbehind: true,
-			greedy: true,
-			inside: inside
-		};
-
-		Prism.languages.insertBefore('markup', 'cdata', def);
-	}
-});
-Object.defineProperty(Prism.languages.markup.tag, 'addAttribute', {
-	/**
-	 * Adds an pattern to highlight languages embedded in HTML attributes.
-	 *
-	 * An example of an inlined language is CSS with `style` attributes.
-	 *
-	 * @param {string} attrName The name of the tag that contains the inlined language. This name will be treated as
-	 * case insensitive.
-	 * @param {string} lang The language key.
-	 * @example
-	 * addAttribute('style', 'css');
-	 */
-	value: function (attrName, lang) {
-		Prism.languages.markup.tag.inside['special-attr'].push({
-			pattern: RegExp(
-				/(^|["'\s])/.source + '(?:' + attrName + ')' + /\s*=\s*(?:"[^"]*"|'[^']*'|[^\s'">=]+(?=[\s>]))/.source,
-				'i'
-			),
-			lookbehind: true,
-			inside: {
-				'attr-name': /^[^\s=]+/,
-				'attr-value': {
-					pattern: /=[\s\S]+/,
-					inside: {
-						'value': {
-							pattern: /(^=\s*(["']|(?!["'])))\S[\s\S]*(?=\2$)/,
-							lookbehind: true,
-							alias: [lang, 'language-' + lang],
-							inside: Prism.languages[lang]
-						},
-						'punctuation': [
-							{
-								pattern: /^=/,
-								alias: 'attr-equals'
-							},
-							/"|'/
-						]
-					}
-				}
-			}
-		});
-	}
-});
-
-Prism.languages.html = Prism.languages.markup;
-Prism.languages.mathml = Prism.languages.markup;
-Prism.languages.svg = Prism.languages.markup;
-
-Prism.languages.xml = Prism.languages.extend('markup', {});
-Prism.languages.ssml = Prism.languages.xml;
-Prism.languages.atom = Prism.languages.xml;
-Prism.languages.rss = Prism.languages.xml;
-
-
-/* **********************************************
-     Begin prism-css.js
-********************************************** */
-
-(function (Prism) {
-
-	var string = /(?:"(?:\\(?:\r\n|[\s\S])|[^"\\\r\n])*"|'(?:\\(?:\r\n|[\s\S])|[^'\\\r\n])*')/;
-
-	Prism.languages.css = {
-		'comment': /\/\*[\s\S]*?\*\//,
-		'atrule': {
-			pattern: RegExp('@[\\w-](?:' + /[^;{\s"']|\s+(?!\s)/.source + '|' + string.source + ')*?' + /(?:;|(?=\s*\{))/.source),
-			inside: {
-				'rule': /^@[\w-]+/,
-				'selector-function-argument': {
-					pattern: /(\bselector\s*\(\s*(?![\s)]))(?:[^()\s]|\s+(?![\s)])|\((?:[^()]|\([^()]*\))*\))+(?=\s*\))/,
-					lookbehind: true,
-					alias: 'selector'
-				},
-				'keyword': {
-					pattern: /(^|[^\w-])(?:and|not|only|or)(?![\w-])/,
-					lookbehind: true
-				}
-				// See rest below
-			}
-		},
-		'url': {
-			// https://drafts.csswg.org/css-values-3/#urls
-			pattern: RegExp('\\burl\\((?:' + string.source + '|' + /(?:[^\\\r\n()"']|\\[\s\S])*/.source + ')\\)', 'i'),
-			greedy: true,
-			inside: {
-				'function': /^url/i,
-				'punctuation': /^\(|\)$/,
-				'string': {
-					pattern: RegExp('^' + string.source + '$'),
-					alias: 'url'
-				}
-			}
-		},
-		'selector': {
-			pattern: RegExp('(^|[{}\\s])[^{}\\s](?:[^{};"\'\\s]|\\s+(?![\\s{])|' + string.source + ')*(?=\\s*\\{)'),
-			lookbehind: true
-		},
-		'string': {
-			pattern: string,
-			greedy: true
-		},
-		'property': {
-			pattern: /(^|[^-\w\xA0-\uFFFF])(?!\s)[-_a-z\xA0-\uFFFF](?:(?!\s)[-\w\xA0-\uFFFF])*(?=\s*:)/i,
-			lookbehind: true
-		},
-		'important': /!important\b/i,
-		'function': {
-			pattern: /(^|[^-a-z0-9])[-a-z0-9]+(?=\()/i,
-			lookbehind: true
-		},
-		'punctuation': /[(){};:,]/
-	};
-
-	Prism.languages.css['atrule'].inside.rest = Prism.languages.css;
-
-	var markup = Prism.languages.markup;
-	if (markup) {
-		markup.tag.addInlined('style', 'css');
-		markup.tag.addAttribute('style', 'css');
-	}
-
-}(Prism));
-
-
-/* **********************************************
-     Begin prism-clike.js
-********************************************** */
-
-Prism.languages.clike = {
-	'comment': [
-		{
-			pattern: /(^|[^\\])\/\*[\s\S]*?(?:\*\/|$)/,
-			lookbehind: true,
-			greedy: true
-		},
-		{
-			pattern: /(^|[^\\:])\/\/.*/,
-			lookbehind: true,
-			greedy: true
-		}
-	],
-	'string': {
-		pattern: /(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,
-		greedy: true
-	},
-	'class-name': {
-		pattern: /(\b(?:class|extends|implements|instanceof|interface|new|trait)\s+|\bcatch\s+\()[\w.\\]+/i,
-		lookbehind: true,
-		inside: {
-			'punctuation': /[.\\]/
-		}
-	},
-	'keyword': /\b(?:break|catch|continue|do|else|finally|for|function|if|in|instanceof|new|null|return|throw|try|while)\b/,
-	'boolean': /\b(?:false|true)\b/,
-	'function': /\b\w+(?=\()/,
-	'number': /\b0x[\da-f]+\b|(?:\b\d+(?:\.\d*)?|\B\.\d+)(?:e[+-]?\d+)?/i,
-	'operator': /[<>]=?|[!=]=?=?|--?|\+\+?|&&?|\|\|?|[?*/~^%]/,
-	'punctuation': /[{}[\];(),.:]/
-};
-
-
-/* **********************************************
-     Begin prism-javascript.js
-********************************************** */
-
-Prism.languages.javascript = Prism.languages.extend('clike', {
-	'class-name': [
-		Prism.languages.clike['class-name'],
-		{
-			pattern: /(^|[^$\w\xA0-\uFFFF])(?!\s)[_$A-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\.(?:constructor|prototype))/,
-			lookbehind: true
-		}
-	],
-	'keyword': [
-		{
-			pattern: /((?:^|\})\s*)catch\b/,
-			lookbehind: true
-		},
-		{
-			pattern: /(^|[^.]|\.\.\.\s*)\b(?:as|assert(?=\s*\{)|async(?=\s*(?:function\b|\(|[$\w\xA0-\uFFFF]|$))|await|break|case|class|const|continue|debugger|default|delete|do|else|enum|export|extends|finally(?=\s*(?:\{|$))|for|from(?=\s*(?:['"]|$))|function|(?:get|set)(?=\s*(?:[#\[$\w\xA0-\uFFFF]|$))|if|implements|import|in|instanceof|interface|let|new|null|of|package|private|protected|public|return|static|super|switch|this|throw|try|typeof|undefined|var|void|while|with|yield)\b/,
-			lookbehind: true
-		},
-	],
-	// Allow for all non-ASCII characters (See http://stackoverflow.com/a/2008444)
-	'function': /#?(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\s*(?:\.\s*(?:apply|bind|call)\s*)?\()/,
-	'number': {
-		pattern: RegExp(
-			/(^|[^\w$])/.source +
-			'(?:' +
-			(
-				// constant
-				/NaN|Infinity/.source +
-				'|' +
-				// binary integer
-				/0[bB][01]+(?:_[01]+)*n?/.source +
-				'|' +
-				// octal integer
-				/0[oO][0-7]+(?:_[0-7]+)*n?/.source +
-				'|' +
-				// hexadecimal integer
-				/0[xX][\dA-Fa-f]+(?:_[\dA-Fa-f]+)*n?/.source +
-				'|' +
-				// decimal bigint
-				/\d+(?:_\d+)*n/.source +
-				'|' +
-				// decimal number (integer or float) but no bigint
-				/(?:\d+(?:_\d+)*(?:\.(?:\d+(?:_\d+)*)?)?|\.\d+(?:_\d+)*)(?:[Ee][+-]?\d+(?:_\d+)*)?/.source
-			) +
-			')' +
-			/(?![\w$])/.source
-		),
-		lookbehind: true
-	},
-	'operator': /--|\+\+|\*\*=?|=>|&&=?|\|\|=?|[!=]==|<<=?|>>>?=?|[-+*/%&|^!=<>]=?|\.{3}|\?\?=?|\?\.?|[~:]/
-});
-
-Prism.languages.javascript['class-name'][0].pattern = /(\b(?:class|extends|implements|instanceof|interface|new)\s+)[\w.\\]+/;
-
-Prism.languages.insertBefore('javascript', 'keyword', {
-	'regex': {
-		pattern: RegExp(
-			// lookbehind
-			// eslint-disable-next-line regexp/no-dupe-characters-character-class
-			/((?:^|[^$\w\xA0-\uFFFF."'\])\s]|\b(?:return|yield))\s*)/.source +
-			// Regex pattern:
-			// There are 2 regex patterns here. The RegExp set notation proposal added support for nested character
-			// classes if the `v` flag is present. Unfortunately, nested CCs are both context-free and incompatible
-			// with the only syntax, so we have to define 2 different regex patterns.
-			/\//.source +
-			'(?:' +
-			/(?:\[(?:[^\]\\\r\n]|\\.)*\]|\\.|[^/\\\[\r\n])+\/[dgimyus]{0,7}/.source +
-			'|' +
-			// `v` flag syntax. This supports 3 levels of nested character classes.
-			/(?:\[(?:[^[\]\\\r\n]|\\.|\[(?:[^[\]\\\r\n]|\\.|\[(?:[^[\]\\\r\n]|\\.)*\])*\])*\]|\\.|[^/\\\[\r\n])+\/[dgimyus]{0,7}v[dgimyus]{0,7}/.source +
-			')' +
-			// lookahead
-			/(?=(?:\s|\/\*(?:[^*]|\*(?!\/))*\*\/)*(?:$|[\r\n,.;:})\]]|\/\/))/.source
-		),
-		lookbehind: true,
-		greedy: true,
-		inside: {
-			'regex-source': {
-				pattern: /^(\/)[\s\S]+(?=\/[a-z]*$)/,
-				lookbehind: true,
-				alias: 'language-regex',
-				inside: Prism.languages.regex
-			},
-			'regex-delimiter': /^\/|\/$/,
-			'regex-flags': /^[a-z]+$/,
-		}
-	},
-	// This must be declared before keyword because we use "function" inside the look-forward
-	'function-variable': {
-		pattern: /#?(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\s*[=:]\s*(?:async\s*)?(?:\bfunction\b|(?:\((?:[^()]|\([^()]*\))*\)|(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*)\s*=>))/,
-		alias: 'function'
-	},
-	'parameter': [
-		{
-			pattern: /(function(?:\s+(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*)?\s*\(\s*)(?!\s)(?:[^()\s]|\s+(?![\s)])|\([^()]*\))+(?=\s*\))/,
-			lookbehind: true,
-			inside: Prism.languages.javascript
-		},
-		{
-			pattern: /(^|[^$\w\xA0-\uFFFF])(?!\s)[_$a-z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\s*=>)/i,
-			lookbehind: true,
-			inside: Prism.languages.javascript
-		},
-		{
-			pattern: /(\(\s*)(?!\s)(?:[^()\s]|\s+(?![\s)])|\([^()]*\))+(?=\s*\)\s*=>)/,
-			lookbehind: true,
-			inside: Prism.languages.javascript
-		},
-		{
-			pattern: /((?:\b|\s|^)(?!(?:as|async|await|break|case|catch|class|const|continue|debugger|default|delete|do|else|enum|export|extends|finally|for|from|function|get|if|implements|import|in|instanceof|interface|let|new|null|of|package|private|protected|public|return|set|static|super|switch|this|throw|try|typeof|undefined|var|void|while|with|yield)(?![$\w\xA0-\uFFFF]))(?:(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*\s*)\(\s*|\]\s*\(\s*)(?!\s)(?:[^()\s]|\s+(?![\s)])|\([^()]*\))+(?=\s*\)\s*\{)/,
-			lookbehind: true,
-			inside: Prism.languages.javascript
-		}
-	],
-	'constant': /\b[A-Z](?:[A-Z_]|\dx?)*\b/
-});
-
-Prism.languages.insertBefore('javascript', 'string', {
-	'hashbang': {
-		pattern: /^#!.*/,
-		greedy: true,
-		alias: 'comment'
-	},
-	'template-string': {
-		pattern: /`(?:\\[\s\S]|\$\{(?:[^{}]|\{(?:[^{}]|\{[^}]*\})*\})+\}|(?!\$\{)[^\\`])*`/,
-		greedy: true,
-		inside: {
-			'template-punctuation': {
-				pattern: /^`|`$/,
-				alias: 'string'
-			},
-			'interpolation': {
-				pattern: /((?:^|[^\\])(?:\\{2})*)\$\{(?:[^{}]|\{(?:[^{}]|\{[^}]*\})*\})+\}/,
-				lookbehind: true,
-				inside: {
-					'interpolation-punctuation': {
-						pattern: /^\$\{|\}$/,
-						alias: 'punctuation'
-					},
-					rest: Prism.languages.javascript
-				}
-			},
-			'string': /[\s\S]+/
-		}
-	},
-	'string-property': {
-		pattern: /((?:^|[,{])[ \t]*)(["'])(?:\\(?:\r\n|[\s\S])|(?!\2)[^\\\r\n])*\2(?=\s*:)/m,
-		lookbehind: true,
-		greedy: true,
-		alias: 'property'
-	}
-});
-
-Prism.languages.insertBefore('javascript', 'operator', {
-	'literal-property': {
-		pattern: /((?:^|[,{])[ \t]*)(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\s*:)/m,
-		lookbehind: true,
-		alias: 'property'
-	},
-});
-
-if (Prism.languages.markup) {
-	Prism.languages.markup.tag.addInlined('script', 'javascript');
-
-	// add attribute support for all DOM events.
-	// https://developer.mozilla.org/en-US/docs/Web/Events#Standard_events
-	Prism.languages.markup.tag.addAttribute(
-		/on(?:abort|blur|change|click|composition(?:end|start|update)|dblclick|error|focus(?:in|out)?|key(?:down|up)|load|mouse(?:down|enter|leave|move|out|over|up)|reset|resize|scroll|select|slotchange|submit|unload|wheel)/.source,
-		'javascript'
-	);
-}
-
-Prism.languages.js = Prism.languages.javascript;
-
-
-/* **********************************************
-     Begin prism-file-highlight.js
-********************************************** */
-
-(function () {
-
-	if (typeof Prism === 'undefined' || typeof document === 'undefined') {
-		return;
-	}
-
-	// https://developer.mozilla.org/en-US/docs/Web/API/Element/matches#Polyfill
-	if (!Element.prototype.matches) {
-		Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
-	}
-
-	var LOADING_MESSAGE = 'Loading…';
-	var FAILURE_MESSAGE = function (status, message) {
-		return '✖ Error ' + status + ' while fetching file: ' + message;
-	};
-	var FAILURE_EMPTY_MESSAGE = '✖ Error: File does not exist or is empty';
-
-	var EXTENSIONS = {
-		'js': 'javascript',
-		'py': 'python',
-		'rb': 'ruby',
-		'ps1': 'powershell',
-		'psm1': 'powershell',
-		'sh': 'bash',
-		'bat': 'batch',
-		'h': 'c',
-		'tex': 'latex'
-	};
-
-	var STATUS_ATTR = 'data-src-status';
-	var STATUS_LOADING = 'loading';
-	var STATUS_LOADED = 'loaded';
-	var STATUS_FAILED = 'failed';
-
-	var SELECTOR = 'pre[data-src]:not([' + STATUS_ATTR + '="' + STATUS_LOADED + '"])'
-		+ ':not([' + STATUS_ATTR + '="' + STATUS_LOADING + '"])';
-
-	/**
-	 * Loads the given file.
-	 *
-	 * @param {string} src The URL or path of the source file to load.
-	 * @param {(result: string) => void} success
-	 * @param {(reason: string) => void} error
-	 */
-	function loadFile(src, success, error) {
-		var xhr = new XMLHttpRequest();
-		xhr.open('GET', src, true);
-		xhr.onreadystatechange = function () {
-			if (xhr.readyState == 4) {
-				if (xhr.status < 400 && xhr.responseText) {
-					success(xhr.responseText);
-				} else {
-					if (xhr.status >= 400) {
-						error(FAILURE_MESSAGE(xhr.status, xhr.statusText));
-					} else {
-						error(FAILURE_EMPTY_MESSAGE);
-					}
-				}
-			}
-		};
-		xhr.send(null);
-	}
-
-	/**
-	 * Parses the given range.
-	 *
-	 * This returns a range with inclusive ends.
-	 *
-	 * @param {string | null | undefined} range
-	 * @returns {[number, number | undefined] | undefined}
-	 */
-	function parseRange(range) {
-		var m = /^\s*(\d+)\s*(?:(,)\s*(?:(\d+)\s*)?)?$/.exec(range || '');
-		if (m) {
-			var start = Number(m[1]);
-			var comma = m[2];
-			var end = m[3];
-
-			if (!comma) {
-				return [start, start];
-			}
-			if (!end) {
-				return [start, undefined];
-			}
-			return [start, Number(end)];
-		}
-		return undefined;
-	}
-
-	Prism.hooks.add('before-highlightall', function (env) {
-		env.selector += ', ' + SELECTOR;
-	});
-
-	Prism.hooks.add('before-sanity-check', function (env) {
-		var pre = /** @type {HTMLPreElement} */ (env.element);
-		if (pre.matches(SELECTOR)) {
-			env.code = ''; // fast-path the whole thing and go to complete
-
-			pre.setAttribute(STATUS_ATTR, STATUS_LOADING); // mark as loading
-
-			// add code element with loading message
-			var code = pre.appendChild(document.createElement('CODE'));
-			code.textContent = LOADING_MESSAGE;
-
-			var src = pre.getAttribute('data-src');
-
-			var language = env.language;
-			if (language === 'none') {
-				// the language might be 'none' because there is no language set;
-				// in this case, we want to use the extension as the language
-				var extension = (/\.(\w+)$/.exec(src) || [, 'none'])[1];
-				language = EXTENSIONS[extension] || extension;
-			}
-
-			// set language classes
-			Prism.util.setLanguage(code, language);
-			Prism.util.setLanguage(pre, language);
-
-			// preload the language
-			var autoloader = Prism.plugins.autoloader;
-			if (autoloader) {
-				autoloader.loadLanguages(language);
-			}
-
-			// load file
-			loadFile(
-				src,
-				function (text) {
-					// mark as loaded
-					pre.setAttribute(STATUS_ATTR, STATUS_LOADED);
-
-					// handle data-range
-					var range = parseRange(pre.getAttribute('data-range'));
-					if (range) {
-						var lines = text.split(/\r\n?|\n/g);
-
-						// the range is one-based and inclusive on both ends
-						var start = range[0];
-						var end = range[1] == null ? lines.length : range[1];
-
-						if (start < 0) { start += lines.length; }
-						start = Math.max(0, Math.min(start - 1, lines.length));
-						if (end < 0) { end += lines.length; }
-						end = Math.max(0, Math.min(end, lines.length));
-
-						text = lines.slice(start, end).join('\n');
-
-						// add data-start for line numbers
-						if (!pre.hasAttribute('data-start')) {
-							pre.setAttribute('data-start', String(start + 1));
-						}
-					}
-
-					// highlight code
-					code.textContent = text;
-					Prism.highlightElement(code);
-				},
-				function (error) {
-					// mark as failed
-					pre.setAttribute(STATUS_ATTR, STATUS_FAILED);
-
-					code.textContent = error;
-				}
-			);
-		}
-	});
-
-	Prism.plugins.fileHighlight = {
-		/**
-		 * Executes the File Highlight plugin for all matching `pre` elements under the given container.
-		 *
-		 * Note: Elements which are already loaded or currently loading will not be touched by this method.
-		 *
-		 * @param {ParentNode} [container=document]
-		 */
-		highlight: function highlight(container) {
-			var elements = (container || document).querySelectorAll(SELECTOR);
-
-			for (var i = 0, element; (element = elements[i++]);) {
-				Prism.highlightElement(element);
-			}
-		}
-	};
-
-	var logged = false;
-	/** @deprecated Use `Prism.plugins.fileHighlight.highlight` instead. */
-	Prism.fileHighlight = function () {
-		if (!logged) {
-			console.warn('Prism.fileHighlight is deprecated. Use `Prism.plugins.fileHighlight.highlight` instead.');
-			logged = true;
-		}
-		Prism.plugins.fileHighlight.highlight.apply(this, arguments);
-	};
-
-}());
-</script>
-  <script>!function(e){var n=/[*&][^\s[\]{},]+/,r=/!(?:<[\w\-%#;/?:@&=+$,.!~*'()[\]]+>|(?:[a-zA-Z\d-]*!)?[\w\-%#;/?:@&=+$.~*'()]+)?/,t="(?:"+r.source+"(?:[ \t]+"+n.source+")?|"+n.source+"(?:[ \t]+"+r.source+")?)",a="(?:[^\\s\\x00-\\x08\\x0e-\\x1f!\"#%&'*,\\-:>?@[\\]`{|}\\x7f-\\x84\\x86-\\x9f\\ud800-\\udfff\\ufffe\\uffff]|[?:-]<PLAIN>)(?:[ \t]*(?:(?![#:])<PLAIN>|:<PLAIN>))*".replace(/<PLAIN>/g,(function(){return"[^\\s\\x00-\\x08\\x0e-\\x1f,[\\]{}\\x7f-\\x84\\x86-\\x9f\\ud800-\\udfff\\ufffe\\uffff]"})),d="\"(?:[^\"\\\\\r\n]|\\\\.)*\"|'(?:[^'\\\\\r\n]|\\\\.)*'";function o(e,n){n=(n||"").replace(/m/g,"")+"m";var r="([:\\-,[{]\\s*(?:\\s<<prop>>[ \t]+)?)(?:<<value>>)(?=[ \t]*(?:$|,|\\]|\\}|(?:[\r\n]\\s*)?#))".replace(/<<prop>>/g,(function(){return t})).replace(/<<value>>/g,(function(){return e}));return RegExp(r,n)}e.languages.yaml={scalar:{pattern:RegExp("([\\-:]\\s*(?:\\s<<prop>>[ \t]+)?[|>])[ \t]*(?:((?:\r?\n|\r)[ \t]+)\\S[^\r\n]*(?:\\2[^\r\n]+)*)".replace(/<<prop>>/g,(function(){return t}))),lookbehind:!0,alias:"string"},comment:/#.*/,key:{pattern:RegExp("((?:^|[:\\-,[{\r\n?])[ \t]*(?:<<prop>>[ \t]+)?)<<key>>(?=\\s*:\\s)".replace(/<<prop>>/g,(function(){return t})).replace(/<<key>>/g,(function(){return"(?:"+a+"|"+d+")"}))),lookbehind:!0,greedy:!0,alias:"atrule"},directive:{pattern:/(^[ \t]*)%.+/m,lookbehind:!0,alias:"important"},datetime:{pattern:o("\\d{4}-\\d\\d?-\\d\\d?(?:[tT]|[ \t]+)\\d\\d?:\\d{2}:\\d{2}(?:\\.\\d*)?(?:[ \t]*(?:Z|[-+]\\d\\d?(?::\\d{2})?))?|\\d{4}-\\d{2}-\\d{2}|\\d\\d?:\\d{2}(?::\\d{2}(?:\\.\\d*)?)?"),lookbehind:!0,alias:"number"},boolean:{pattern:o("false|true","i"),lookbehind:!0,alias:"important"},null:{pattern:o("null|~","i"),lookbehind:!0,alias:"important"},string:{pattern:o(d),lookbehind:!0,greedy:!0},number:{pattern:o("[+-]?(?:0x[\\da-f]+|0o[0-7]+|(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:e[+-]?\\d+)?|\\.inf|\\.nan)","i"),lookbehind:!0},tag:r,important:n,punctuation:/---|[:[\]{}\-,|>?]|\.\.\./},e.languages.yml=e.languages.yaml}(Prism);</script>
-  <script>Prism.languages.json={property:{pattern:/(^|[^\\])"(?:\\.|[^\\"\r\n])*"(?=\s*:)/,lookbehind:!0,greedy:!0},string:{pattern:/(^|[^\\])"(?:\\.|[^\\"\r\n])*"(?!\s*:)/,lookbehind:!0,greedy:!0},comment:{pattern:/\/\/.*|\/\*[\s\S]*?(?:\*\/|$)/,greedy:!0},number:/-?\b\d+(?:\.\d+)?(?:e[+-]?\d+)?\b/i,punctuation:/[{}[\],]/,operator:/:/,boolean:/\b(?:false|true)\b/,null:{pattern:/\bnull\b/,alias:"keyword"}},Prism.languages.webmanifest=Prism.languages.json;</script>
-  <script>/*! Split.js - v1.6.5 */
-!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):(e="undefined"!=typeof globalThis?globalThis:e||self).Split=t()}(this,(function(){"use strict";var e="undefined"!=typeof window?window:null,t=null===e,n=t?void 0:e.document,i=function(){return!1},r=t?"calc":["","-webkit-","-moz-","-o-"].filter((function(e){var t=n.createElement("div");return t.style.cssText="width:"+e+"calc(9px)",!!t.style.length})).shift()+"calc",s=function(e){return"string"==typeof e||e instanceof String},o=function(e){if(s(e)){var t=n.querySelector(e);if(!t)throw new Error("Selector "+e+" did not match a DOM element");return t}return e},a=function(e,t,n){var i=e[t];return void 0!==i?i:n},u=function(e,t,n,i){if(t){if("end"===i)return 0;if("center"===i)return e/2}else if(n){if("start"===i)return 0;if("center"===i)return e/2}return e},l=function(e,t){var i=n.createElement("div");return i.className="gutter gutter-"+t,i},c=function(e,t,n){var i={};return s(t)?i[e]=t:i[e]=r+"("+t+"% - "+n+"px)",i},h=function(e,t){var n;return(n={})[e]=t+"px",n};return function(r,s){if(void 0===s&&(s={}),t)return{};var f,d,v,m,g,p,y=r;Array.from&&(y=Array.from(y));var z=o(y[0]).parentNode,S=getComputedStyle?getComputedStyle(z):null,b=S?S.flexDirection:null,E=a(s,"sizes")||y.map((function(){return 100/y.length})),_=a(s,"minSize",100),L=Array.isArray(_)?_:y.map((function(){return _})),w=a(s,"maxSize",1/0),x=Array.isArray(w)?w:y.map((function(){return w})),O=a(s,"expandToMin",!1),A=a(s,"gutterSize",10),k=a(s,"gutterAlign","center"),C=a(s,"snapOffset",30),M=Array.isArray(C)?C:y.map((function(){return C})),U=a(s,"dragInterval",1),D=a(s,"direction","horizontal"),B=a(s,"cursor","horizontal"===D?"col-resize":"row-resize"),T=a(s,"gutter",l),j=a(s,"elementStyle",c),F=a(s,"gutterStyle",h);function R(e,t,n,i){var r=j(f,t,n,i);Object.keys(r).forEach((function(t){e.style[t]=r[t]}))}function N(){return p.map((function(e){return e.size}))}function q(e){return"touches"in e?e.touches[0][d]:e[d]}function H(e){var t=p[this.a],n=p[this.b],i=t.size+n.size;t.size=e/this.size*i,n.size=i-e/this.size*i,R(t.element,t.size,this._b,t.i),R(n.element,n.size,this._c,n.i)}function I(e){var t,n=p[this.a],r=p[this.b];this.dragging&&(t=q(e)-this.start+(this._b-this.dragOffset),U>1&&(t=Math.round(t/U)*U),t<=n.minSize+n.snapOffset+this._b?t=n.minSize+this._b:t>=this.size-(r.minSize+r.snapOffset+this._c)&&(t=this.size-(r.minSize+this._c)),t>=n.maxSize-n.snapOffset+this._b?t=n.maxSize+this._b:t<=this.size-(r.maxSize-r.snapOffset+this._c)&&(t=this.size-(r.maxSize+this._c)),H.call(this,t),a(s,"onDrag",i)(N()))}function W(){var e=p[this.a].element,t=p[this.b].element,n=e.getBoundingClientRect(),i=t.getBoundingClientRect();this.size=n[f]+i[f]+this._b+this._c,this.start=n[v],this.end=n[m]}function X(e){var t=function(e){if(!getComputedStyle)return null;var t=getComputedStyle(e);if(!t)return null;var n=e[g];return 0===n?null:n-="horizontal"===D?parseFloat(t.paddingLeft)+parseFloat(t.paddingRight):parseFloat(t.paddingTop)+parseFloat(t.paddingBottom)}(z);if(null===t)return e;if(L.reduce((function(e,t){return e+t}),0)>t)return e;var n=0,i=[],r=e.map((function(r,s){var o=t*r/100,a=u(A,0===s,s===e.length-1,k),l=L[s]+a;return o<l?(n+=l-o,i.push(0),l):(i.push(o-l),o)}));return 0===n?e:r.map((function(e,r){var s=e;if(n>0&&i[r]-n>0){var o=Math.min(n,i[r]-n);n-=o,s=e-o}return s/t*100}))}function Y(){var t=p[this.a].element,r=p[this.b].element;this.dragging&&a(s,"onDragEnd",i)(N()),this.dragging=!1,e.removeEventListener("mouseup",this.stop),e.removeEventListener("touchend",this.stop),e.removeEventListener("touchcancel",this.stop),e.removeEventListener("mousemove",this.move),e.removeEventListener("touchmove",this.move),this.stop=null,this.move=null,t.removeEventListener("selectstart",i),t.removeEventListener("dragstart",i),r.removeEventListener("selectstart",i),r.removeEventListener("dragstart",i),t.style.userSelect="",t.style.webkitUserSelect="",t.style.MozUserSelect="",t.style.pointerEvents="",r.style.userSelect="",r.style.webkitUserSelect="",r.style.MozUserSelect="",r.style.pointerEvents="",this.gutter.style.cursor="",this.parent.style.cursor="",n.body.style.cursor=""}function G(t){if(!("button"in t)||0===t.button){var r=p[this.a].element,o=p[this.b].element;this.dragging||a(s,"onDragStart",i)(N()),t.preventDefault(),this.dragging=!0,this.move=I.bind(this),this.stop=Y.bind(this),e.addEventListener("mouseup",this.stop),e.addEventListener("touchend",this.stop),e.addEventListener("touchcancel",this.stop),e.addEventListener("mousemove",this.move),e.addEventListener("touchmove",this.move),r.addEventListener("selectstart",i),r.addEventListener("dragstart",i),o.addEventListener("selectstart",i),o.addEventListener("dragstart",i),r.style.userSelect="none",r.style.webkitUserSelect="none",r.style.MozUserSelect="none",r.style.pointerEvents="none",o.style.userSelect="none",o.style.webkitUserSelect="none",o.style.MozUserSelect="none",o.style.pointerEvents="none",this.gutter.style.cursor=B,this.parent.style.cursor=B,n.body.style.cursor=B,W.call(this),this.dragOffset=q(t)-this.end}}"horizontal"===D?(f="width",d="clientX",v="left",m="right",g="clientWidth"):"vertical"===D&&(f="height",d="clientY",v="top",m="bottom",g="clientHeight"),E=X(E);var J=[];function K(e){var t=e.i===J.length,n=t?J[e.i-1]:J[e.i];W.call(n);var i=t?n.size-e.minSize-n._c:e.minSize+n._b;H.call(n,i)}return(p=y.map((function(e,t){var n,i={element:o(e),size:E[t],minSize:L[t],maxSize:x[t],snapOffset:M[t],i:t};if(t>0&&((n={a:t-1,b:t,dragging:!1,direction:D,parent:z})._b=u(A,t-1==0,!1,k),n._c=u(A,!1,t===y.length-1,k),"row-reverse"===b||"column-reverse"===b)){var r=n.a;n.a=n.b,n.b=r}if(t>0){var s=T(t,D,i.element);!function(e,t,n){var i=F(f,t,n);Object.keys(i).forEach((function(t){e.style[t]=i[t]}))}(s,A,t),n._a=G.bind(n),s.addEventListener("mousedown",n._a),s.addEventListener("touchstart",n._a),z.insertBefore(s,i.element),n.gutter=s}return R(i.element,i.size,u(A,0===t,t===y.length-1,k),t),t>0&&J.push(n),i}))).forEach((function(e){var t=e.element.getBoundingClientRect()[f];t<e.minSize&&(O?K(e):e.minSize=t)})),{setSizes:function(e){var t=X(e);t.forEach((function(e,n){if(n>0){var i=J[n-1],r=p[i.a],s=p[i.b];r.size=t[n-1],s.size=e,R(r.element,r.size,i._b,r.i),R(s.element,s.size,i._c,s.i)}}))},getSizes:N,collapse:function(e){K(p[e])},destroy:function(e,t){J.forEach((function(n){if(!0!==t?n.parent.removeChild(n.gutter):(n.gutter.removeEventListener("mousedown",n._a),n.gutter.removeEventListener("touchstart",n._a)),!0!==e){var i=j(f,n.a.size,n._b);Object.keys(i).forEach((function(e){p[n.a].element.style[e]="",p[n.b].element.style[e]=""}))}}))},parent:z,pairs:J}}}));
-//# sourceMappingURL=split.min.js.map
-</script>
-  <script>/*! Sortable 1.15.2 - MIT | git://github.com/SortableJS/Sortable.git */
-!function(t,e){"object"==typeof exports&&"undefined"!=typeof module?module.exports=e():"function"==typeof define&&define.amd?define(e):(t=t||self).Sortable=e()}(this,function(){"use strict";function e(e,t){var n,o=Object.keys(e);return Object.getOwnPropertySymbols&&(n=Object.getOwnPropertySymbols(e),t&&(n=n.filter(function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable})),o.push.apply(o,n)),o}function I(o){for(var t=1;t<arguments.length;t++){var i=null!=arguments[t]?arguments[t]:{};t%2?e(Object(i),!0).forEach(function(t){var e,n;e=o,t=i[n=t],n in e?Object.defineProperty(e,n,{value:t,enumerable:!0,configurable:!0,writable:!0}):e[n]=t}):Object.getOwnPropertyDescriptors?Object.defineProperties(o,Object.getOwnPropertyDescriptors(i)):e(Object(i)).forEach(function(t){Object.defineProperty(o,t,Object.getOwnPropertyDescriptor(i,t))})}return o}function o(t){return(o="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t})(t)}function a(){return(a=Object.assign||function(t){for(var e=1;e<arguments.length;e++){var n,o=arguments[e];for(n in o)Object.prototype.hasOwnProperty.call(o,n)&&(t[n]=o[n])}return t}).apply(this,arguments)}function i(t,e){if(null==t)return{};var n,o=function(t,e){if(null==t)return{};for(var n,o={},i=Object.keys(t),r=0;r<i.length;r++)n=i[r],0<=e.indexOf(n)||(o[n]=t[n]);return o}(t,e);if(Object.getOwnPropertySymbols)for(var i=Object.getOwnPropertySymbols(t),r=0;r<i.length;r++)n=i[r],0<=e.indexOf(n)||Object.prototype.propertyIsEnumerable.call(t,n)&&(o[n]=t[n]);return o}function r(t){return function(t){if(Array.isArray(t))return l(t)}(t)||function(t){if("undefined"!=typeof Symbol&&null!=t[Symbol.iterator]||null!=t["@@iterator"])return Array.from(t)}(t)||function(t,e){if(t){if("string"==typeof t)return l(t,e);var n=Object.prototype.toString.call(t).slice(8,-1);return"Map"===(n="Object"===n&&t.constructor?t.constructor.name:n)||"Set"===n?Array.from(t):"Arguments"===n||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)?l(t,e):void 0}}(t)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()}function l(t,e){(null==e||e>t.length)&&(e=t.length);for(var n=0,o=new Array(e);n<e;n++)o[n]=t[n];return o}function t(t){if("undefined"!=typeof window&&window.navigator)return!!navigator.userAgent.match(t)}var y=t(/(?:Trident.*rv[ :]?11\.|msie|iemobile|Windows Phone)/i),w=t(/Edge/i),s=t(/firefox/i),u=t(/safari/i)&&!t(/chrome/i)&&!t(/android/i),n=t(/iP(ad|od|hone)/i),c=t(/chrome/i)&&t(/android/i),d={capture:!1,passive:!1};function h(t,e,n){t.addEventListener(e,n,!y&&d)}function f(t,e,n){t.removeEventListener(e,n,!y&&d)}function p(t,e){if(e&&(">"===e[0]&&(e=e.substring(1)),t))try{if(t.matches)return t.matches(e);if(t.msMatchesSelector)return t.msMatchesSelector(e);if(t.webkitMatchesSelector)return t.webkitMatchesSelector(e)}catch(t){return}}function P(t,e,n,o){if(t){n=n||document;do{if(null!=e&&(">"!==e[0]||t.parentNode===n)&&p(t,e)||o&&t===n)return t}while(t!==n&&(t=(i=t).host&&i!==document&&i.host.nodeType?i.host:i.parentNode))}var i;return null}var g,m=/\s+/g;function k(t,e,n){var o;t&&e&&(t.classList?t.classList[n?"add":"remove"](e):(o=(" "+t.className+" ").replace(m," ").replace(" "+e+" "," "),t.className=(o+(n?" "+e:"")).replace(m," ")))}function R(t,e,n){var o=t&&t.style;if(o){if(void 0===n)return document.defaultView&&document.defaultView.getComputedStyle?n=document.defaultView.getComputedStyle(t,""):t.currentStyle&&(n=t.currentStyle),void 0===e?n:n[e];o[e=!(e in o||-1!==e.indexOf("webkit"))?"-webkit-"+e:e]=n+("string"==typeof n?"":"px")}}function v(t,e){var n="";if("string"==typeof t)n=t;else do{var o=R(t,"transform")}while(o&&"none"!==o&&(n=o+" "+n),!e&&(t=t.parentNode));var i=window.DOMMatrix||window.WebKitCSSMatrix||window.CSSMatrix||window.MSCSSMatrix;return i&&new i(n)}function b(t,e,n){if(t){var o=t.getElementsByTagName(e),i=0,r=o.length;if(n)for(;i<r;i++)n(o[i],i);return o}return[]}function O(){var t=document.scrollingElement;return t||document.documentElement}function X(t,e,n,o,i){if(t.getBoundingClientRect||t===window){var r,a,l,s,c,u,d=t!==window&&t.parentNode&&t!==O()?(a=(r=t.getBoundingClientRect()).top,l=r.left,s=r.bottom,c=r.right,u=r.height,r.width):(l=a=0,s=window.innerHeight,c=window.innerWidth,u=window.innerHeight,window.innerWidth);if((e||n)&&t!==window&&(i=i||t.parentNode,!y))do{if(i&&i.getBoundingClientRect&&("none"!==R(i,"transform")||n&&"static"!==R(i,"position"))){var h=i.getBoundingClientRect();a-=h.top+parseInt(R(i,"border-top-width")),l-=h.left+parseInt(R(i,"border-left-width")),s=a+r.height,c=l+r.width;break}}while(i=i.parentNode);return o&&t!==window&&(o=(e=v(i||t))&&e.a,t=e&&e.d,e&&(s=(a/=t)+(u/=t),c=(l/=o)+(d/=o))),{top:a,left:l,bottom:s,right:c,width:d,height:u}}}function Y(t,e,n){for(var o=M(t,!0),i=X(t)[e];o;){var r=X(o)[n];if(!("top"===n||"left"===n?r<=i:i<=r))return o;if(o===O())break;o=M(o,!1)}return!1}function B(t,e,n,o){for(var i=0,r=0,a=t.children;r<a.length;){if("none"!==a[r].style.display&&a[r]!==Ft.ghost&&(o||a[r]!==Ft.dragged)&&P(a[r],n.draggable,t,!1)){if(i===e)return a[r];i++}r++}return null}function F(t,e){for(var n=t.lastElementChild;n&&(n===Ft.ghost||"none"===R(n,"display")||e&&!p(n,e));)n=n.previousElementSibling;return n||null}function j(t,e){var n=0;if(!t||!t.parentNode)return-1;for(;t=t.previousElementSibling;)"TEMPLATE"===t.nodeName.toUpperCase()||t===Ft.clone||e&&!p(t,e)||n++;return n}function E(t){var e=0,n=0,o=O();if(t)do{var i=v(t),r=i.a,i=i.d}while(e+=t.scrollLeft*r,n+=t.scrollTop*i,t!==o&&(t=t.parentNode));return[e,n]}function M(t,e){if(!t||!t.getBoundingClientRect)return O();var n=t,o=!1;do{if(n.clientWidth<n.scrollWidth||n.clientHeight<n.scrollHeight){var i=R(n);if(n.clientWidth<n.scrollWidth&&("auto"==i.overflowX||"scroll"==i.overflowX)||n.clientHeight<n.scrollHeight&&("auto"==i.overflowY||"scroll"==i.overflowY)){if(!n.getBoundingClientRect||n===document.body)return O();if(o||e)return n;o=!0}}}while(n=n.parentNode);return O()}function D(t,e){return Math.round(t.top)===Math.round(e.top)&&Math.round(t.left)===Math.round(e.left)&&Math.round(t.height)===Math.round(e.height)&&Math.round(t.width)===Math.round(e.width)}function S(e,n){return function(){var t;g||(1===(t=arguments).length?e.call(this,t[0]):e.apply(this,t),g=setTimeout(function(){g=void 0},n))}}function H(t,e,n){t.scrollLeft+=e,t.scrollTop+=n}function _(t){var e=window.Polymer,n=window.jQuery||window.Zepto;return e&&e.dom?e.dom(t).cloneNode(!0):n?n(t).clone(!0)[0]:t.cloneNode(!0)}function C(t,e){R(t,"position","absolute"),R(t,"top",e.top),R(t,"left",e.left),R(t,"width",e.width),R(t,"height",e.height)}function T(t){R(t,"position",""),R(t,"top",""),R(t,"left",""),R(t,"width",""),R(t,"height","")}function L(n,o,i){var r={};return Array.from(n.children).forEach(function(t){var e;P(t,o.draggable,n,!1)&&!t.animated&&t!==i&&(e=X(t),r.left=Math.min(null!==(t=r.left)&&void 0!==t?t:1/0,e.left),r.top=Math.min(null!==(t=r.top)&&void 0!==t?t:1/0,e.top),r.right=Math.max(null!==(t=r.right)&&void 0!==t?t:-1/0,e.right),r.bottom=Math.max(null!==(t=r.bottom)&&void 0!==t?t:-1/0,e.bottom))}),r.width=r.right-r.left,r.height=r.bottom-r.top,r.x=r.left,r.y=r.top,r}var K="Sortable"+(new Date).getTime();function x(){var e,o=[];return{captureAnimationState:function(){o=[],this.options.animation&&[].slice.call(this.el.children).forEach(function(t){var e,n;"none"!==R(t,"display")&&t!==Ft.ghost&&(o.push({target:t,rect:X(t)}),e=I({},o[o.length-1].rect),!t.thisAnimationDuration||(n=v(t,!0))&&(e.top-=n.f,e.left-=n.e),t.fromRect=e)})},addAnimationState:function(t){o.push(t)},removeAnimationState:function(t){o.splice(function(t,e){for(var n in t)if(t.hasOwnProperty(n))for(var o in e)if(e.hasOwnProperty(o)&&e[o]===t[n][o])return Number(n);return-1}(o,{target:t}),1)},animateAll:function(t){var c=this;if(!this.options.animation)return clearTimeout(e),void("function"==typeof t&&t());var u=!1,d=0;o.forEach(function(t){var e=0,n=t.target,o=n.fromRect,i=X(n),r=n.prevFromRect,a=n.prevToRect,l=t.rect,s=v(n,!0);s&&(i.top-=s.f,i.left-=s.e),n.toRect=i,n.thisAnimationDuration&&D(r,i)&&!D(o,i)&&(l.top-i.top)/(l.left-i.left)==(o.top-i.top)/(o.left-i.left)&&(t=l,s=r,r=a,a=c.options,e=Math.sqrt(Math.pow(s.top-t.top,2)+Math.pow(s.left-t.left,2))/Math.sqrt(Math.pow(s.top-r.top,2)+Math.pow(s.left-r.left,2))*a.animation),D(i,o)||(n.prevFromRect=o,n.prevToRect=i,e=e||c.options.animation,c.animate(n,l,i,e)),e&&(u=!0,d=Math.max(d,e),clearTimeout(n.animationResetTimer),n.animationResetTimer=setTimeout(function(){n.animationTime=0,n.prevFromRect=null,n.fromRect=null,n.prevToRect=null,n.thisAnimationDuration=null},e),n.thisAnimationDuration=e)}),clearTimeout(e),u?e=setTimeout(function(){"function"==typeof t&&t()},d):"function"==typeof t&&t(),o=[]},animate:function(t,e,n,o){var i,r;o&&(R(t,"transition",""),R(t,"transform",""),i=(r=v(this.el))&&r.a,r=r&&r.d,i=(e.left-n.left)/(i||1),r=(e.top-n.top)/(r||1),t.animatingX=!!i,t.animatingY=!!r,R(t,"transform","translate3d("+i+"px,"+r+"px,0)"),this.forRepaintDummy=t.offsetWidth,R(t,"transition","transform "+o+"ms"+(this.options.easing?" "+this.options.easing:"")),R(t,"transform","translate3d(0,0,0)"),"number"==typeof t.animated&&clearTimeout(t.animated),t.animated=setTimeout(function(){R(t,"transition",""),R(t,"transform",""),t.animated=!1,t.animatingX=!1,t.animatingY=!1},o))}}}var A=[],N={initializeByDefault:!0},W={mount:function(e){for(var t in N)!N.hasOwnProperty(t)||t in e||(e[t]=N[t]);A.forEach(function(t){if(t.pluginName===e.pluginName)throw"Sortable: Cannot mount plugin ".concat(e.pluginName," more than once")}),A.push(e)},pluginEvent:function(e,n,o){var t=this;this.eventCanceled=!1,o.cancel=function(){t.eventCanceled=!0};var i=e+"Global";A.forEach(function(t){n[t.pluginName]&&(n[t.pluginName][i]&&n[t.pluginName][i](I({sortable:n},o)),n.options[t.pluginName]&&n[t.pluginName][e]&&n[t.pluginName][e](I({sortable:n},o)))})},initializePlugins:function(n,o,i,t){for(var e in A.forEach(function(t){var e=t.pluginName;(n.options[e]||t.initializeByDefault)&&((t=new t(n,o,n.options)).sortable=n,t.options=n.options,n[e]=t,a(i,t.defaults))}),n.options){var r;n.options.hasOwnProperty(e)&&(void 0!==(r=this.modifyOption(n,e,n.options[e]))&&(n.options[e]=r))}},getEventProperties:function(e,n){var o={};return A.forEach(function(t){"function"==typeof t.eventProperties&&a(o,t.eventProperties.call(n[t.pluginName],e))}),o},modifyOption:function(e,n,o){var i;return A.forEach(function(t){e[t.pluginName]&&t.optionListeners&&"function"==typeof t.optionListeners[n]&&(i=t.optionListeners[n].call(e[t.pluginName],o))}),i}};function z(t){var e=t.sortable,n=t.rootEl,o=t.name,i=t.targetEl,r=t.cloneEl,a=t.toEl,l=t.fromEl,s=t.oldIndex,c=t.newIndex,u=t.oldDraggableIndex,d=t.newDraggableIndex,h=t.originalEvent,f=t.putSortable,p=t.extraEventProperties;if(e=e||n&&n[K]){var g,m=e.options,t="on"+o.charAt(0).toUpperCase()+o.substr(1);!window.CustomEvent||y||w?(g=document.createEvent("Event")).initEvent(o,!0,!0):g=new CustomEvent(o,{bubbles:!0,cancelable:!0}),g.to=a||n,g.from=l||n,g.item=i||n,g.clone=r,g.oldIndex=s,g.newIndex=c,g.oldDraggableIndex=u,g.newDraggableIndex=d,g.originalEvent=h,g.pullMode=f?f.lastPutMode:void 0;var v,b=I(I({},p),W.getEventProperties(o,e));for(v in b)g[v]=b[v];n&&n.dispatchEvent(g),m[t]&&m[t].call(e,g)}}function G(t,e){var n=(o=2<arguments.length&&void 0!==arguments[2]?arguments[2]:{}).evt,o=i(o,U);W.pluginEvent.bind(Ft)(t,e,I({dragEl:V,parentEl:Z,ghostEl:$,rootEl:Q,nextEl:J,lastDownEl:tt,cloneEl:et,cloneHidden:nt,dragStarted:gt,putSortable:st,activeSortable:Ft.active,originalEvent:n,oldIndex:ot,oldDraggableIndex:rt,newIndex:it,newDraggableIndex:at,hideGhostForTarget:Rt,unhideGhostForTarget:Xt,cloneNowHidden:function(){nt=!0},cloneNowShown:function(){nt=!1},dispatchSortableEvent:function(t){q({sortable:e,name:t,originalEvent:n})}},o))}var U=["evt"];function q(t){z(I({putSortable:st,cloneEl:et,targetEl:V,rootEl:Q,oldIndex:ot,oldDraggableIndex:rt,newIndex:it,newDraggableIndex:at},t))}var V,Z,$,Q,J,tt,et,nt,ot,it,rt,at,lt,st,ct,ut,dt,ht,ft,pt,gt,mt,vt,bt,yt,wt=!1,Et=!1,Dt=[],St=!1,_t=!1,Ct=[],Tt=!1,xt=[],Ot="undefined"!=typeof document,Mt=n,At=w||y?"cssFloat":"float",Nt=Ot&&!c&&!n&&"draggable"in document.createElement("div"),It=function(){if(Ot){if(y)return!1;var t=document.createElement("x");return t.style.cssText="pointer-events:auto","auto"===t.style.pointerEvents}}(),Pt=function(t,e){var n=R(t),o=parseInt(n.width)-parseInt(n.paddingLeft)-parseInt(n.paddingRight)-parseInt(n.borderLeftWidth)-parseInt(n.borderRightWidth),i=B(t,0,e),r=B(t,1,e),a=i&&R(i),l=r&&R(r),s=a&&parseInt(a.marginLeft)+parseInt(a.marginRight)+X(i).width,t=l&&parseInt(l.marginLeft)+parseInt(l.marginRight)+X(r).width;if("flex"===n.display)return"column"===n.flexDirection||"column-reverse"===n.flexDirection?"vertical":"horizontal";if("grid"===n.display)return n.gridTemplateColumns.split(" ").length<=1?"vertical":"horizontal";if(i&&a.float&&"none"!==a.float){e="left"===a.float?"left":"right";return!r||"both"!==l.clear&&l.clear!==e?"horizontal":"vertical"}return i&&("block"===a.display||"flex"===a.display||"table"===a.display||"grid"===a.display||o<=s&&"none"===n[At]||r&&"none"===n[At]&&o<s+t)?"vertical":"horizontal"},kt=function(t){function l(r,a){return function(t,e,n,o){var i=t.options.group.name&&e.options.group.name&&t.options.group.name===e.options.group.name;if(null==r&&(a||i))return!0;if(null==r||!1===r)return!1;if(a&&"clone"===r)return r;if("function"==typeof r)return l(r(t,e,n,o),a)(t,e,n,o);e=(a?t:e).options.group.name;return!0===r||"string"==typeof r&&r===e||r.join&&-1<r.indexOf(e)}}var e={},n=t.group;n&&"object"==o(n)||(n={name:n}),e.name=n.name,e.checkPull=l(n.pull,!0),e.checkPut=l(n.put),e.revertClone=n.revertClone,t.group=e},Rt=function(){!It&&$&&R($,"display","none")},Xt=function(){!It&&$&&R($,"display","")};Ot&&!c&&document.addEventListener("click",function(t){if(Et)return t.preventDefault(),t.stopPropagation&&t.stopPropagation(),t.stopImmediatePropagation&&t.stopImmediatePropagation(),Et=!1},!0);function Yt(t){if(V){t=t.touches?t.touches[0]:t;var e=(i=t.clientX,r=t.clientY,Dt.some(function(t){var e=t[K].options.emptyInsertThreshold;if(e&&!F(t)){var n=X(t),o=i>=n.left-e&&i<=n.right+e,e=r>=n.top-e&&r<=n.bottom+e;return o&&e?a=t:void 0}}),a);if(e){var n,o={};for(n in t)t.hasOwnProperty(n)&&(o[n]=t[n]);o.target=o.rootEl=e,o.preventDefault=void 0,o.stopPropagation=void 0,e[K]._onDragOver(o)}}var i,r,a}function Bt(t){V&&V.parentNode[K]._isOutsideThisEl(t.target)}function Ft(t,e){if(!t||!t.nodeType||1!==t.nodeType)throw"Sortable: `el` must be an HTMLElement, not ".concat({}.toString.call(t));this.el=t,this.options=e=a({},e),t[K]=this;var n,o,i={group:null,sort:!0,disabled:!1,store:null,handle:null,draggable:/^[uo]l$/i.test(t.nodeName)?">li":">*",swapThreshold:1,invertSwap:!1,invertedSwapThreshold:null,removeCloneOnHide:!0,direction:function(){return Pt(t,this.options)},ghostClass:"sortable-ghost",chosenClass:"sortable-chosen",dragClass:"sortable-drag",ignore:"a, img",filter:null,preventOnFilter:!0,animation:0,easing:null,setData:function(t,e){t.setData("Text",e.textContent)},dropBubble:!1,dragoverBubble:!1,dataIdAttr:"data-id",delay:0,delayOnTouchOnly:!1,touchStartThreshold:(Number.parseInt?Number:window).parseInt(window.devicePixelRatio,10)||1,forceFallback:!1,fallbackClass:"sortable-fallback",fallbackOnBody:!1,fallbackTolerance:0,fallbackOffset:{x:0,y:0},supportPointer:!1!==Ft.supportPointer&&"PointerEvent"in window&&!u,emptyInsertThreshold:5};for(n in W.initializePlugins(this,t,i),i)n in e||(e[n]=i[n]);for(o in kt(e),this)"_"===o.charAt(0)&&"function"==typeof this[o]&&(this[o]=this[o].bind(this));this.nativeDraggable=!e.forceFallback&&Nt,this.nativeDraggable&&(this.options.touchStartThreshold=1),e.supportPointer?h(t,"pointerdown",this._onTapStart):(h(t,"mousedown",this._onTapStart),h(t,"touchstart",this._onTapStart)),this.nativeDraggable&&(h(t,"dragover",this),h(t,"dragenter",this)),Dt.push(this.el),e.store&&e.store.get&&this.sort(e.store.get(this)||[]),a(this,x())}function jt(t,e,n,o,i,r,a,l){var s,c,u=t[K],d=u.options.onMove;return!window.CustomEvent||y||w?(s=document.createEvent("Event")).initEvent("move",!0,!0):s=new CustomEvent("move",{bubbles:!0,cancelable:!0}),s.to=e,s.from=t,s.dragged=n,s.draggedRect=o,s.related=i||e,s.relatedRect=r||X(e),s.willInsertAfter=l,s.originalEvent=a,t.dispatchEvent(s),c=d?d.call(u,s,a):c}function Ht(t){t.draggable=!1}function Lt(){Tt=!1}function Kt(t){return setTimeout(t,0)}function Wt(t){return clearTimeout(t)}Ft.prototype={constructor:Ft,_isOutsideThisEl:function(t){this.el.contains(t)||t===this.el||(mt=null)},_getDirection:function(t,e){return"function"==typeof this.options.direction?this.options.direction.call(this,t,e,V):this.options.direction},_onTapStart:function(e){if(e.cancelable){var n=this,o=this.el,t=this.options,i=t.preventOnFilter,r=e.type,a=e.touches&&e.touches[0]||e.pointerType&&"touch"===e.pointerType&&e,l=(a||e).target,s=e.target.shadowRoot&&(e.path&&e.path[0]||e.composedPath&&e.composedPath()[0])||l,c=t.filter;if(!function(t){xt.length=0;var e=t.getElementsByTagName("input"),n=e.length;for(;n--;){var o=e[n];o.checked&&xt.push(o)}}(o),!V&&!(/mousedown|pointerdown/.test(r)&&0!==e.button||t.disabled)&&!s.isContentEditable&&(this.nativeDraggable||!u||!l||"SELECT"!==l.tagName.toUpperCase())&&!((l=P(l,t.draggable,o,!1))&&l.animated||tt===l)){if(ot=j(l),rt=j(l,t.draggable),"function"==typeof c){if(c.call(this,e,l,this))return q({sortable:n,rootEl:s,name:"filter",targetEl:l,toEl:o,fromEl:o}),G("filter",n,{evt:e}),void(i&&e.cancelable&&e.preventDefault())}else if(c=c&&c.split(",").some(function(t){if(t=P(s,t.trim(),o,!1))return q({sortable:n,rootEl:t,name:"filter",targetEl:l,fromEl:o,toEl:o}),G("filter",n,{evt:e}),!0}))return void(i&&e.cancelable&&e.preventDefault());t.handle&&!P(s,t.handle,o,!1)||this._prepareDragStart(e,a,l)}}},_prepareDragStart:function(t,e,n){var o,i=this,r=i.el,a=i.options,l=r.ownerDocument;n&&!V&&n.parentNode===r&&(o=X(n),Q=r,Z=(V=n).parentNode,J=V.nextSibling,tt=n,lt=a.group,ct={target:Ft.dragged=V,clientX:(e||t).clientX,clientY:(e||t).clientY},ft=ct.clientX-o.left,pt=ct.clientY-o.top,this._lastX=(e||t).clientX,this._lastY=(e||t).clientY,V.style["will-change"]="all",o=function(){G("delayEnded",i,{evt:t}),Ft.eventCanceled?i._onDrop():(i._disableDelayedDragEvents(),!s&&i.nativeDraggable&&(V.draggable=!0),i._triggerDragStart(t,e),q({sortable:i,name:"choose",originalEvent:t}),k(V,a.chosenClass,!0))},a.ignore.split(",").forEach(function(t){b(V,t.trim(),Ht)}),h(l,"dragover",Yt),h(l,"mousemove",Yt),h(l,"touchmove",Yt),h(l,"mouseup",i._onDrop),h(l,"touchend",i._onDrop),h(l,"touchcancel",i._onDrop),s&&this.nativeDraggable&&(this.options.touchStartThreshold=4,V.draggable=!0),G("delayStart",this,{evt:t}),!a.delay||a.delayOnTouchOnly&&!e||this.nativeDraggable&&(w||y)?o():Ft.eventCanceled?this._onDrop():(h(l,"mouseup",i._disableDelayedDrag),h(l,"touchend",i._disableDelayedDrag),h(l,"touchcancel",i._disableDelayedDrag),h(l,"mousemove",i._delayedDragTouchMoveHandler),h(l,"touchmove",i._delayedDragTouchMoveHandler),a.supportPointer&&h(l,"pointermove",i._delayedDragTouchMoveHandler),i._dragStartTimer=setTimeout(o,a.delay)))},_delayedDragTouchMoveHandler:function(t){t=t.touches?t.touches[0]:t;Math.max(Math.abs(t.clientX-this._lastX),Math.abs(t.clientY-this._lastY))>=Math.floor(this.options.touchStartThreshold/(this.nativeDraggable&&window.devicePixelRatio||1))&&this._disableDelayedDrag()},_disableDelayedDrag:function(){V&&Ht(V),clearTimeout(this._dragStartTimer),this._disableDelayedDragEvents()},_disableDelayedDragEvents:function(){var t=this.el.ownerDocument;f(t,"mouseup",this._disableDelayedDrag),f(t,"touchend",this._disableDelayedDrag),f(t,"touchcancel",this._disableDelayedDrag),f(t,"mousemove",this._delayedDragTouchMoveHandler),f(t,"touchmove",this._delayedDragTouchMoveHandler),f(t,"pointermove",this._delayedDragTouchMoveHandler)},_triggerDragStart:function(t,e){e=e||"touch"==t.pointerType&&t,!this.nativeDraggable||e?this.options.supportPointer?h(document,"pointermove",this._onTouchMove):h(document,e?"touchmove":"mousemove",this._onTouchMove):(h(V,"dragend",this),h(Q,"dragstart",this._onDragStart));try{document.selection?Kt(function(){document.selection.empty()}):window.getSelection().removeAllRanges()}catch(t){}},_dragStarted:function(t,e){var n;wt=!1,Q&&V?(G("dragStarted",this,{evt:e}),this.nativeDraggable&&h(document,"dragover",Bt),n=this.options,t||k(V,n.dragClass,!1),k(V,n.ghostClass,!0),Ft.active=this,t&&this._appendGhost(),q({sortable:this,name:"start",originalEvent:e})):this._nulling()},_emulateDragOver:function(){if(ut){this._lastX=ut.clientX,this._lastY=ut.clientY,Rt();for(var t=document.elementFromPoint(ut.clientX,ut.clientY),e=t;t&&t.shadowRoot&&(t=t.shadowRoot.elementFromPoint(ut.clientX,ut.clientY))!==e;)e=t;if(V.parentNode[K]._isOutsideThisEl(t),e)do{if(e[K])if(e[K]._onDragOver({clientX:ut.clientX,clientY:ut.clientY,target:t,rootEl:e})&&!this.options.dragoverBubble)break}while(e=(t=e).parentNode);Xt()}},_onTouchMove:function(t){if(ct){var e=this.options,n=e.fallbackTolerance,o=e.fallbackOffset,i=t.touches?t.touches[0]:t,r=$&&v($,!0),a=$&&r&&r.a,l=$&&r&&r.d,e=Mt&&yt&&E(yt),a=(i.clientX-ct.clientX+o.x)/(a||1)+(e?e[0]-Ct[0]:0)/(a||1),l=(i.clientY-ct.clientY+o.y)/(l||1)+(e?e[1]-Ct[1]:0)/(l||1);if(!Ft.active&&!wt){if(n&&Math.max(Math.abs(i.clientX-this._lastX),Math.abs(i.clientY-this._lastY))<n)return;this._onDragStart(t,!0)}$&&(r?(r.e+=a-(dt||0),r.f+=l-(ht||0)):r={a:1,b:0,c:0,d:1,e:a,f:l},r="matrix(".concat(r.a,",").concat(r.b,",").concat(r.c,",").concat(r.d,",").concat(r.e,",").concat(r.f,")"),R($,"webkitTransform",r),R($,"mozTransform",r),R($,"msTransform",r),R($,"transform",r),dt=a,ht=l,ut=i),t.cancelable&&t.preventDefault()}},_appendGhost:function(){if(!$){var t=this.options.fallbackOnBody?document.body:Q,e=X(V,!0,Mt,!0,t),n=this.options;if(Mt){for(yt=t;"static"===R(yt,"position")&&"none"===R(yt,"transform")&&yt!==document;)yt=yt.parentNode;yt!==document.body&&yt!==document.documentElement?(yt===document&&(yt=O()),e.top+=yt.scrollTop,e.left+=yt.scrollLeft):yt=O(),Ct=E(yt)}k($=V.cloneNode(!0),n.ghostClass,!1),k($,n.fallbackClass,!0),k($,n.dragClass,!0),R($,"transition",""),R($,"transform",""),R($,"box-sizing","border-box"),R($,"margin",0),R($,"top",e.top),R($,"left",e.left),R($,"width",e.width),R($,"height",e.height),R($,"opacity","0.8"),R($,"position",Mt?"absolute":"fixed"),R($,"zIndex","100000"),R($,"pointerEvents","none"),Ft.ghost=$,t.appendChild($),R($,"transform-origin",ft/parseInt($.style.width)*100+"% "+pt/parseInt($.style.height)*100+"%")}},_onDragStart:function(t,e){var n=this,o=t.dataTransfer,i=n.options;G("dragStart",this,{evt:t}),Ft.eventCanceled?this._onDrop():(G("setupClone",this),Ft.eventCanceled||((et=_(V)).removeAttribute("id"),et.draggable=!1,et.style["will-change"]="",this._hideClone(),k(et,this.options.chosenClass,!1),Ft.clone=et),n.cloneId=Kt(function(){G("clone",n),Ft.eventCanceled||(n.options.removeCloneOnHide||Q.insertBefore(et,V),n._hideClone(),q({sortable:n,name:"clone"}))}),e||k(V,i.dragClass,!0),e?(Et=!0,n._loopId=setInterval(n._emulateDragOver,50)):(f(document,"mouseup",n._onDrop),f(document,"touchend",n._onDrop),f(document,"touchcancel",n._onDrop),o&&(o.effectAllowed="move",i.setData&&i.setData.call(n,o,V)),h(document,"drop",n),R(V,"transform","translateZ(0)")),wt=!0,n._dragStartId=Kt(n._dragStarted.bind(n,e,t)),h(document,"selectstart",n),gt=!0,u&&R(document.body,"user-select","none"))},_onDragOver:function(n){var o,i,r,t,e,a=this.el,l=n.target,s=this.options,c=s.group,u=Ft.active,d=lt===c,h=s.sort,f=st||u,p=this,g=!1;if(!Tt){if(void 0!==n.preventDefault&&n.cancelable&&n.preventDefault(),l=P(l,s.draggable,a,!0),O("dragOver"),Ft.eventCanceled)return g;if(V.contains(n.target)||l.animated&&l.animatingX&&l.animatingY||p._ignoreWhileAnimating===l)return A(!1);if(Et=!1,u&&!s.disabled&&(d?h||(i=Z!==Q):st===this||(this.lastPutMode=lt.checkPull(this,u,V,n))&&c.checkPut(this,u,V,n))){if(r="vertical"===this._getDirection(n,l),o=X(V),O("dragOverValid"),Ft.eventCanceled)return g;if(i)return Z=Q,M(),this._hideClone(),O("revert"),Ft.eventCanceled||(J?Q.insertBefore(V,J):Q.appendChild(V)),A(!0);var m=F(a,s.draggable);if(m&&(S=n,c=r,x=X(F((D=this).el,D.options.draggable)),D=L(D.el,D.options,$),!(c?S.clientX>D.right+10||S.clientY>x.bottom&&S.clientX>x.left:S.clientY>D.bottom+10||S.clientX>x.right&&S.clientY>x.top)||m.animated)){if(m&&(t=n,e=r,C=X(B((_=this).el,0,_.options,!0)),_=L(_.el,_.options,$),e?t.clientX<_.left-10||t.clientY<C.top&&t.clientX<C.right:t.clientY<_.top-10||t.clientY<C.bottom&&t.clientX<C.left)){var v=B(a,0,s,!0);if(v===V)return A(!1);if(E=X(l=v),!1!==jt(Q,a,V,o,l,E,n,!1))return M(),a.insertBefore(V,v),Z=a,N(),A(!0)}else if(l.parentNode===a){var b,y,w,E=X(l),D=V.parentNode!==a,S=(S=V.animated&&V.toRect||o,x=l.animated&&l.toRect||E,_=(e=r)?S.left:S.top,t=e?S.right:S.bottom,C=e?S.width:S.height,v=e?x.left:x.top,S=e?x.right:x.bottom,x=e?x.width:x.height,!(_===v||t===S||_+C/2===v+x/2)),_=r?"top":"left",C=Y(l,"top","top")||Y(V,"top","top"),v=C?C.scrollTop:void 0;if(mt!==l&&(y=E[_],St=!1,_t=!S&&s.invertSwap||D),0!==(b=function(t,e,n,o,i,r,a,l){var s=o?t.clientY:t.clientX,c=o?n.height:n.width,t=o?n.top:n.left,o=o?n.bottom:n.right,n=!1;if(!a)if(l&&bt<c*i){if(St=!St&&(1===vt?t+c*r/2<s:s<o-c*r/2)?!0:St)n=!0;else if(1===vt?s<t+bt:o-bt<s)return-vt}else if(t+c*(1-i)/2<s&&s<o-c*(1-i)/2)return function(t){return j(V)<j(t)?1:-1}(e);if((n=n||a)&&(s<t+c*r/2||o-c*r/2<s))return t+c/2<s?1:-1;return 0}(n,l,E,r,S?1:s.swapThreshold,null==s.invertedSwapThreshold?s.swapThreshold:s.invertedSwapThreshold,_t,mt===l)))for(var T=j(V);(w=Z.children[T-=b])&&("none"===R(w,"display")||w===$););if(0===b||w===l)return A(!1);vt=b;var x=(mt=l).nextElementSibling,D=!1,S=jt(Q,a,V,o,l,E,n,D=1===b);if(!1!==S)return 1!==S&&-1!==S||(D=1===S),Tt=!0,setTimeout(Lt,30),M(),D&&!x?a.appendChild(V):l.parentNode.insertBefore(V,D?x:l),C&&H(C,0,v-C.scrollTop),Z=V.parentNode,void 0===y||_t||(bt=Math.abs(y-X(l)[_])),N(),A(!0)}}else{if(m===V)return A(!1);if((l=m&&a===n.target?m:l)&&(E=X(l)),!1!==jt(Q,a,V,o,l,E,n,!!l))return M(),m&&m.nextSibling?a.insertBefore(V,m.nextSibling):a.appendChild(V),Z=a,N(),A(!0)}if(a.contains(V))return A(!1)}return!1}function O(t,e){G(t,p,I({evt:n,isOwner:d,axis:r?"vertical":"horizontal",revert:i,dragRect:o,targetRect:E,canSort:h,fromSortable:f,target:l,completed:A,onMove:function(t,e){return jt(Q,a,V,o,t,X(t),n,e)},changed:N},e))}function M(){O("dragOverAnimationCapture"),p.captureAnimationState(),p!==f&&f.captureAnimationState()}function A(t){return O("dragOverCompleted",{insertion:t}),t&&(d?u._hideClone():u._showClone(p),p!==f&&(k(V,(st||u).options.ghostClass,!1),k(V,s.ghostClass,!0)),st!==p&&p!==Ft.active?st=p:p===Ft.active&&st&&(st=null),f===p&&(p._ignoreWhileAnimating=l),p.animateAll(function(){O("dragOverAnimationComplete"),p._ignoreWhileAnimating=null}),p!==f&&(f.animateAll(),f._ignoreWhileAnimating=null)),(l===V&&!V.animated||l===a&&!l.animated)&&(mt=null),s.dragoverBubble||n.rootEl||l===document||(V.parentNode[K]._isOutsideThisEl(n.target),t||Yt(n)),!s.dragoverBubble&&n.stopPropagation&&n.stopPropagation(),g=!0}function N(){it=j(V),at=j(V,s.draggable),q({sortable:p,name:"change",toEl:a,newIndex:it,newDraggableIndex:at,originalEvent:n})}},_ignoreWhileAnimating:null,_offMoveEvents:function(){f(document,"mousemove",this._onTouchMove),f(document,"touchmove",this._onTouchMove),f(document,"pointermove",this._onTouchMove),f(document,"dragover",Yt),f(document,"mousemove",Yt),f(document,"touchmove",Yt)},_offUpEvents:function(){var t=this.el.ownerDocument;f(t,"mouseup",this._onDrop),f(t,"touchend",this._onDrop),f(t,"pointerup",this._onDrop),f(t,"touchcancel",this._onDrop),f(document,"selectstart",this)},_onDrop:function(t){var e=this.el,n=this.options;it=j(V),at=j(V,n.draggable),G("drop",this,{evt:t}),Z=V&&V.parentNode,it=j(V),at=j(V,n.draggable),Ft.eventCanceled||(St=_t=wt=!1,clearInterval(this._loopId),clearTimeout(this._dragStartTimer),Wt(this.cloneId),Wt(this._dragStartId),this.nativeDraggable&&(f(document,"drop",this),f(e,"dragstart",this._onDragStart)),this._offMoveEvents(),this._offUpEvents(),u&&R(document.body,"user-select",""),R(V,"transform",""),t&&(gt&&(t.cancelable&&t.preventDefault(),n.dropBubble||t.stopPropagation()),$&&$.parentNode&&$.parentNode.removeChild($),(Q===Z||st&&"clone"!==st.lastPutMode)&&et&&et.parentNode&&et.parentNode.removeChild(et),V&&(this.nativeDraggable&&f(V,"dragend",this),Ht(V),V.style["will-change"]="",gt&&!wt&&k(V,(st||this).options.ghostClass,!1),k(V,this.options.chosenClass,!1),q({sortable:this,name:"unchoose",toEl:Z,newIndex:null,newDraggableIndex:null,originalEvent:t}),Q!==Z?(0<=it&&(q({rootEl:Z,name:"add",toEl:Z,fromEl:Q,originalEvent:t}),q({sortable:this,name:"remove",toEl:Z,originalEvent:t}),q({rootEl:Z,name:"sort",toEl:Z,fromEl:Q,originalEvent:t}),q({sortable:this,name:"sort",toEl:Z,originalEvent:t})),st&&st.save()):it!==ot&&0<=it&&(q({sortable:this,name:"update",toEl:Z,originalEvent:t}),q({sortable:this,name:"sort",toEl:Z,originalEvent:t})),Ft.active&&(null!=it&&-1!==it||(it=ot,at=rt),q({sortable:this,name:"end",toEl:Z,originalEvent:t}),this.save())))),this._nulling()},_nulling:function(){G("nulling",this),Q=V=Z=$=J=et=tt=nt=ct=ut=gt=it=at=ot=rt=mt=vt=st=lt=Ft.dragged=Ft.ghost=Ft.clone=Ft.active=null,xt.forEach(function(t){t.checked=!0}),xt.length=dt=ht=0},handleEvent:function(t){switch(t.type){case"drop":case"dragend":this._onDrop(t);break;case"dragenter":case"dragover":V&&(this._onDragOver(t),function(t){t.dataTransfer&&(t.dataTransfer.dropEffect="move");t.cancelable&&t.preventDefault()}(t));break;case"selectstart":t.preventDefault()}},toArray:function(){for(var t,e=[],n=this.el.children,o=0,i=n.length,r=this.options;o<i;o++)P(t=n[o],r.draggable,this.el,!1)&&e.push(t.getAttribute(r.dataIdAttr)||function(t){var e=t.tagName+t.className+t.src+t.href+t.textContent,n=e.length,o=0;for(;n--;)o+=e.charCodeAt(n);return o.toString(36)}(t));return e},sort:function(t,e){var n={},o=this.el;this.toArray().forEach(function(t,e){e=o.children[e];P(e,this.options.draggable,o,!1)&&(n[t]=e)},this),e&&this.captureAnimationState(),t.forEach(function(t){n[t]&&(o.removeChild(n[t]),o.appendChild(n[t]))}),e&&this.animateAll()},save:function(){var t=this.options.store;t&&t.set&&t.set(this)},closest:function(t,e){return P(t,e||this.options.draggable,this.el,!1)},option:function(t,e){var n=this.options;if(void 0===e)return n[t];var o=W.modifyOption(this,t,e);n[t]=void 0!==o?o:e,"group"===t&&kt(n)},destroy:function(){G("destroy",this);var t=this.el;t[K]=null,f(t,"mousedown",this._onTapStart),f(t,"touchstart",this._onTapStart),f(t,"pointerdown",this._onTapStart),this.nativeDraggable&&(f(t,"dragover",this),f(t,"dragenter",this)),Array.prototype.forEach.call(t.querySelectorAll("[draggable]"),function(t){t.removeAttribute("draggable")}),this._onDrop(),this._disableDelayedDragEvents(),Dt.splice(Dt.indexOf(this.el),1),this.el=t=null},_hideClone:function(){nt||(G("hideClone",this),Ft.eventCanceled||(R(et,"display","none"),this.options.removeCloneOnHide&&et.parentNode&&et.parentNode.removeChild(et),nt=!0))},_showClone:function(t){"clone"===t.lastPutMode?nt&&(G("showClone",this),Ft.eventCanceled||(V.parentNode!=Q||this.options.group.revertClone?J?Q.insertBefore(et,J):Q.appendChild(et):Q.insertBefore(et,V),this.options.group.revertClone&&this.animate(V,et),R(et,"display",""),nt=!1)):this._hideClone()}},Ot&&h(document,"touchmove",function(t){(Ft.active||wt)&&t.cancelable&&t.preventDefault()}),Ft.utils={on:h,off:f,css:R,find:b,is:function(t,e){return!!P(t,e,t,!1)},extend:function(t,e){if(t&&e)for(var n in e)e.hasOwnProperty(n)&&(t[n]=e[n]);return t},throttle:S,closest:P,toggleClass:k,clone:_,index:j,nextTick:Kt,cancelNextTick:Wt,detectDirection:Pt,getChild:B},Ft.get=function(t){return t[K]},Ft.mount=function(){for(var t=arguments.length,e=new Array(t),n=0;n<t;n++)e[n]=arguments[n];(e=e[0].constructor===Array?e[0]:e).forEach(function(t){if(!t.prototype||!t.prototype.constructor)throw"Sortable: Mounted plugin must be a constructor function, not ".concat({}.toString.call(t));t.utils&&(Ft.utils=I(I({},Ft.utils),t.utils)),W.mount(t)})},Ft.create=function(t,e){return new Ft(t,e)};var zt,Gt,Ut,qt,Vt,Zt,$t=[],Qt=!(Ft.version="1.15.2");function Jt(){$t.forEach(function(t){clearInterval(t.pid)}),$t=[]}function te(){clearInterval(Zt)}var ee,ne=S(function(n,t,e,o){if(t.scroll){var i,r=(n.touches?n.touches[0]:n).clientX,a=(n.touches?n.touches[0]:n).clientY,l=t.scrollSensitivity,s=t.scrollSpeed,c=O(),u=!1;Gt!==e&&(Gt=e,Jt(),zt=t.scroll,i=t.scrollFn,!0===zt&&(zt=M(e,!0)));var d=0,h=zt;do{var f=h,p=X(f),g=p.top,m=p.bottom,v=p.left,b=p.right,y=p.width,w=p.height,E=void 0,D=void 0,S=f.scrollWidth,_=f.scrollHeight,C=R(f),T=f.scrollLeft,p=f.scrollTop,D=f===c?(E=y<S&&("auto"===C.overflowX||"scroll"===C.overflowX||"visible"===C.overflowX),w<_&&("auto"===C.overflowY||"scroll"===C.overflowY||"visible"===C.overflowY)):(E=y<S&&("auto"===C.overflowX||"scroll"===C.overflowX),w<_&&("auto"===C.overflowY||"scroll"===C.overflowY)),T=E&&(Math.abs(b-r)<=l&&T+y<S)-(Math.abs(v-r)<=l&&!!T),p=D&&(Math.abs(m-a)<=l&&p+w<_)-(Math.abs(g-a)<=l&&!!p);if(!$t[d])for(var x=0;x<=d;x++)$t[x]||($t[x]={});$t[d].vx==T&&$t[d].vy==p&&$t[d].el===f||($t[d].el=f,$t[d].vx=T,$t[d].vy=p,clearInterval($t[d].pid),0==T&&0==p||(u=!0,$t[d].pid=setInterval(function(){o&&0===this.layer&&Ft.active._onTouchMove(Vt);var t=$t[this.layer].vy?$t[this.layer].vy*s:0,e=$t[this.layer].vx?$t[this.layer].vx*s:0;"function"==typeof i&&"continue"!==i.call(Ft.dragged.parentNode[K],e,t,n,Vt,$t[this.layer].el)||H($t[this.layer].el,e,t)}.bind({layer:d}),24))),d++}while(t.bubbleScroll&&h!==c&&(h=M(h,!1)));Qt=u}},30),c=function(t){var e=t.originalEvent,n=t.putSortable,o=t.dragEl,i=t.activeSortable,r=t.dispatchSortableEvent,a=t.hideGhostForTarget,t=t.unhideGhostForTarget;e&&(i=n||i,a(),e=e.changedTouches&&e.changedTouches.length?e.changedTouches[0]:e,e=document.elementFromPoint(e.clientX,e.clientY),t(),i&&!i.el.contains(e)&&(r("spill"),this.onSpill({dragEl:o,putSortable:n})))};function oe(){}function ie(){}oe.prototype={startIndex:null,dragStart:function(t){t=t.oldDraggableIndex;this.startIndex=t},onSpill:function(t){var e=t.dragEl,n=t.putSortable;this.sortable.captureAnimationState(),n&&n.captureAnimationState();t=B(this.sortable.el,this.startIndex,this.options);t?this.sortable.el.insertBefore(e,t):this.sortable.el.appendChild(e),this.sortable.animateAll(),n&&n.animateAll()},drop:c},a(oe,{pluginName:"revertOnSpill"}),ie.prototype={onSpill:function(t){var e=t.dragEl,t=t.putSortable||this.sortable;t.captureAnimationState(),e.parentNode&&e.parentNode.removeChild(e),t.animateAll()},drop:c},a(ie,{pluginName:"removeOnSpill"});var re,ae,le,se,ce,ue=[],de=[],he=!1,fe=!1,pe=!1;function ge(n,o){de.forEach(function(t,e){e=o.children[t.sortableIndex+(n?Number(e):0)];e?o.insertBefore(t,e):o.appendChild(t)})}function me(){ue.forEach(function(t){t!==le&&t.parentNode&&t.parentNode.removeChild(t)})}return Ft.mount(new function(){function t(){for(var t in this.defaults={scroll:!0,forceAutoScrollFallback:!1,scrollSensitivity:30,scrollSpeed:10,bubbleScroll:!0},this)"_"===t.charAt(0)&&"function"==typeof this[t]&&(this[t]=this[t].bind(this))}return t.prototype={dragStarted:function(t){t=t.originalEvent;this.sortable.nativeDraggable?h(document,"dragover",this._handleAutoScroll):this.options.supportPointer?h(document,"pointermove",this._handleFallbackAutoScroll):t.touches?h(document,"touchmove",this._handleFallbackAutoScroll):h(document,"mousemove",this._handleFallbackAutoScroll)},dragOverCompleted:function(t){t=t.originalEvent;this.options.dragOverBubble||t.rootEl||this._handleAutoScroll(t)},drop:function(){this.sortable.nativeDraggable?f(document,"dragover",this._handleAutoScroll):(f(document,"pointermove",this._handleFallbackAutoScroll),f(document,"touchmove",this._handleFallbackAutoScroll),f(document,"mousemove",this._handleFallbackAutoScroll)),te(),Jt(),clearTimeout(g),g=void 0},nulling:function(){Vt=Gt=zt=Qt=Zt=Ut=qt=null,$t.length=0},_handleFallbackAutoScroll:function(t){this._handleAutoScroll(t,!0)},_handleAutoScroll:function(e,n){var o,i=this,r=(e.touches?e.touches[0]:e).clientX,a=(e.touches?e.touches[0]:e).clientY,t=document.elementFromPoint(r,a);Vt=e,n||this.options.forceAutoScrollFallback||w||y||u?(ne(e,this.options,t,n),o=M(t,!0),!Qt||Zt&&r===Ut&&a===qt||(Zt&&te(),Zt=setInterval(function(){var t=M(document.elementFromPoint(r,a),!0);t!==o&&(o=t,Jt()),ne(e,i.options,t,n)},10),Ut=r,qt=a)):this.options.bubbleScroll&&M(t,!0)!==O()?ne(e,this.options,M(t,!1),!1):Jt()}},a(t,{pluginName:"scroll",initializeByDefault:!0})}),Ft.mount(ie,oe),Ft.mount(new function(){function t(){this.defaults={swapClass:"sortable-swap-highlight"}}return t.prototype={dragStart:function(t){t=t.dragEl;ee=t},dragOverValid:function(t){var e=t.completed,n=t.target,o=t.onMove,i=t.activeSortable,r=t.changed,a=t.cancel;i.options.swap&&(t=this.sortable.el,i=this.options,n&&n!==t&&(t=ee,ee=!1!==o(n)?(k(n,i.swapClass,!0),n):null,t&&t!==ee&&k(t,i.swapClass,!1)),r(),e(!0),a())},drop:function(t){var e,n,o=t.activeSortable,i=t.putSortable,r=t.dragEl,a=i||this.sortable,l=this.options;ee&&k(ee,l.swapClass,!1),ee&&(l.swap||i&&i.options.swap)&&r!==ee&&(a.captureAnimationState(),a!==o&&o.captureAnimationState(),n=ee,t=(e=r).parentNode,l=n.parentNode,t&&l&&!t.isEqualNode(n)&&!l.isEqualNode(e)&&(i=j(e),r=j(n),t.isEqualNode(l)&&i<r&&r++,t.insertBefore(n,t.children[i]),l.insertBefore(e,l.children[r])),a.animateAll(),a!==o&&o.animateAll())},nulling:function(){ee=null}},a(t,{pluginName:"swap",eventProperties:function(){return{swapItem:ee}}})}),Ft.mount(new function(){function t(o){for(var t in this)"_"===t.charAt(0)&&"function"==typeof this[t]&&(this[t]=this[t].bind(this));o.options.avoidImplicitDeselect||(o.options.supportPointer?h(document,"pointerup",this._deselectMultiDrag):(h(document,"mouseup",this._deselectMultiDrag),h(document,"touchend",this._deselectMultiDrag))),h(document,"keydown",this._checkKeyDown),h(document,"keyup",this._checkKeyUp),this.defaults={selectedClass:"sortable-selected",multiDragKey:null,avoidImplicitDeselect:!1,setData:function(t,e){var n="";ue.length&&ae===o?ue.forEach(function(t,e){n+=(e?", ":"")+t.textContent}):n=e.textContent,t.setData("Text",n)}}}return t.prototype={multiDragKeyDown:!1,isMultiDrag:!1,delayStartGlobal:function(t){t=t.dragEl;le=t},delayEnded:function(){this.isMultiDrag=~ue.indexOf(le)},setupClone:function(t){var e=t.sortable,t=t.cancel;if(this.isMultiDrag){for(var n=0;n<ue.length;n++)de.push(_(ue[n])),de[n].sortableIndex=ue[n].sortableIndex,de[n].draggable=!1,de[n].style["will-change"]="",k(de[n],this.options.selectedClass,!1),ue[n]===le&&k(de[n],this.options.chosenClass,!1);e._hideClone(),t()}},clone:function(t){var e=t.sortable,n=t.rootEl,o=t.dispatchSortableEvent,t=t.cancel;this.isMultiDrag&&(this.options.removeCloneOnHide||ue.length&&ae===e&&(ge(!0,n),o("clone"),t()))},showClone:function(t){var e=t.cloneNowShown,n=t.rootEl,t=t.cancel;this.isMultiDrag&&(ge(!1,n),de.forEach(function(t){R(t,"display","")}),e(),ce=!1,t())},hideClone:function(t){var e=this,n=(t.sortable,t.cloneNowHidden),t=t.cancel;this.isMultiDrag&&(de.forEach(function(t){R(t,"display","none"),e.options.removeCloneOnHide&&t.parentNode&&t.parentNode.removeChild(t)}),n(),ce=!0,t())},dragStartGlobal:function(t){t.sortable;!this.isMultiDrag&&ae&&ae.multiDrag._deselectMultiDrag(),ue.forEach(function(t){t.sortableIndex=j(t)}),ue=ue.sort(function(t,e){return t.sortableIndex-e.sortableIndex}),pe=!0},dragStarted:function(t){var e,n=this,t=t.sortable;this.isMultiDrag&&(this.options.sort&&(t.captureAnimationState(),this.options.animation&&(ue.forEach(function(t){t!==le&&R(t,"position","absolute")}),e=X(le,!1,!0,!0),ue.forEach(function(t){t!==le&&C(t,e)}),he=fe=!0)),t.animateAll(function(){he=fe=!1,n.options.animation&&ue.forEach(function(t){T(t)}),n.options.sort&&me()}))},dragOver:function(t){var e=t.target,n=t.completed,t=t.cancel;fe&&~ue.indexOf(e)&&(n(!1),t())},revert:function(t){var n,o,e=t.fromSortable,i=t.rootEl,r=t.sortable,a=t.dragRect;1<ue.length&&(ue.forEach(function(t){r.addAnimationState({target:t,rect:fe?X(t):a}),T(t),t.fromRect=a,e.removeAnimationState(t)}),fe=!1,n=!this.options.removeCloneOnHide,o=i,ue.forEach(function(t,e){e=o.children[t.sortableIndex+(n?Number(e):0)];e?o.insertBefore(t,e):o.appendChild(t)}))},dragOverCompleted:function(t){var e,n=t.sortable,o=t.isOwner,i=t.insertion,r=t.activeSortable,a=t.parentEl,l=t.putSortable,t=this.options;i&&(o&&r._hideClone(),he=!1,t.animation&&1<ue.length&&(fe||!o&&!r.options.sort&&!l)&&(e=X(le,!1,!0,!0),ue.forEach(function(t){t!==le&&(C(t,e),a.appendChild(t))}),fe=!0),o||(fe||me(),1<ue.length?(o=ce,r._showClone(n),r.options.animation&&!ce&&o&&de.forEach(function(t){r.addAnimationState({target:t,rect:se}),t.fromRect=se,t.thisAnimationDuration=null})):r._showClone(n)))},dragOverAnimationCapture:function(t){var e=t.dragRect,n=t.isOwner,t=t.activeSortable;ue.forEach(function(t){t.thisAnimationDuration=null}),t.options.animation&&!n&&t.multiDrag.isMultiDrag&&(se=a({},e),e=v(le,!0),se.top-=e.f,se.left-=e.e)},dragOverAnimationComplete:function(){fe&&(fe=!1,me())},drop:function(t){var e=t.originalEvent,n=t.rootEl,o=t.parentEl,i=t.sortable,r=t.dispatchSortableEvent,a=t.oldIndex,l=t.putSortable,s=l||this.sortable;if(e){var c,u,d,h=this.options,f=o.children;if(!pe)if(h.multiDragKey&&!this.multiDragKeyDown&&this._deselectMultiDrag(),k(le,h.selectedClass,!~ue.indexOf(le)),~ue.indexOf(le))ue.splice(ue.indexOf(le),1),re=null,z({sortable:i,rootEl:n,name:"deselect",targetEl:le,originalEvent:e});else{if(ue.push(le),z({sortable:i,rootEl:n,name:"select",targetEl:le,originalEvent:e}),e.shiftKey&&re&&i.el.contains(re)){var p=j(re),t=j(le);if(~p&&~t&&p!==t)for(var g,m=p<t?(g=p,t):(g=t,p+1);g<m;g++)~ue.indexOf(f[g])||(k(f[g],h.selectedClass,!0),ue.push(f[g]),z({sortable:i,rootEl:n,name:"select",targetEl:f[g],originalEvent:e}))}else re=le;ae=s}pe&&this.isMultiDrag&&(fe=!1,(o[K].options.sort||o!==n)&&1<ue.length&&(c=X(le),u=j(le,":not(."+this.options.selectedClass+")"),!he&&h.animation&&(le.thisAnimationDuration=null),s.captureAnimationState(),he||(h.animation&&(le.fromRect=c,ue.forEach(function(t){var e;t.thisAnimationDuration=null,t!==le&&(e=fe?X(t):c,t.fromRect=e,s.addAnimationState({target:t,rect:e}))})),me(),ue.forEach(function(t){f[u]?o.insertBefore(t,f[u]):o.appendChild(t),u++}),a===j(le)&&(d=!1,ue.forEach(function(t){t.sortableIndex!==j(t)&&(d=!0)}),d&&(r("update"),r("sort")))),ue.forEach(function(t){T(t)}),s.animateAll()),ae=s),(n===o||l&&"clone"!==l.lastPutMode)&&de.forEach(function(t){t.parentNode&&t.parentNode.removeChild(t)})}},nullingGlobal:function(){this.isMultiDrag=pe=!1,de.length=0},destroyGlobal:function(){this._deselectMultiDrag(),f(document,"pointerup",this._deselectMultiDrag),f(document,"mouseup",this._deselectMultiDrag),f(document,"touchend",this._deselectMultiDrag),f(document,"keydown",this._checkKeyDown),f(document,"keyup",this._checkKeyUp)},_deselectMultiDrag:function(t){if(!(void 0!==pe&&pe||ae!==this.sortable||t&&P(t.target,this.options.draggable,this.sortable.el,!1)||t&&0!==t.button))for(;ue.length;){var e=ue[0];k(e,this.options.selectedClass,!1),ue.shift(),z({sortable:this.sortable,rootEl:this.sortable.el,name:"deselect",targetEl:e,originalEvent:t})}},_checkKeyDown:function(t){t.key===this.options.multiDragKey&&(this.multiDragKeyDown=!0)},_checkKeyUp:function(t){t.key===this.options.multiDragKey&&(this.multiDragKeyDown=!1)}},a(t,{pluginName:"multiDrag",utils:{select:function(t){var e=t.parentNode[K];e&&e.options.multiDrag&&!~ue.indexOf(t)&&(ae&&ae!==e&&(ae.multiDrag._deselectMultiDrag(),ae=e),k(t,e.options.selectedClass,!0),ue.push(t))},deselect:function(t){var e=t.parentNode[K],n=ue.indexOf(t);e&&e.options.multiDrag&&~n&&(k(t,e.options.selectedClass,!1),ue.splice(n,1))}},eventProperties:function(){var n=this,o=[],i=[];return ue.forEach(function(t){var e;o.push({multiDragElement:t,index:t.sortableIndex}),e=fe&&t!==le?-1:fe?j(t,":not(."+n.options.selectedClass+")"):j(t),i.push({multiDragElement:t,index:e})}),{items:r(ue),clones:[].concat(de),oldIndicies:o,newIndicies:i}},optionListeners:{multiDragKey:function(t){return"ctrl"===(t=t.toLowerCase())?t="Control":1<t.length&&(t=t.charAt(0).toUpperCase()+t.substr(1)),t}}})}),Ft});</script>
+  <script>{ { prism_core_inline | safe } }</script>
+  <script>{ { prism_yaml_inline | safe } }</script>
+  <script>{ { prism_json_inline | safe } }</script>
+  <script>{ { split_js_inline | safe } }</script>
+  <script>{ { sortable_js_inline | safe } }</script>
   
 
 </head>
@@ -3256,7 +1348,7 @@ Prism.languages.js = Prism.languages.javascript;
   <header class="toolbar">
     <div class="title-wrap">
       <h1>Truth Capsule Viewer & Prompt Composer</h1>
-      <div class="small" style="font-size:12px;margin-top:4px;">Generated 2025-11-11T01:10:42.941585Z</div>
+      <div class="small" style="font-size:12px;margin-top:4px;">Generated 2025-11-11T01:58:59.014635Z</div>
     </div>
 
     <nav class="toolbar-actions">
@@ -3320,6 +1412,7 @@ Prism.languages.js = Prism.languages.javascript;
             <button id="profileInfo" class="icon-btn" type="button" aria-haspopup="dialog" aria-expanded="false"
               title="What are Profiles?">?</button>
             <select id="profiles"></select>
+            <button id="profileView" class="btn small" type="button" title="View profile YAML">View</button>
           </div>
 
           <div id="profileDesc" class="small" style="margin-top:4px"></div>
@@ -3360,7 +1453,7 @@ Prism.languages.js = Prism.languages.javascript;
               </span>
             </div>
             <input id="search" type="text" placeholder="Filter loaded capsules by id/title/domain/statement…"
-            style="margin-left: 12px; max-width:432px; width:100%">
+              style="margin-left: 12px; max-width:432px; width:100%">
             <div id="capsules" class="list"></div>
           </div>
         </div>
@@ -6577,32 +4670,56 @@ Prism.languages.js = Prism.languages.javascript;
     "profile.macgyver_v1": {
       "id": "profile.macgyver_v1",
       "title": "MacGyver Upgrade (Conversational)",
-      "version": "1.1.1",
-      "description": "A lean, declarative profile that primes the model with MacGyver-style problem solving. Minimal capsule view, strong startup priming, one crisp follow-up only, and built-in safety.",
+      "version": "1.2.2",
+      "description": "Lean, declarative profile that primes the model with MacGyver-style problem solving. Profile controls fragments and capsule rendering; one crisp follow-up only; safety built-in.",
       "response": {
         "format": "natural",
+        "override_compose_defaults": true,
+        "force_pedagogy": true,
+        "markdown_wrap_default": false,
+        "fragments": [
+          {
+            "id": "system",
+            "kind": "system",
+            "include": true,
+            "content": "SYSTEM: MacGyver Upgrade — Problem-Solving Profile\nMODE: Natural language; concise and declarative.\nSTARTUP (do silently, do not echo):\n  • Read the capsule excerpts below.\n  • Build two internal lists:\n    – SOCRATIC_PRIMES = all Socratic questions from capsules\n    – APHORISM_GUARDS = all aphorisms from capsules\n  • Reflect internally so you’re primed for fast, safe, resourceful problem solving.\nOPERATING CYCLE:\n  1) GOAL; 2) INVENTORY (assets→properties); 3) LAWS; 4) ROUTES (P/I/E);\n  5) CHOSEN ROUTE (Sense→Gate→Amplify→Actuate); 6) PREMORTEM & SAFETY;\n  7) MICRO-TEST; 8) ANSWER.\nFOLLOW-UP: If a required fact is missing, ask exactly ONE crisp question first, then proceed.\nSTYLE: Verbs over nouns; properties over brands; prefer low-tech, observable, interruptible mechanisms.\nSCOPE: No hazardous/unlawful/security-bypass guidance—offer safe legal analogues.\n"
+          },
+          {
+            "id": "loader",
+            "kind": "fragment",
+            "include": true,
+            "content": "SYSTEM: Truth Capsules Loader\nPURPOSE: Use capsule principles as prompts and guards; keep chains short; prefer reversible micro-tests.\n"
+          },
+          {
+            "id": "discipline",
+            "kind": "fragment",
+            "include": true,
+            "content": "SYSTEM: Bootstrap Discipline\n• Prefer curated fixtures/evidence; abstain when unsure.\n• Show your work when citing; else reason from first principles.\n• Make failures explicit and reversible with tiny experiments.\n"
+          }
+        ],
+        "capsules_heading": "SYSTEM: Principles (Selected)",
         "policy": "Ask at most ONE crisp follow-up only if a blocker exists. Prefer concrete, low-risk, reversible steps. Cite if you use sources; otherwise reason from first principles. Validate JSON before any tool call.\n",
-        "system_block": "SYSTEM: MacGyver Upgrade — Problem-Solving Profile\nMODE: Natural language; concise and declarative.\n\nSTARTUP (do silently, do not echo):\n  • Read the capsule excerpts below.\n  • Build two internal lists:\n    – SOCRATIC_PRIMES = all Socratic questions from capsules\n    – APHORISM_GUARDS = all aphorisms from capsules\n  • Spend several internal steps reflecting on these lists so you are primed for fast, safe, resourceful problem solving.\n\nOPERATING CYCLE (each task):\n  1) GOAL → restate in one short sentence.\n  2) INVENTORY → assets → properties (not brand labels).\n  3) LAWS → map the need to simple physical / informational laws.\n  4) ROUTES → propose 3 routes (Physical / Informational / Environmental).\n  5) CHOSEN ROUTE → lowest-risk, highest-control; show the chain Sense→Gate→Amplify→Actuate.\n  6) PREMORTEM & SAFETY → likely failure + how to shrink blast radius.\n  7) MICRO-TEST → the smallest, reversible test to validate safely.\n  8) ANSWER → numbered steps + benign analogue if needed.\n\nFOLLOW-UP RULE:\n  • If a required fact is missing, ask exactly ONE crisp question first, then proceed.\n\nOUTPUT SHAPE:\n  • GOAL\n  • INVENTORY (assets→properties)\n  • LAWS\n  • ROUTES (P/I/E)\n  • CHOSEN ROUTE (chain & why)\n  • PREMORTEM & SAFETY\n  • MICRO-TEST\n  • ANSWER\n\nSTYLE:\n  • Verbs over nouns; properties over brand labels.\n  • Prefer low-tech, observable, interruptible mechanisms.\n  • Keep steps short, testable, and reversible.\n\nSAFETY & SCOPE:\n  • No hazardous, unlawful, or security-bypass guidance. Offer safe, legal, educational analogues instead.\n\nEXAMPLES\n— Good —\n  User: “Open a sealed paint can without a proper opener.”\n  Assistant:\n    GOAL: Open lid without damage or injury.\n    INVENTORY: flat screwdriver→lever; rag→shim; wooden block→fulcrum; warm water→thermal expansion.\n    LAWS: torque/leverage; thermal expansion; edge protection.\n    ROUTES:\n      P: screwdriver + block as lever; rag protects rim.\n      I: check can label for opening guidance.\n      E: warm the lid circumference 60–90 s to relax seal.\n    CHOSEN ROUTE: Physical — Sense (seat tip) → Gate (small lift) → Amplify (longer lever) → Actuate (slow pry).\n    PREMORTEM & SAFETY: slip risk→use rag; paint splash→tilt away; eye protection.\n    MICRO-TEST: 2 mm lift at one point; inspect seal.\n    ANSWER: 1) Wrap rag on rim; 2) Place block as fulcrum; 3) Pry in small increments around clock; 4) If stiff, warm rim then repeat.\n— Bad —\n  “Just pry it open with a knife or google it.”\n",
+        "system_block": "",
         "projection": {
           "include": [
-            "title",
-            "statement",
-            "pedagogy.socratic[:2]",
-            "pedagogy.aphorisms[:2]"
+            "pedagogy.socratic",
+            "pedagogy.aphorisms"
           ],
+          "force_pedagogy": true,
           "render": {
-            "capsule_header": " ",
+            "capsule_header": "PRINCIPLE — {title}\nUSE: {statement}",
             "socratic_bullet": "  ? {text}",
             "aphorism_bullet": "  ✱ {text}",
-            "enforcement_footer": " "
+            "enforcement_footer": ""
           }
-        }
+        },
+        "footer": "SYSTEM: Refresh\n• Ask at most ONE crisp follow-up, then proceed.\n• Prefer low-tech, reversible, observable steps; show the chain Sense→Gate→Amplify→Actuate.\n• Safety & legality first; offer benign analogues when needed.\n• Output sections: GOAL / INVENTORY / LAWS / ROUTES (P/I/E) / CHOSEN ROUTE / PREMORTEM & SAFETY / MICRO-TEST / ANSWER.\n"
       },
       "download": {
         "suggested_ext": "txt"
       },
       "_file": "./profiles/conversational_macgyver.yaml",
-      "_raw": "kind: profile\nid: profile.macgyver_v1\ntitle: MacGyver Upgrade (Conversational)\nversion: 1.1.1\ndescription: A lean, declarative profile that primes the model with MacGyver-style problem solving. Minimal capsule view, strong startup priming, one crisp follow-up only, and built-in safety.\nresponse:\n  format: natural\n  policy: |\n    Ask at most ONE crisp follow-up only if a blocker exists. Prefer concrete, low-risk, reversible steps. Cite if you use sources; otherwise reason from first principles. Validate JSON before any tool call.\n  system_block: |\n    SYSTEM: MacGyver Upgrade — Problem-Solving Profile\n    MODE: Natural language; concise and declarative.\n\n    STARTUP (do silently, do not echo):\n      • Read the capsule excerpts below.\n      • Build two internal lists:\n        – SOCRATIC_PRIMES = all Socratic questions from capsules\n        – APHORISM_GUARDS = all aphorisms from capsules\n      • Spend several internal steps reflecting on these lists so you are primed for fast, safe, resourceful problem solving.\n\n    OPERATING CYCLE (each task):\n      1) GOAL → restate in one short sentence.\n      2) INVENTORY → assets → properties (not brand labels).\n      3) LAWS → map the need to simple physical / informational laws.\n      4) ROUTES → propose 3 routes (Physical / Informational / Environmental).\n      5) CHOSEN ROUTE → lowest-risk, highest-control; show the chain Sense→Gate→Amplify→Actuate.\n      6) PREMORTEM & SAFETY → likely failure + how to shrink blast radius.\n      7) MICRO-TEST → the smallest, reversible test to validate safely.\n      8) ANSWER → numbered steps + benign analogue if needed.\n\n    FOLLOW-UP RULE:\n      • If a required fact is missing, ask exactly ONE crisp question first, then proceed.\n\n    OUTPUT SHAPE:\n      • GOAL\n      • INVENTORY (assets→properties)\n      • LAWS\n      • ROUTES (P/I/E)\n      • CHOSEN ROUTE (chain & why)\n      • PREMORTEM & SAFETY\n      • MICRO-TEST\n      • ANSWER\n\n    STYLE:\n      • Verbs over nouns; properties over brand labels.\n      • Prefer low-tech, observable, interruptible mechanisms.\n      • Keep steps short, testable, and reversible.\n\n    SAFETY & SCOPE:\n      • No hazardous, unlawful, or security-bypass guidance. Offer safe, legal, educational analogues instead.\n\n    EXAMPLES\n    — Good —\n      User: “Open a sealed paint can without a proper opener.”\n      Assistant:\n        GOAL: Open lid without damage or injury.\n        INVENTORY: flat screwdriver→lever; rag→shim; wooden block→fulcrum; warm water→thermal expansion.\n        LAWS: torque/leverage; thermal expansion; edge protection.\n        ROUTES:\n          P: screwdriver + block as lever; rag protects rim.\n          I: check can label for opening guidance.\n          E: warm the lid circumference 60–90 s to relax seal.\n        CHOSEN ROUTE: Physical — Sense (seat tip) → Gate (small lift) → Amplify (longer lever) → Actuate (slow pry).\n        PREMORTEM & SAFETY: slip risk→use rag; paint splash→tilt away; eye protection.\n        MICRO-TEST: 2 mm lift at one point; inspect seal.\n        ANSWER: 1) Wrap rag on rim; 2) Place block as fulcrum; 3) Pry in small increments around clock; 4) If stiff, warm rim then repeat.\n    — Bad —\n      “Just pry it open with a knife or google it.”\n\n  projection:\n    include:\n      - title\n      - statement\n      - pedagogy.socratic[:2]\n      - pedagogy.aphorisms[:2]\n    render:\n      # Keep the header empty to avoid unsupported placeholders.\n      capsule_header: \" \"\n      socratic_bullet: \"  ? {text}\"\n      aphorism_bullet: \"  ✱ {text}\"\n      # Explicitly clear the enforcement footer (many renderers default this if absent).\n      enforcement_footer: \" \"\ndownload:\n  suggested_ext: txt\n"
+      "_raw": "kind: profile\nid: profile.macgyver_v1\ntitle: MacGyver Upgrade (Conversational)\nversion: 1.2.2\ndescription: Lean, declarative profile that primes the model with MacGyver-style problem solving. Profile controls fragments and capsule rendering; one crisp follow-up only; safety built-in.\n\nresponse:\n  format: natural\n  override_compose_defaults: true\n  force_pedagogy: true\n  markdown_wrap_default: false\n\n  fragments:\n    - id: system\n      kind: system\n      include: true\n      content: |\n        SYSTEM: MacGyver Upgrade — Problem-Solving Profile\n        MODE: Natural language; concise and declarative.\n        STARTUP (do silently, do not echo):\n          • Read the capsule excerpts below.\n          • Build two internal lists:\n            – SOCRATIC_PRIMES = all Socratic questions from capsules\n            – APHORISM_GUARDS = all aphorisms from capsules\n          • Reflect internally so you’re primed for fast, safe, resourceful problem solving.\n        OPERATING CYCLE:\n          1) GOAL; 2) INVENTORY (assets→properties); 3) LAWS; 4) ROUTES (P/I/E);\n          5) CHOSEN ROUTE (Sense→Gate→Amplify→Actuate); 6) PREMORTEM & SAFETY;\n          7) MICRO-TEST; 8) ANSWER.\n        FOLLOW-UP: If a required fact is missing, ask exactly ONE crisp question first, then proceed.\n        STYLE: Verbs over nouns; properties over brands; prefer low-tech, observable, interruptible mechanisms.\n        SCOPE: No hazardous/unlawful/security-bypass guidance—offer safe legal analogues.\n\n    - id: loader\n      kind: fragment\n      include: true\n      content: |\n        SYSTEM: Truth Capsules Loader\n        PURPOSE: Use capsule principles as prompts and guards; keep chains short; prefer reversible micro-tests.\n\n    - id: discipline\n      kind: fragment\n      include: true\n      content: |\n        SYSTEM: Bootstrap Discipline\n        • Prefer curated fixtures/evidence; abstain when unsure.\n        • Show your work when citing; else reason from first principles.\n        • Make failures explicit and reversible with tiny experiments.\n\n  capsules_heading: \"SYSTEM: Principles (Selected)\"\n\n  policy: |\n    Ask at most ONE crisp follow-up only if a blocker exists. Prefer concrete, low-risk, reversible steps. Cite if you use sources; otherwise reason from first principles. Validate JSON before any tool call.\n\n  system_block: \"\"\n\n  projection:\n    include:\n      - pedagogy.socratic\n      - pedagogy.aphorisms\n    force_pedagogy: true\n    render:\n      capsule_header: \"PRINCIPLE — {title}\\nUSE: {statement}\"\n      socratic_bullet: \"  ? {text}\"\n      aphorism_bullet: \"  ✱ {text}\"\n      enforcement_footer: \"\"\n\n  # NEW: footer appended to the very end of the composed prompt\n  footer: |\n    SYSTEM: Refresh\n    • Ask at most ONE crisp follow-up, then proceed.\n    • Prefer low-tech, reversible, observable steps; show the chain Sense→Gate→Amplify→Actuate.\n    • Safety & legality first; offer benign analogues when needed.\n    • Output sections: GOAL / INVENTORY / LAWS / ROUTES (P/I/E) / CHOSEN ROUTE / PREMORTEM & SAFETY / MICRO-TEST / ANSWER.\n\ndownload:\n  suggested_ext: txt\n"
     },
     "profile.dev.code_assistant_v1": {
       "id": "profile.dev.code_assistant_v1",
@@ -6671,6 +4788,7 @@ Prism.languages.js = Prism.languages.javascript;
     <script>
       /* ------------ Data ------------ */
       const DATA = JSON.parse(document.getElementById('tc-data').textContent);
+
 
 
       // Derive posture/witness_count if missing; keep raw yaml if provided upstream
@@ -6843,40 +4961,73 @@ Prism.languages.js = Prism.languages.javascript;
       }
 
 
-      /* ------------ Modal ------------ */
-      let MODAL = null;
-      function openModal(title, c) {
-        MODAL = c;
-        $('m_title').textContent = title;
-        $('m_body_code').textContent = (c._raw || '');
-        if (window.Prism && Prism.highlightElement) {
-          Prism.highlightElement($('m_body_code'));
+      /* ------------ Modal (upgraded: capsules + profiles + bundles) ------------ */
+      let MODAL_CTX = null;
+      // kind ∈ {'capsule','profile','bundle'}
+      // data = the object (capsule/profile/bundle)
+      // raw  = preferred text to show (YAML if available; JSON pretty as fallback)
+      function openModal(title, data, { kind = 'capsule' } = {}) {
+        // Prefer YAML when provided as _raw; else pretty JSON
+        let raw = (data && data._raw) ? String(data._raw) : null;
+        let lang = 'yaml';
+        if (!raw) {
+          raw = JSON.stringify(data || {}, null, 2);
+          lang = 'json';
         }
-        $('m_result').textContent = 'idle'; $('m_result').className = 'badge';
+
+        MODAL_CTX = { kind, data, raw };
+
+        $('m_title').textContent = title || (kind === 'bundle' ? 'Bundle' : kind === 'profile' ? 'Profile' : 'Capsule');
+
+        // Toggle controls based on kind
+        const showProv = (kind === 'capsule');
+        const showValidate = (kind === 'capsule');
+        $('m_copy_prov').style.display = showProv ? '' : 'none';
+        $('m_validate').style.display = showValidate ? '' : 'none';
+
+        // Set code block + highlight
+        const code = $('m_body_code');
+        code.className = 'language-' + lang;
+        code.textContent = raw;
+        if (window.Prism && Prism.highlightElement) Prism.highlightElement(code);
+
+        $('m_result').textContent = 'idle';
+        $('m_result').className = 'badge';
         $('modal').style.display = 'flex';
       }
-      function closeModal() { $('modal').style.display = 'none'; MODAL = null; }
+
+      function closeModal() { $('modal').style.display = 'none'; MODAL_CTX = null; }
+
       $('m_close').addEventListener('click', closeModal);
       $('modal').addEventListener('click', e => { if (e.target && e.target.id === 'modal') closeModal(); });
-      $('m_copy_yaml').addEventListener('click', () => { if (!MODAL) return; navigator.clipboard.writeText(MODAL._raw || ''); toast('YAML copied'); });
-      $('m_copy_prov').addEventListener('click', () => { if (!MODAL) return; navigator.clipboard.writeText(JSON.stringify(MODAL.provenance || {}, null, 2)); toast('Provenance copied'); });
-      $('m_validate').addEventListener('click', async () => { if (!MODAL) return; const r = await validateDigest(MODAL); const tag = $('m_result'); tag.textContent = r.ok ? 'digest✓' : 'digest✗'; tag.className = 'badge ' + (r.ok ? 'ok' : 'err'); tag.title = r.ok ? 'OK' : ('have:' + r.have + ' want:' + r.want); });
 
-      $('expandAllBtn')?.addEventListener('click', () => {
-        document.querySelectorAll('details.domain-group').forEach(d => {
-          d.open = true;
-          const domain = d.querySelector('summary .domain-title')?.textContent || 'misc';
-          setDomainOpen(domain, true);
-        });
+      $('m_copy_yaml').addEventListener('click', () => {
+        if (!MODAL_CTX) return;
+        navigator.clipboard.writeText(MODAL_CTX.raw || '').then(() => toast('YAML/JSON copied'));
       });
 
-      $('collapseAllBtn')?.addEventListener('click', () => {
-        document.querySelectorAll('details.domain-group').forEach(d => {
-          d.open = false;
-          const domain = d.querySelector('summary .domain-title')?.textContent || 'misc';
-          setDomainOpen(domain, false);
-        });
+      $('m_copy_prov').addEventListener('click', () => {
+        if (!MODAL_CTX) return;
+        if (MODAL_CTX.kind !== 'capsule') { toast('No provenance for this type'); return; }
+        navigator.clipboard.writeText(JSON.stringify((MODAL_CTX.data && MODAL_CTX.data.provenance) || {}, null, 2))
+          .then(() => toast('Provenance copied'));
       });
+
+      $('m_validate').addEventListener('click', async () => {
+        if (!MODAL_CTX) return;
+        const tag = $('m_result');
+        if (MODAL_CTX.kind !== 'capsule') {
+          tag.textContent = 'n/a';
+          tag.className = 'badge';
+          tag.title = 'Validation only applies to capsules';
+          return;
+        }
+        const r = await validateDigest(MODAL_CTX.data);
+        tag.textContent = r.ok ? 'digest✓' : 'digest✗';
+        tag.className = 'badge ' + (r.ok ? 'ok' : 'err');
+        tag.title = r.ok ? 'OK' : ('have:' + r.have + ' want:' + r.want);
+      });
+
 
 
 
@@ -6927,6 +5078,17 @@ Prism.languages.js = Prism.languages.javascript;
         sel.dispatchEvent(new Event('change', { bubbles: true }));
       }
 
+      // Profile YAML/JSON modal
+      (function wireProfileView() {
+        const btn = $('profileView');
+        if (!btn) return;
+        btn.addEventListener('click', () => {
+          const id = STATE.profile;
+          const p = (DATA.profiles || {})[id];
+          if (!p) { toast('No profile selected'); return; }
+          openModal(p.title || id || 'Profile', p, { kind: 'profile' });
+        });
+      })();
 
       function capsuleRow(c, id, opts = {}) {
         const showDomainChip = !!opts.showDomainChip;
@@ -6978,7 +5140,7 @@ Prism.languages.js = Prism.languages.javascript;
         const btn = document.createElement('button');
         btn.className = 'btn small';
         btn.textContent = 'View';
-        btn.onclick = () => openModal(c.title || id, c);
+        btn.onclick = () => openModal(c.title || id, c, { kind: 'capsule' });
         top.appendChild(btn);
 
         const stmt = document.createElement('div');
@@ -7106,6 +5268,7 @@ Prism.languages.js = Prism.languages.javascript;
       function renderBundles() {
         const list = $('bundles'); list.innerHTML = '';
         const keys = Object.keys(DATA.bundles || {}).sort((a, b) => (DATA.bundles[a].name || a).localeCompare(DATA.bundles[b].name || b));
+
         for (const k of keys) {
           const b = DATA.bundles[k] || {};
           const item = document.createElement('div'); item.className = 'item';
@@ -7120,7 +5283,10 @@ Prism.languages.js = Prism.languages.javascript;
               STATE.selectedBundles.delete(k);
               const others = [...STATE.selectedBundles];
               (b.capsules || []).forEach(cid => {
-                const elsewhere = others.some(name => { const b2 = DATA.bundles[name]; return b2 && Array.isArray(b2.capsules) && b2.capsules.includes(cid); });
+                const elsewhere = others.some(name => {
+                  const b2 = DATA.bundles[name];
+                  return b2 && Array.isArray(b2.capsules) && b2.capsules.includes(cid);
+                });
                 const manual = STATE.manualCaps.has(cid);
                 if (!elsewhere && !manual) STATE.selectedCaps.delete(cid);
                 STATE.order = STATE.order.filter(x => STATE.selectedCaps.has(x));
@@ -7132,7 +5298,14 @@ Prism.languages.js = Prism.languages.javascript;
 
           const ttl = document.createElement('div'); ttl.textContent = (b.name || k); row.appendChild(ttl);
 
-          // Add description if present
+          // NEW: "View" button for bundle YAML/JSON
+          const viewBtn = document.createElement('button');
+          viewBtn.className = 'btn small';
+          viewBtn.textContent = 'View';
+          viewBtn.onclick = () => openModal(b.name || k || 'Bundle', b, { kind: 'bundle' });
+          row.appendChild(viewBtn);
+
+          // optional description
           if (b.description) {
             const desc = document.createElement('div'); desc.className = 'small'; desc.textContent = b.description; item.appendChild(desc);
           }
@@ -7141,6 +5314,7 @@ Prism.languages.js = Prism.languages.javascript;
         }
         $('bundlesCount').textContent = keys.length;
       }
+
 
       function renderPreview() {
         const list = $('preview'); list.innerHTML = '';
@@ -7156,7 +5330,12 @@ Prism.languages.js = Prism.languages.javascript;
           ttl.innerHTML = esc(c.title || id) + ' <span class="muted"> -  ' + esc(c.domain || '') + '</span>';
           row.appendChild(ttl);
 
-          const btn = document.createElement('button'); btn.className = 'btn small'; btn.textContent = 'View'; btn.onclick = () => openModal(c.title || id, c); row.appendChild(btn);
+          const btn = document.createElement('button');
+          btn.className = 'btn small';
+          btn.textContent = 'View';
+          btn.onclick = () => openModal(c.title || id, c, { kind: 'capsule' });
+          row.appendChild(btn);
+
 
           list.appendChild(item);
         });
@@ -7176,121 +5355,294 @@ Prism.languages.js = Prism.languages.javascript;
           }
         });
       }
+      /* ------------ Composition (hardened) ------------ */
 
-      /* ------------ Composition ------------ */
-      function parseFieldSpec(spec) {
-        const m = String(spec).match(/^([a-z_.]+)(?:\[:(\d+)\])?$/i);
-        return { path: m ? m[1].toLowerCase() : String(spec).toLowerCase(), limit: m && m[2] ? parseInt(m[2], 10) : null };
+      /* Canonicalize ids so filenames/paths/exts match capsule ids/keys */
+      function canonicalizeId(s) {
+        return String(s || '')
+          .trim()
+          .replace(/^.*[\\/]/, '')              // strip any leading path
+          .replace(/\.(yaml|yml|json)$/i, '');  // strip extension
       }
 
-      function applyProjection(capsule, projection, includePedagogy) {
-        const proj = projection || {};
-        const include = Array.isArray(proj.include) ? proj.include : [];
-        const render = proj.render || {};
+      /* Turn a Set or object-map of selections into a canonical Set of ids */
+      function toIdSet(x) {
+        if (x instanceof Set) return new Set([...x].map(canonicalizeId));
+        if (x && typeof x === 'object') {
+          return new Set(Object.keys(x).filter(k => x[k]).map(canonicalizeId));
+        }
+        return new Set();
+      }
 
-        const header = render.capsule_header || "BEGIN CAPSULE id={id} version={version} domain={domain}";
-        const footer = render.enforcement_footer || "ENFORCEMENT: Ensure outputs satisfy this capsule; otherwise abstain and request the minimal missing info.";
-        const aBullet = render.assumption_bullet || "  - {text}";
-        const sBullet = render.socratic_bullet || "  - {text}";
-        const aphBullet = render.aphorism_bullet || "  - {text}";
+      /* Find a capsule by id, key, or filename-like string */
+      function getCapsuleByAnyId(anyId) {
+        const canon = canonicalizeId(anyId);
+        const store = (DATA && DATA.capsules) || {};
+        if (store[anyId]) return store[anyId]; // exact key hit
+        for (const k in store) {
+          const cap = store[k];
+          const capIdCanon = canonicalizeId(cap.id || '');
+          const keyCanon = canonicalizeId(k);
+          if (capIdCanon === canon || keyCanon === canon) return cap;
+        }
+        return null;
+      }
 
+      /* Selection that survives order/selected mismatches */
+      function getSelectedIdsSafe() {
+        const order = Array.isArray(STATE.order) ? STATE.order.slice() : [];
+        const sel = toIdSet(STATE.selectedCaps);
+        const ordered = [];
+        const seen = new Set();
+
+        for (const raw of order) {
+          const canon = canonicalizeId(raw);
+          if (sel.has(canon) && !seen.has(canon)) {
+            ordered.push(canon);
+            seen.add(canon);
+          }
+        }
+        for (const canon of sel) {
+          if (!seen.has(canon)) ordered.push(canon);
+        }
+        return ordered;
+      }
+
+      /* Optional legacy helper (kept for completeness if you use it elsewhere) */
+      function parseFieldSpec(spec) {
+        const m = String(spec).match(/^([a-z_.]+)(?:\[:(\d+)\])?$/i);
+        return {
+          path: m ? m[1].toLowerCase() : String(spec).toLowerCase(),
+          limit: m && m[2] ? parseInt(m[2], 10) : null
+        };
+      }
+
+      /* ---------- Pedagogy normalization (supports both schemas) ---------- */
+      function normalizePedagogy(capsule) {
+        // A) pedagogy: [{kind:'Socratic'|'Aphorism', text:'...'}, ...]
+        // B) pedagogy: { socratic:[...], aphorisms:[...] }
+        const out = { socratic: [], aphorisms: [] };
+        const p = capsule && capsule.pedagogy;
+        if (!p) return out;
+
+        if (Array.isArray(p)) {
+          for (const item of p) {
+            if (!item) continue;
+            const kind = String(item.kind || '').toLowerCase();
+            const text = (item.text == null) ? '' : String(item.text);
+            if (!text) continue;
+            if (kind === 'socratic') out.socratic.push(text);
+            else if (kind === 'aphorism' || kind === 'aphorisms') out.aphorisms.push(text);
+          }
+        } else if (typeof p === 'object') {
+          if (Array.isArray(p.socratic)) out.socratic.push(...p.socratic.map(String));
+          if (Array.isArray(p.aphorisms)) out.aphorisms.push(...p.aphorisms.map(String));
+        }
+        return out;
+      }
+
+      /* ---------- Projection Renderer (profile-driven) ---------- */
+      function applyProjection(capsule, projection, withPed) {
         const lines = [];
-        lines.push(
-          header
-            .replace('{id}', capsule.id || '')
-            .replace('{version}', capsule.version || '1.0.0')
-            .replace('{domain}', capsule.domain || '')
-        );
 
-        for (const spec of include) {
-          const { path, limit } = parseFieldSpec(spec);
-          const lim = (limit == null ? Number.MAX_SAFE_INTEGER : limit);
+        // Header (supports {title}/{statement})
+        const headerTpl = (projection.render && typeof projection.render.capsule_header === 'string')
+          ? projection.render.capsule_header
+          : null;
 
-          if (path === 'title' && capsule.title) lines.push("TITLE: " + capsule.title);
-          else if (path === 'statement' && capsule.statement) lines.push("STATEMENT: " + capsule.statement);
-          else if (path === 'assumptions') {
-            let items = capsule.assumptions || [];
-            // allow object assumptions: {text: "..."} or {assumption: "..."}
-            items = items.map(a => (typeof a === 'string') ? a : (a?.text || a?.assumption || JSON.stringify(a)));
-            items = items.slice(0, lim);
-            if (items.length) {
-              lines.push("ASSUMPTIONS:");
-              items.forEach(t => lines.push(aBullet.replace('{text}', t)));
-            }
+        if (headerTpl && headerTpl.length > 0) {
+          lines.push(applyTemplate(headerTpl, {
+            id: capsule.id || '',
+            version: capsule.version || '',
+            domain: capsule.domain || '',
+            title: capsule.title || capsule.TITLE || '',
+            statement: capsule.statement || capsule.STATEMENT || ''
+          }).trim());
+        }
+
+        // Normalize pedagogy for consistent addressing
+        const ped = normalizePedagogy(capsule);
+
+        // Build include list; ensure pedagogy is present when forced
+        let includes = Array.isArray(projection.include) ? projection.include.slice() : [];
+        const forcePed = !!(projection && projection.force_pedagogy);
+        const hasPedInList = includes.some(s => String(s).startsWith('pedagogy.'));
+        if (forcePed && !hasPedInList) {
+          includes.push('pedagogy.socratic', 'pedagogy.aphorisms');
+        }
+
+        for (const inc of includes) {
+          const { path, sliceFrom, sliceTo } = parseInclude(inc);
+
+          // Respect UI/profile gating
+          if (!withPed && path.startsWith('pedagogy.')) continue;
+
+          let val = null;
+          if (path === 'pedagogy.socratic') val = ped.socratic;
+          else if (path === 'pedagogy.aphorisms') val = ped.aphorisms;
+          else val = getByPath(capsule, path);
+
+          if (val == null) continue;
+
+          if (Array.isArray(val)) {
+            const sub = sliceArray(val, sliceFrom, sliceTo);
+            const bulletKey = path.endsWith('socratic') ? 'socratic_bullet'
+              : path.endsWith('aphorisms') ? 'aphorism_bullet'
+                : null;
+            const bulletTpl = (projection.render && projection.render[bulletKey]) || '  - {text}';
+            for (const item of sub) lines.push(applyTemplate(bulletTpl, { text: String(item) }));
+            continue;
           }
-          else if (path === 'pedagogy.socratic' && includePedagogy) {
-            const soc = (capsule.pedagogy || [])
-              .filter(p => /socratic/.test((p.kind || '').toLowerCase()))
-              .slice(0, lim);
-            if (soc.length) {
-              lines.push("PEDAGOGY (Socratic):");
-              soc.forEach(p => lines.push(sBullet.replace('{text}', p.text || '')));
-            }
-          }
-          else if (path === 'pedagogy.aphorisms' && includePedagogy) {
-            const aph = (capsule.pedagogy || [])
-              .filter(p => /aphorism/.test((p.kind || '').toLowerCase()))
-              .slice(0, lim);
-            if (aph.length) {
-              lines.push("PEDAGOGY (Aphorisms):");
-              aph.forEach(p => lines.push(aphBullet.replace('{text}', p.text || '')));
-            }
+
+          if (typeof val === 'string') {
+            const lineTpl = (projection.render && projection.render[`${path}_line`]) || null;
+            lines.push(lineTpl ? applyTemplate(lineTpl, { text: val }) : val);
           }
         }
 
-        lines.push(footer);
-        return lines.join("\n");
+        // Footer (suppressed when empty string)
+        const footer = projection.render ? projection.render.enforcement_footer : null;
+        if (typeof footer === 'string' && footer.trim().length > 0) lines.push(footer.trim());
+
+        return lines.join("\n").trim();
       }
 
-
+      /* ---------- Legacy capsule composer (only used if no projection provided) ---------- */
       function composeLegacy(c, includePedagogy) {
         const lines = [];
-        /* lines.push("BEGIN CAPSULE id=" + (c.id || '') + " version=" + (c.version || '1.0.0') + " domain=" + (c.domain || '')); */
-        lines.push("BEGIN CAPSULE id=" + (c.id || '') +
+        lines.push(
+          "BEGIN CAPSULE id=" + (c.id || '') +
           " version=" + (c.version || '1.0.0') +
           " domain=" + (c.domain || '') +
-          " posture=" + (c.posture || 'informational') + ")");
+          " posture=" + (c.posture || 'informational')
+        );
         if (c.statement) lines.push("STATEMENT: " + c.statement);
         if (includePedagogy && c.pedagogy) {
-          const ped = c.pedagogy.map(p => (p.kind + ': ' + p.text)).join('\n');
-          if (ped) lines.push('PEDAGOGY:\n' + ped);
+          const ped = normalizePedagogy(c);
+          const body = []
+            .concat(ped.socratic.map(t => "Socratic: " + t))
+            .concat(ped.aphorisms.map(t => "Aphorism: " + t))
+            .join('\n');
+          if (body) lines.push('PEDAGOGY:\n' + body);
         }
         lines.push('END CAPSULE');
         return lines.join("\n");
       }
+
+      /* ---------- Main compose ---------- */
       function compose() {
-        const prof = DATA.profiles[STATE.profile || ''] || {};
-        const response = prof.response || {};
-        const projection = response.projection || null;
+        try {
+          const prof = (DATA && DATA.profiles && STATE.profile && DATA.profiles[STATE.profile]) || {};
+          const response = prof.response || {};
+          const projection = response.projection || {};
+          const blocks = [];
 
-        const ids = STATE.order.filter(id => STATE.selectedCaps.has(id));
-        const blocks = [];
+          // Fragments / system
+          const overrideDefaults = !!response.override_compose_defaults;
+          const fragments = Array.isArray(response.fragments) ? response.fragments : [];
 
-        const policy = response.policy || 'Cite or abstain; follow Plan-Verify-Answer; ask ONE crisp follow-up if required.';
-        const format = response.format || 'natural';
-        const system_block = response.system_block || ("SYSTEM: Profile=" + (prof.title || 'unknown') + "\nPOLICY: " + policy + "\nFORMAT: " + format);
-        blocks.push(system_block);
+          const sysFragments = fragments.filter(f => f && f.include !== false && f.kind === 'system');
+          if (sysFragments.length) {
+            for (const f of sysFragments) blocks.push(String(f.content || '').trim());
+          } else {
+            const policy = response.policy || 'Cite or abstain; follow Plan→Verify→Answer; ask ONE crisp follow-up if required.';
+            const format = response.format || 'natural';
+            const system_block = response.system_block ||
+              ("SYSTEM: Profile=" + (prof.title || 'unknown') + "\nPOLICY: " + policy + "\nFORMAT: " + format);
+            blocks.push(system_block);
+          }
 
-        // If the profile’s projection includes pedagogy.* then force-enable pedagogy rendering
-        const wantsPed = Array.isArray(projection?.include) && projection.include.some(s => String(s).startsWith('pedagogy.'));
-        const withPed = $('includePed').checked || wantsPed;
+          const auxFragments = fragments.filter(f => f && f.include !== false && f.kind !== 'system');
+          if (auxFragments.length) {
+            for (const f of auxFragments) blocks.push(String(f.content || '').trim());
+          } else if (!overrideDefaults) {
+            // Legacy defaults only if profile does not override
+            blocks.push("SYSTEM: Truth Capsules Loader v1\nPURPOSE: Use curated capsules to scaffold reasoning and enforce acceptance rules.\nMETHOD:\n  1) Load capsule rules (below).\n  2) For each task, follow Plan → Verify → Answer.\n  3) If required fields are missing, ask ONE concise follow-up.\n  4) Cite sources or abstain. Redact PII. Validate tool JSON before calling.\n  5) Emit a JSON report when asked (see REPORT SCHEMA).\nFAILURE POLICY: If a capsule cannot be satisfied, abstain + explain what is missing.");
+            blocks.push("SYSTEM: Bootstrap Discipline\n• Curation is king - prefer curated fixtures/evidence; abstain when unsure.\n• Show your work - reference evidence in answers.\n• Make failures explicit and reversible - choose tiny experiments.");
+          }
 
-        blocks.push("SYSTEM: Truth Capsules Loader v1\nPURPOSE: Use curated capsules to scaffold reasoning and enforce acceptance rules.\nMETHOD:\n  1) Load capsule rules (below).\n  2) For each task, follow Plan → Verify → Answer.\n  3) If required fields are missing, ask ONE concise follow-up.\n  4) Cite sources or abstain. Redact PII. Validate tool JSON before calling.\n  5) Emit a JSON report when asked (see REPORT SCHEMA).\nFAILURE POLICY: If a capsule cannot be satisfied, abstain + explain what is missing.");
-        blocks.push("SYSTEM: Bootstrap Discipline\n• Curation is king - prefer curated fixtures/evidence; abstain when unsure.\n• Show your work - reference evidence in answers.\n• Make failures explicit and reversible - choose tiny experiments.");
+          // Heading + pedagogy policy
+          const heading = response.capsules_heading || 'SYSTEM: Capsule Rules (Selected)';
+          const wantsPedInProfile = Array.isArray(projection.include) && projection.include.some(s => String(s).startsWith('pedagogy.'));
+          const forcePed = !!(projection && projection.force_pedagogy) || !!response.force_pedagogy;
+          const withPedUI = !!($('includePed') && $('includePed').checked);
+          const withPed = forcePed || withPedUI || wantsPedInProfile;
 
-        if (ids.length === 0) {
-          blocks.push('SYSTEM: Capsule Rules (Selected)\n- (No capsules selected)');
-        } else {
-          blocks.push('SYSTEM: Capsule Rules (Selected)');
-          for (const id of ids) {
-            const c = DATA.capsules[id]; if (!c) continue;
-            blocks.push((projection && projection.include) ? applyProjection(c, projection, withPed) : composeLegacy(c, withPed));
+          // Robust selected ids
+          const idsCanon = getSelectedIdsSafe();
+          if (!idsCanon.length) {
+            blocks.push(heading + "\n- (No capsules selected)");
+          } else {
+            blocks.push(heading);
+            for (const canon of idsCanon) {
+              const cap = getCapsuleByAnyId(canon);
+              if (!cap) continue;
+              if (projection && projection.include) blocks.push(applyProjection(cap, projection, withPed));
+              else blocks.push(composeLegacy(cap, withPed));
+            }
+          }
+
+          // --- footer (profile-controlled) ---
+          if (typeof response.footer === 'string' && response.footer.trim().length) {
+            blocks.push(response.footer.trim());
+          }
+
+          // Markdown wrap choice: UI wins; otherwise profile default (if provided)
+          const wrapDefault = !!response.markdown_wrap_default;
+          const wrapUI = !!($('markdown') && $('markdown').checked);
+          const wrap = wrapUI || (wrapDefault && !$('markdown'));
+          let out = blocks.filter(Boolean).join("\n\n").trim();
+          if (wrap) out = "```\n" + out + "\n```";
+          $('out').value = out;
+
+        } catch (err) {
+          console.error(err);
+          $('out').value = "ERROR composing prompt: " + (err && err.message ? err.message : String(err));
+        }
+      }
+
+      /* ---------- Small templating & structure helpers ---------- */
+      function applyTemplate(tpl, dict) {
+        return String(tpl).replace(/\{([\w.]+)\}/g, (_, k) => {
+          const v = dict[k];
+          return (v === undefined || v === null) ? '' : String(v);
+        });
+      }
+      function parseInclude(spec) {
+        // e.g., "pedagogy.socratic[:2]" or "pedagogy.aphorisms[1:3]"
+        const s = String(spec);
+        const m = s.match(/^([\w.]+)(\[(?::?\d*)?(?::\d*)?\])?$/);
+        const path = m ? m[1] : s;
+        let sliceFrom = null, sliceTo = null;
+        const slice = m && m[2] ? m[2].slice(1, -1) : null;
+        if (slice != null && slice.length) {
+          const parts = slice.split(':');
+          if (parts.length === 2) {
+            sliceFrom = parts[0].length ? parseInt(parts[0], 10) : null;
+            sliceTo = parts[1].length ? parseInt(parts[1], 10) : null;
+          } else if (parts.length === 1 && parts[0].length) {
+            const idx = parseInt(parts[0], 10);
+            sliceFrom = isNaN(idx) ? null : idx;
+            sliceTo = isNaN(idx) ? null : (idx + 1);
           }
         }
-
-        let out = blocks.join("\n\n");
-        if ($('markdown').checked) out = "```\n" + out + "\n```";
-        $('out').value = out;
+        return { path, sliceFrom, sliceTo };
+      }
+      function sliceArray(arr, from, to) {
+        const n = Array.isArray(arr) ? arr.length : 0;
+        const start = (from == null) ? 0 : Math.max(0, from);
+        const end = (to == null) ? n : Math.max(start, Math.min(n, to));
+        return arr.slice(start, end);
+      }
+      function getByPath(obj, path) {
+        if (!obj || !path) return null;
+        const parts = path.split('.');
+        let cur = obj;
+        for (const p of parts) {
+          if (cur == null) return null;
+          cur = cur[p];
+        }
+        return cur;
       }
 
       /* ------------ Manifest + share ------------ */

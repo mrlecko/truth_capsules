@@ -1038,7 +1038,7 @@
     .toolbar .title-wrap {
       display: flex;
       flex-direction: column;
-      padding-left:30px;
+      padding-left: 30px;
     }
 
     .toolbar-actions {
@@ -1047,7 +1047,7 @@
       align-items: center;
       gap: 10px;
       flex-wrap: wrap;
-      margin-right:30px;
+      margin-right: 30px;
     }
 
     /* Groups = compact button clusters */
@@ -1144,140 +1144,182 @@
       font-size: 12px;
     }
 
-/* === Modern ghost pills (borderless groups) === */
-:root{
-  --btn-h: 30px;
-  --btn-r: 12px;
-  --hairline: color-mix(in oklab, var(--border), transparent 35%);
-  --hover:   color-mix(in oklab, var(--accent), transparent 88%);
-  --press:   color-mix(in oklab, var(--accent), transparent 70%);
-}
+    /* === Modern ghost pills (borderless groups) === */
+    :root {
+      --btn-h: 30px;
+      --btn-r: 12px;
+      --hairline: color-mix(in oklab, var(--border), transparent 35%);
+      --hover: color-mix(in oklab, var(--accent), transparent 88%);
+      --press: color-mix(in oklab, var(--accent), transparent 70%);
+    }
 
-.toolbar { gap: 10px; padding: 6px 0; }
-.toolbar-actions { gap: 8px; }
+    .toolbar {
+      gap: 10px;
+      padding: 6px 0;
+    }
 
-/* No chrome around clusters */
-.group{
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  border-radius: 0;
-}
-/* kill any old highlight rings */
-.group:has(.menu[open]){ box-shadow: none; }
+    .toolbar-actions {
+      gap: 8px;
+    }
 
-/* Pills */
-.btn{
-  -webkit-appearance: none;
-  appearance: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  height: var(--btn-h);
-  padding: 0 12px;
-  border-radius: var(--btn-r);
-  border: 1px solid var(--hairline);         /* hairline, not heavy */
-  background: color-mix(in oklab, var(--btn-bg), transparent 10%);
-  color: var(--text);
-  font-weight: 600;
-  line-height: 1;
-  cursor: pointer;
-  transition: background .15s ease, border-color .15s ease,
-              box-shadow .15s ease, transform .04s ease;
-}
+    /* No chrome around clusters */
+    .group {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      border-radius: 0;
+    }
 
-.btn:hover{
-  background: var(--hover);
-  border-color: color-mix(in oklab, var(--border), var(--accent) 40%);
-  box-shadow: 0 2px 10px rgba(0,0,0,.12);
-}
+    /* kill any old highlight rings */
+    .group:has(.menu[open]) {
+      box-shadow: none;
+    }
 
-.btn:active{
-  background: var(--press);
-  transform: translateY(1px);
-  box-shadow: 0 1px 4px rgba(0,0,0,.18) inset;
-}
+    /* Pills */
+    .btn {
+      -webkit-appearance: none;
+      appearance: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: var(--btn-h);
+      padding: 0 12px;
+      border-radius: var(--btn-r);
+      border: 1px solid var(--hairline);
+      /* hairline, not heavy */
+      background: color-mix(in oklab, var(--btn-bg), transparent 10%);
+      color: var(--text);
+      font-weight: 600;
+      line-height: 1;
+      cursor: pointer;
+      transition: background .15s ease, border-color .15s ease,
+        box-shadow .15s ease, transform .04s ease;
+    }
 
-/* Subtle, accessible focus */
-.btn:focus{ outline: none; }
-.btn:focus-visible{
-  outline: 2px solid color-mix(in oklab, var(--accent), transparent 60%);
-  outline-offset: 2px;
-  box-shadow: none;
-}
+    .btn:hover {
+      background: var(--hover);
+      border-color: color-mix(in oklab, var(--border), var(--accent) 40%);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, .12);
+    }
 
-/* Icon-only = circular ghost */
-.btn.icon{
-  width: var(--btn-h);
-  min-width: var(--btn-h);
-  padding: 0;
-  border-radius: 999px;
-}
+    .btn:active {
+      background: var(--press);
+      transform: translateY(1px);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .18) inset;
+    }
 
-/* Caution tone stays ghost (no filled red blob) */
-.btn.warn{
-  color: var(--danger, #e06c75);
-  background: color-mix(in oklab, var(--btn-bg), transparent 6%);
-  border-color: color-mix(in oklab, var(--danger, #e06c75), var(--border) 75%);
-}
+    /* Subtle, accessible focus */
+    .btn:focus {
+      outline: none;
+    }
 
-/* Details/summary dropdown matches pills */
-.menu{ position: relative; }
-.menu > summary{ list-style: none; cursor: pointer; }
-.menu > summary::-webkit-details-marker{ display: none; }
+    .btn:focus-visible {
+      outline: 2px solid color-mix(in oklab, var(--accent), transparent 60%);
+      outline-offset: 2px;
+      box-shadow: none;
+    }
 
-/* Panel */
-.menu[open] .menu-list{ display: block; }
-.menu-list{
-  display: none;
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  min-width: 220px;
-  padding: 8px;
-  background: var(--bgElevated, var(--bg));
-  border: 1px solid var(--hairline);
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.35);
-  z-index: 1000;
-}
+    /* Icon-only = circular ghost */
+    .btn.icon {
+      width: var(--btn-h);
+      min-width: var(--btn-h);
+      padding: 0;
+      border-radius: 999px;
+    }
 
-.menu-item{
-  display: block;
-  width: 100%;
-  padding: 8px 10px;
-  text-align: left;
-  background: none;
-  border: 0;
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-  border-radius: 8px;
-}
-.menu-item:hover{
-  background: color-mix(in oklab, var(--panel), var(--text) 4%);
-}
-.menu-item.warn{ color: var(--danger, #e06c75); }
+    /* Caution tone stays ghost (no filled red blob) */
+    .btn.warn {
+      color: var(--danger, #e06c75);
+      background: color-mix(in oklab, var(--btn-bg), transparent 6%);
+      border-color: color-mix(in oklab, var(--danger, #e06c75), var(--border) 75%);
+    }
 
-.menu-field{ padding: 6px 6px 8px; }
-.menu-row{ display: flex; gap: 6px; padding: 4px 6px; }
-.menu-row .menu-item{ flex: 1; text-align: center; }
+    /* Details/summary dropdown matches pills */
+    .menu {
+      position: relative;
+    }
 
-.menu-sep{
-  border: 0; height: 1px; margin: 6px 0;
-  background: linear-gradient(to right, transparent, var(--hairline), transparent);
-}
+    .menu>summary {
+      list-style: none;
+      cursor: pointer;
+    }
 
-/* Tiny screen tweak */
-@media (max-width: 900px){
-  :root{ --btn-h: 28px; }
-}
+    .menu>summary::-webkit-details-marker {
+      display: none;
+    }
 
-    
+    /* Panel */
+    .menu[open] .menu-list {
+      display: block;
+    }
+
+    .menu-list {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 220px;
+      padding: 8px;
+      background: var(--bgElevated, var(--bg));
+      border: 1px solid var(--hairline);
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+      z-index: 1000;
+    }
+
+    .menu-item {
+      display: block;
+      width: 100%;
+      padding: 8px 10px;
+      text-align: left;
+      background: none;
+      border: 0;
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+
+    .menu-item:hover {
+      background: color-mix(in oklab, var(--panel), var(--text) 4%);
+    }
+
+    .menu-item.warn {
+      color: var(--danger, #e06c75);
+    }
+
+    .menu-field {
+      padding: 6px 6px 8px;
+    }
+
+    .menu-row {
+      display: flex;
+      gap: 6px;
+      padding: 4px 6px;
+    }
+
+    .menu-row .menu-item {
+      flex: 1;
+      text-align: center;
+    }
+
+    .menu-sep {
+      border: 0;
+      height: 1px;
+      margin: 6px 0;
+      background: linear-gradient(to right, transparent, var(--hairline), transparent);
+    }
+
+    /* Tiny screen tweak */
+    @media (max-width: 900px) {
+      :root {
+        --btn-h: 28px;
+      }
+    }
   </style>
 
 
@@ -1293,11 +1335,11 @@
 
   <style>{{prism_css_inline | safe}}</style>
 
-  <script>{{prism_core_inline | safe}}</script>
-  <script>{{prism_yaml_inline | safe}}</script>
-  <script>{{prism_json_inline | safe}}</script>
-  <script>{{split_js_inline | safe}}</script>
-  <script>{{sortable_js_inline | safe}}</script>
+  <script>{ { prism_core_inline | safe } }</script>
+  <script>{ { prism_yaml_inline | safe } }</script>
+  <script>{ { prism_json_inline | safe } }</script>
+  <script>{ { split_js_inline | safe } }</script>
+  <script>{ { sortable_js_inline | safe } }</script>
   {% else %}
   <!-- CDN fallback (deterministic, pinned) -->
   <link rel="stylesheet" href="{{ cdn_urls['prism_css'] }}">
@@ -1378,6 +1420,7 @@
             <button id="profileInfo" class="icon-btn" type="button" aria-haspopup="dialog" aria-expanded="false"
               title="What are Profiles?">?</button>
             <select id="profiles"></select>
+            <button id="profileView" class="btn small" type="button" title="View profile YAML">View</button>
           </div>
 
           <div id="profileDesc" class="small" style="margin-top:4px"></div>
@@ -1418,7 +1461,7 @@
               </span>
             </div>
             <input id="search" type="text" placeholder="Filter loaded capsules by id/title/domain/statement…"
-            style="margin-left: 12px; max-width:432px; width:100%">
+              style="margin-left: 12px; max-width:432px; width:100%">
             <div id="capsules" class="list"></div>
           </div>
         </div>
@@ -1522,6 +1565,7 @@
     <script>
       /* ------------ Data ------------ */
       const DATA = JSON.parse(document.getElementById('tc-data').textContent);
+
 
 
       // Derive posture/witness_count if missing; keep raw yaml if provided upstream
@@ -1694,40 +1738,73 @@
       }
 
 
-      /* ------------ Modal ------------ */
-      let MODAL = null;
-      function openModal(title, c) {
-        MODAL = c;
-        $('m_title').textContent = title;
-        $('m_body_code').textContent = (c._raw || '');
-        if (window.Prism && Prism.highlightElement) {
-          Prism.highlightElement($('m_body_code'));
+      /* ------------ Modal (upgraded: capsules + profiles + bundles) ------------ */
+      let MODAL_CTX = null;
+      // kind ∈ {'capsule','profile','bundle'}
+      // data = the object (capsule/profile/bundle)
+      // raw  = preferred text to show (YAML if available; JSON pretty as fallback)
+      function openModal(title, data, { kind = 'capsule' } = {}) {
+        // Prefer YAML when provided as _raw; else pretty JSON
+        let raw = (data && data._raw) ? String(data._raw) : null;
+        let lang = 'yaml';
+        if (!raw) {
+          raw = JSON.stringify(data || {}, null, 2);
+          lang = 'json';
         }
-        $('m_result').textContent = 'idle'; $('m_result').className = 'badge';
+
+        MODAL_CTX = { kind, data, raw };
+
+        $('m_title').textContent = title || (kind === 'bundle' ? 'Bundle' : kind === 'profile' ? 'Profile' : 'Capsule');
+
+        // Toggle controls based on kind
+        const showProv = (kind === 'capsule');
+        const showValidate = (kind === 'capsule');
+        $('m_copy_prov').style.display = showProv ? '' : 'none';
+        $('m_validate').style.display = showValidate ? '' : 'none';
+
+        // Set code block + highlight
+        const code = $('m_body_code');
+        code.className = 'language-' + lang;
+        code.textContent = raw;
+        if (window.Prism && Prism.highlightElement) Prism.highlightElement(code);
+
+        $('m_result').textContent = 'idle';
+        $('m_result').className = 'badge';
         $('modal').style.display = 'flex';
       }
-      function closeModal() { $('modal').style.display = 'none'; MODAL = null; }
+
+      function closeModal() { $('modal').style.display = 'none'; MODAL_CTX = null; }
+
       $('m_close').addEventListener('click', closeModal);
       $('modal').addEventListener('click', e => { if (e.target && e.target.id === 'modal') closeModal(); });
-      $('m_copy_yaml').addEventListener('click', () => { if (!MODAL) return; navigator.clipboard.writeText(MODAL._raw || ''); toast('YAML copied'); });
-      $('m_copy_prov').addEventListener('click', () => { if (!MODAL) return; navigator.clipboard.writeText(JSON.stringify(MODAL.provenance || {}, null, 2)); toast('Provenance copied'); });
-      $('m_validate').addEventListener('click', async () => { if (!MODAL) return; const r = await validateDigest(MODAL); const tag = $('m_result'); tag.textContent = r.ok ? 'digest✓' : 'digest✗'; tag.className = 'badge ' + (r.ok ? 'ok' : 'err'); tag.title = r.ok ? 'OK' : ('have:' + r.have + ' want:' + r.want); });
 
-      $('expandAllBtn')?.addEventListener('click', () => {
-        document.querySelectorAll('details.domain-group').forEach(d => {
-          d.open = true;
-          const domain = d.querySelector('summary .domain-title')?.textContent || 'misc';
-          setDomainOpen(domain, true);
-        });
+      $('m_copy_yaml').addEventListener('click', () => {
+        if (!MODAL_CTX) return;
+        navigator.clipboard.writeText(MODAL_CTX.raw || '').then(() => toast('YAML/JSON copied'));
       });
 
-      $('collapseAllBtn')?.addEventListener('click', () => {
-        document.querySelectorAll('details.domain-group').forEach(d => {
-          d.open = false;
-          const domain = d.querySelector('summary .domain-title')?.textContent || 'misc';
-          setDomainOpen(domain, false);
-        });
+      $('m_copy_prov').addEventListener('click', () => {
+        if (!MODAL_CTX) return;
+        if (MODAL_CTX.kind !== 'capsule') { toast('No provenance for this type'); return; }
+        navigator.clipboard.writeText(JSON.stringify((MODAL_CTX.data && MODAL_CTX.data.provenance) || {}, null, 2))
+          .then(() => toast('Provenance copied'));
       });
+
+      $('m_validate').addEventListener('click', async () => {
+        if (!MODAL_CTX) return;
+        const tag = $('m_result');
+        if (MODAL_CTX.kind !== 'capsule') {
+          tag.textContent = 'n/a';
+          tag.className = 'badge';
+          tag.title = 'Validation only applies to capsules';
+          return;
+        }
+        const r = await validateDigest(MODAL_CTX.data);
+        tag.textContent = r.ok ? 'digest✓' : 'digest✗';
+        tag.className = 'badge ' + (r.ok ? 'ok' : 'err');
+        tag.title = r.ok ? 'OK' : ('have:' + r.have + ' want:' + r.want);
+      });
+
 
 
 
@@ -1778,6 +1855,17 @@
         sel.dispatchEvent(new Event('change', { bubbles: true }));
       }
 
+      // Profile YAML/JSON modal
+      (function wireProfileView() {
+        const btn = $('profileView');
+        if (!btn) return;
+        btn.addEventListener('click', () => {
+          const id = STATE.profile;
+          const p = (DATA.profiles || {})[id];
+          if (!p) { toast('No profile selected'); return; }
+          openModal(p.title || id || 'Profile', p, { kind: 'profile' });
+        });
+      })();
 
       function capsuleRow(c, id, opts = {}) {
         const showDomainChip = !!opts.showDomainChip;
@@ -1829,7 +1917,7 @@
         const btn = document.createElement('button');
         btn.className = 'btn small';
         btn.textContent = 'View';
-        btn.onclick = () => openModal(c.title || id, c);
+        btn.onclick = () => openModal(c.title || id, c, { kind: 'capsule' });
         top.appendChild(btn);
 
         const stmt = document.createElement('div');
@@ -1957,6 +2045,7 @@
       function renderBundles() {
         const list = $('bundles'); list.innerHTML = '';
         const keys = Object.keys(DATA.bundles || {}).sort((a, b) => (DATA.bundles[a].name || a).localeCompare(DATA.bundles[b].name || b));
+
         for (const k of keys) {
           const b = DATA.bundles[k] || {};
           const item = document.createElement('div'); item.className = 'item';
@@ -1971,7 +2060,10 @@
               STATE.selectedBundles.delete(k);
               const others = [...STATE.selectedBundles];
               (b.capsules || []).forEach(cid => {
-                const elsewhere = others.some(name => { const b2 = DATA.bundles[name]; return b2 && Array.isArray(b2.capsules) && b2.capsules.includes(cid); });
+                const elsewhere = others.some(name => {
+                  const b2 = DATA.bundles[name];
+                  return b2 && Array.isArray(b2.capsules) && b2.capsules.includes(cid);
+                });
                 const manual = STATE.manualCaps.has(cid);
                 if (!elsewhere && !manual) STATE.selectedCaps.delete(cid);
                 STATE.order = STATE.order.filter(x => STATE.selectedCaps.has(x));
@@ -1983,7 +2075,14 @@
 
           const ttl = document.createElement('div'); ttl.textContent = (b.name || k); row.appendChild(ttl);
 
-          // Add description if present
+          // NEW: "View" button for bundle YAML/JSON
+          const viewBtn = document.createElement('button');
+          viewBtn.className = 'btn small';
+          viewBtn.textContent = 'View';
+          viewBtn.onclick = () => openModal(b.name || k || 'Bundle', b, { kind: 'bundle' });
+          row.appendChild(viewBtn);
+
+          // optional description
           if (b.description) {
             const desc = document.createElement('div'); desc.className = 'small'; desc.textContent = b.description; item.appendChild(desc);
           }
@@ -1992,6 +2091,7 @@
         }
         $('bundlesCount').textContent = keys.length;
       }
+
 
       function renderPreview() {
         const list = $('preview'); list.innerHTML = '';
@@ -2007,7 +2107,12 @@
           ttl.innerHTML = esc(c.title || id) + ' <span class="muted"> -  ' + esc(c.domain || '') + '</span>';
           row.appendChild(ttl);
 
-          const btn = document.createElement('button'); btn.className = 'btn small'; btn.textContent = 'View'; btn.onclick = () => openModal(c.title || id, c); row.appendChild(btn);
+          const btn = document.createElement('button');
+          btn.className = 'btn small';
+          btn.textContent = 'View';
+          btn.onclick = () => openModal(c.title || id, c, { kind: 'capsule' });
+          row.appendChild(btn);
+
 
           list.appendChild(item);
         });
@@ -2027,126 +2132,296 @@
           }
         });
       }
+      /* ------------ Composition (hardened) ------------ */
 
-      /* ------------ Composition ------------ */
-      function parseFieldSpec(spec) {
-        const m = String(spec).match(/^([a-z_.]+)(?:\[:(\d+)\])?$/i);
-        return { path: m ? m[1].toLowerCase() : String(spec).toLowerCase(), limit: m && m[2] ? parseInt(m[2], 10) : null };
+      /* Canonicalize ids so filenames/paths/exts match capsule ids/keys */
+      function canonicalizeId(s) {
+        return String(s || '')
+          .trim()
+          .replace(/^.*[\\/]/, '')              // strip any leading path
+          .replace(/\.(yaml|yml|json)$/i, '');  // strip extension
       }
 
-      function applyProjection(capsule, projection, includePedagogy) {
-        const proj = projection || {};
-        const include = Array.isArray(proj.include) ? proj.include : [];
-        const render = proj.render || {};
+      /* Turn a Set or object-map of selections into a canonical Set of ids */
+      function toIdSet(x) {
+        if (x instanceof Set) return new Set([...x].map(canonicalizeId));
+        if (x && typeof x === 'object') {
+          return new Set(Object.keys(x).filter(k => x[k]).map(canonicalizeId));
+        }
+        return new Set();
+      }
 
-        const header = render.capsule_header || "BEGIN CAPSULE id={id} version={version} domain={domain}";
-        const footer = render.enforcement_footer || "ENFORCEMENT: Ensure outputs satisfy this capsule; otherwise abstain and request the minimal missing info.";
-        const aBullet = render.assumption_bullet || "  - {text}";
-        const sBullet = render.socratic_bullet || "  - {text}";
-        const aphBullet = render.aphorism_bullet || "  - {text}";
+      /* Find a capsule by id, key, or filename-like string */
+      function getCapsuleByAnyId(anyId) {
+        const canon = canonicalizeId(anyId);
+        const store = (DATA && DATA.capsules) || {};
+        if (store[anyId]) return store[anyId]; // exact key hit
+        for (const k in store) {
+          const cap = store[k];
+          const capIdCanon = canonicalizeId(cap.id || '');
+          const keyCanon = canonicalizeId(k);
+          if (capIdCanon === canon || keyCanon === canon) return cap;
+        }
+        return null;
+      }
 
+      /* Selection that survives order/selected mismatches */
+      function getSelectedIdsSafe() {
+        const order = Array.isArray(STATE.order) ? STATE.order.slice() : [];
+        const sel = toIdSet(STATE.selectedCaps);
+        const ordered = [];
+        const seen = new Set();
+
+        for (const raw of order) {
+          const canon = canonicalizeId(raw);
+          if (sel.has(canon) && !seen.has(canon)) {
+            ordered.push(canon);
+            seen.add(canon);
+          }
+        }
+        for (const canon of sel) {
+          if (!seen.has(canon)) ordered.push(canon);
+        }
+        return ordered;
+      }
+
+      /* Optional legacy helper (kept for completeness if you use it elsewhere) */
+      function parseFieldSpec(spec) {
+        const m = String(spec).match(/^([a-z_.]+)(?:\[:(\d+)\])?$/i);
+        return {
+          path: m ? m[1].toLowerCase() : String(spec).toLowerCase(),
+          limit: m && m[2] ? parseInt(m[2], 10) : null
+        };
+      }
+
+      /* ---------- Pedagogy normalization (supports both schemas) ---------- */
+      function normalizePedagogy(capsule) {
+        // A) pedagogy: [{kind:'Socratic'|'Aphorism', text:'...'}, ...]
+        // B) pedagogy: { socratic:[...], aphorisms:[...] }
+        const out = { socratic: [], aphorisms: [] };
+        const p = capsule && capsule.pedagogy;
+        if (!p) return out;
+
+        if (Array.isArray(p)) {
+          for (const item of p) {
+            if (!item) continue;
+            const kind = String(item.kind || '').toLowerCase();
+            const text = (item.text == null) ? '' : String(item.text);
+            if (!text) continue;
+            if (kind === 'socratic') out.socratic.push(text);
+            else if (kind === 'aphorism' || kind === 'aphorisms') out.aphorisms.push(text);
+          }
+        } else if (typeof p === 'object') {
+          if (Array.isArray(p.socratic)) out.socratic.push(...p.socratic.map(String));
+          if (Array.isArray(p.aphorisms)) out.aphorisms.push(...p.aphorisms.map(String));
+        }
+        return out;
+      }
+
+      /* ---------- Projection Renderer (profile-driven) ---------- */
+      function applyProjection(capsule, projection, withPed) {
         const lines = [];
-        lines.push(
-          header
-            .replace('{id}', capsule.id || '')
-            .replace('{version}', capsule.version || '1.0.0')
-            .replace('{domain}', capsule.domain || '')
-        );
 
-        for (const spec of include) {
-          const { path, limit } = parseFieldSpec(spec);
-          const lim = (limit == null ? Number.MAX_SAFE_INTEGER : limit);
+        // Header (supports {title}/{statement})
+        const headerTpl = (projection.render && typeof projection.render.capsule_header === 'string')
+          ? projection.render.capsule_header
+          : null;
 
-          if (path === 'title' && capsule.title) lines.push("TITLE: " + capsule.title);
-          else if (path === 'statement' && capsule.statement) lines.push("STATEMENT: " + capsule.statement);
-          else if (path === 'assumptions') {
-            let items = capsule.assumptions || [];
-            // allow object assumptions: {text: "..."} or {assumption: "..."}
-            items = items.map(a => (typeof a === 'string') ? a : (a?.text || a?.assumption || JSON.stringify(a)));
-            items = items.slice(0, lim);
-            if (items.length) {
-              lines.push("ASSUMPTIONS:");
-              items.forEach(t => lines.push(aBullet.replace('{text}', t)));
-            }
+        if (headerTpl && headerTpl.length > 0) {
+          lines.push(applyTemplate(headerTpl, {
+            id: capsule.id || '',
+            version: capsule.version || '',
+            domain: capsule.domain || '',
+            title: capsule.title || capsule.TITLE || '',
+            statement: capsule.statement || capsule.STATEMENT || ''
+          }).trim());
+        }
+
+        // Normalize pedagogy for consistent addressing
+        const ped = normalizePedagogy(capsule);
+
+        // Build include list; ensure pedagogy is present when forced
+        let includes = Array.isArray(projection.include) ? projection.include.slice() : [];
+        const forcePed = !!(projection && projection.force_pedagogy);
+        const hasPedInList = includes.some(s => String(s).startsWith('pedagogy.'));
+        if (forcePed && !hasPedInList) {
+          includes.push('pedagogy.socratic', 'pedagogy.aphorisms');
+        }
+
+        for (const inc of includes) {
+          const { path, sliceFrom, sliceTo } = parseInclude(inc);
+
+          // Respect UI/profile gating
+          if (!withPed && path.startsWith('pedagogy.')) continue;
+
+          let val = null;
+          if (path === 'pedagogy.socratic') val = ped.socratic;
+          else if (path === 'pedagogy.aphorisms') val = ped.aphorisms;
+          else val = getByPath(capsule, path);
+
+          if (val == null) continue;
+
+          if (Array.isArray(val)) {
+            const sub = sliceArray(val, sliceFrom, sliceTo);
+            const bulletKey = path.endsWith('socratic') ? 'socratic_bullet'
+              : path.endsWith('aphorisms') ? 'aphorism_bullet'
+                : null;
+            const bulletTpl = (projection.render && projection.render[bulletKey]) || '  - {text}';
+            for (const item of sub) lines.push(applyTemplate(bulletTpl, { text: String(item) }));
+            continue;
           }
-          else if (path === 'pedagogy.socratic' && includePedagogy) {
-            const soc = (capsule.pedagogy || [])
-              .filter(p => /socratic/.test((p.kind || '').toLowerCase()))
-              .slice(0, lim);
-            if (soc.length) {
-              lines.push("PEDAGOGY (Socratic):");
-              soc.forEach(p => lines.push(sBullet.replace('{text}', p.text || '')));
-            }
-          }
-          else if (path === 'pedagogy.aphorisms' && includePedagogy) {
-            const aph = (capsule.pedagogy || [])
-              .filter(p => /aphorism/.test((p.kind || '').toLowerCase()))
-              .slice(0, lim);
-            if (aph.length) {
-              lines.push("PEDAGOGY (Aphorisms):");
-              aph.forEach(p => lines.push(aphBullet.replace('{text}', p.text || '')));
-            }
+
+          if (typeof val === 'string') {
+            const lineTpl = (projection.render && projection.render[`${path}_line`]) || null;
+            lines.push(lineTpl ? applyTemplate(lineTpl, { text: val }) : val);
           }
         }
 
-        lines.push(footer);
-        return lines.join("\n");
+        // Footer (suppressed when empty string)
+        const footer = projection.render ? projection.render.enforcement_footer : null;
+        if (typeof footer === 'string' && footer.trim().length > 0) lines.push(footer.trim());
+
+        return lines.join("\n").trim();
       }
 
-
+      /* ---------- Legacy capsule composer (only used if no projection provided) ---------- */
       function composeLegacy(c, includePedagogy) {
         const lines = [];
-        /* lines.push("BEGIN CAPSULE id=" + (c.id || '') + " version=" + (c.version || '1.0.0') + " domain=" + (c.domain || '')); */
-        lines.push("BEGIN CAPSULE id=" + (c.id || '') +
+        lines.push(
+          "BEGIN CAPSULE id=" + (c.id || '') +
           " version=" + (c.version || '1.0.0') +
           " domain=" + (c.domain || '') +
-          " posture=" + (c.posture || 'informational') + ")");
+          " posture=" + (c.posture || 'informational')
+        );
         if (c.statement) lines.push("STATEMENT: " + c.statement);
         if (includePedagogy && c.pedagogy) {
-          const ped = c.pedagogy.map(p => (p.kind + ': ' + p.text)).join('\n');
-          if (ped) lines.push('PEDAGOGY:\n' + ped);
+          const ped = normalizePedagogy(c);
+          const body = []
+            .concat(ped.socratic.map(t => "Socratic: " + t))
+            .concat(ped.aphorisms.map(t => "Aphorism: " + t))
+            .join('\n');
+          if (body) lines.push('PEDAGOGY:\n' + body);
         }
         lines.push('END CAPSULE');
         return lines.join("\n");
       }
+
+      /* ---------- Main compose ---------- */
       function compose() {
-        const prof = DATA.profiles[STATE.profile || ''] || {};
-        const response = prof.response || {};
-        const projection = response.projection || null;
+        try {
+          const prof = (DATA && DATA.profiles && STATE.profile && DATA.profiles[STATE.profile]) || {};
+          const response = prof.response || {};
+          const projection = response.projection || {};
+          const blocks = [];
 
-        const ids = STATE.order.filter(id => STATE.selectedCaps.has(id));
-        const blocks = [];
+          // Fragments / system
+          const overrideDefaults = !!response.override_compose_defaults;
+          const fragments = Array.isArray(response.fragments) ? response.fragments : [];
 
-        const policy = response.policy || 'Cite or abstain; follow Plan-Verify-Answer; ask ONE crisp follow-up if required.';
-        const format = response.format || 'natural';
-        const system_block = response.system_block || ("SYSTEM: Profile=" + (prof.title || 'unknown') + "\nPOLICY: " + policy + "\nFORMAT: " + format);
-        blocks.push(system_block);
-
-        // If the profile’s projection includes pedagogy.* then force-enable pedagogy rendering
-        const wantsPed = Array.isArray(projection?.include) && projection.include.some(s => String(s).startsWith('pedagogy.'));
-        const withPed = $('includePed').checked || wantsPed;
-
-        blocks.push("SYSTEM: Truth Capsules Loader v1\nPURPOSE: Use curated capsules to scaffold reasoning and enforce acceptance rules.\nMETHOD:\n  1) Load capsule rules (below).\n  2) For each task, follow Plan → Verify → Answer.\n  3) If required fields are missing, ask ONE concise follow-up.\n  4) Cite sources or abstain. Redact PII. Validate tool JSON before calling.\n  5) Emit a JSON report when asked (see REPORT SCHEMA).\nFAILURE POLICY: If a capsule cannot be satisfied, abstain + explain what is missing.");
-        blocks.push("SYSTEM: Bootstrap Discipline\n• Curation is king - prefer curated fixtures/evidence; abstain when unsure.\n• Show your work - reference evidence in answers.\n• Make failures explicit and reversible - choose tiny experiments.");
-
-        if (ids.length === 0) {
-          blocks.push('SYSTEM: Capsule Rules (Selected)\n- (No capsules selected)');
-        } else {
-          blocks.push('SYSTEM: Capsule Rules (Selected)');
-          for (const id of ids) {
-            const c = DATA.capsules[id]; if (!c) continue;
-            blocks.push((projection && projection.include) ? applyProjection(c, projection, withPed) : composeLegacy(c, withPed));
+          const sysFragments = fragments.filter(f => f && f.include !== false && f.kind === 'system');
+          if (sysFragments.length) {
+            for (const f of sysFragments) blocks.push(String(f.content || '').trim());
+          } else {
+            const policy = response.policy || 'Cite or abstain; follow Plan→Verify→Answer; ask ONE crisp follow-up if required.';
+            const format = response.format || 'natural';
+            const system_block = response.system_block ||
+              ("SYSTEM: Profile=" + (prof.title || 'unknown') + "\nPOLICY: " + policy + "\nFORMAT: " + format);
+            blocks.push(system_block);
           }
-        }
 
-        let out = blocks.join("\n\n");
-        if ($('markdown').checked) out = "```\n" + out + "\n```";
-        $('out').value = out;
+          const auxFragments = fragments.filter(f => f && f.include !== false && f.kind !== 'system');
+          if (auxFragments.length) {
+            for (const f of auxFragments) blocks.push(String(f.content || '').trim());
+          } else if (!overrideDefaults) {
+            // Legacy defaults only if profile does not override
+            blocks.push("SYSTEM: Truth Capsules Loader v1\nPURPOSE: Use curated capsules to scaffold reasoning and enforce acceptance rules.\nMETHOD:\n  1) Load capsule rules (below).\n  2) For each task, follow Plan → Verify → Answer.\n  3) If required fields are missing, ask ONE concise follow-up.\n  4) Cite sources or abstain. Redact PII. Validate tool JSON before calling.\n  5) Emit a JSON report when asked (see REPORT SCHEMA).\nFAILURE POLICY: If a capsule cannot be satisfied, abstain + explain what is missing.");
+            blocks.push("SYSTEM: Bootstrap Discipline\n• Curation is king - prefer curated fixtures/evidence; abstain when unsure.\n• Show your work - reference evidence in answers.\n• Make failures explicit and reversible - choose tiny experiments.");
+          }
+
+          // Heading + pedagogy policy
+          const heading = response.capsules_heading || 'SYSTEM: Capsule Rules (Selected)';
+          const wantsPedInProfile = Array.isArray(projection.include) && projection.include.some(s => String(s).startsWith('pedagogy.'));
+          const forcePed = !!(projection && projection.force_pedagogy) || !!response.force_pedagogy;
+          const withPedUI = !!($('includePed') && $('includePed').checked);
+          const withPed = forcePed || withPedUI || wantsPedInProfile;
+
+          // Robust selected ids
+          const idsCanon = getSelectedIdsSafe();
+          if (!idsCanon.length) {
+            blocks.push(heading + "\n- (No capsules selected)");
+          } else {
+            blocks.push(heading);
+            for (const canon of idsCanon) {
+              const cap = getCapsuleByAnyId(canon);
+              if (!cap) continue;
+              if (projection && projection.include) blocks.push(applyProjection(cap, projection, withPed));
+              else blocks.push(composeLegacy(cap, withPed));
+            }
+          }
+
+          // --- footer (profile-controlled) ---
+          if (typeof response.footer === 'string' && response.footer.trim().length) {
+            blocks.push(response.footer.trim());
+          }
+
+          // Markdown wrap choice: UI wins; otherwise profile default (if provided)
+          const wrapDefault = !!response.markdown_wrap_default;
+          const wrapUI = !!($('markdown') && $('markdown').checked);
+          const wrap = wrapUI || (wrapDefault && !$('markdown'));
+          let out = blocks.filter(Boolean).join("\n\n").trim();
+          if (wrap) out = "```\n" + out + "\n```";
+          $('out').value = out;
+
+        } catch (err) {
+          console.error(err);
+          $('out').value = "ERROR composing prompt: " + (err && err.message ? err.message : String(err));
+        }
       }
 
+      /* ---------- Small templating & structure helpers ---------- */
+      function applyTemplate(tpl, dict) {
+        return String(tpl).replace(/\{([\w.]+)\}/g, (_, k) => {
+          const v = dict[k];
+          return (v === undefined || v === null) ? '' : String(v);
+        });
+      }
+      function parseInclude(spec) {
+        // e.g., "pedagogy.socratic[:2]" or "pedagogy.aphorisms[1:3]"
+        const s = String(spec);
+        const m = s.match(/^([\w.]+)(\[(?::?\d*)?(?::\d*)?\])?$/);
+        const path = m ? m[1] : s;
+        let sliceFrom = null, sliceTo = null;
+        const slice = m && m[2] ? m[2].slice(1, -1) : null;
+        if (slice != null && slice.length) {
+          const parts = slice.split(':');
+          if (parts.length === 2) {
+            sliceFrom = parts[0].length ? parseInt(parts[0], 10) : null;
+            sliceTo = parts[1].length ? parseInt(parts[1], 10) : null;
+          } else if (parts.length === 1 && parts[0].length) {
+            const idx = parseInt(parts[0], 10);
+            sliceFrom = isNaN(idx) ? null : idx;
+            sliceTo = isNaN(idx) ? null : (idx + 1);
+          }
+        }
+        return { path, sliceFrom, sliceTo };
+      }
+      function sliceArray(arr, from, to) {
+        const n = Array.isArray(arr) ? arr.length : 0;
+        const start = (from == null) ? 0 : Math.max(0, from);
+        const end = (to == null) ? n : Math.max(start, Math.min(n, to));
+        return arr.slice(start, end);
+      }
+      function getByPath(obj, path) {
+        if (!obj || !path) return null;
+        const parts = path.split('.');
+        let cur = obj;
+        for (const p of parts) {
+          if (cur == null) return null;
+          cur = cur[p];
+        }
+        return cur;
+      }
 
-
-      /* ------------ Manifest + share ------------ */
       /* ------------ Manifest + share ------------ */
 
       /* Namespace for LocalStorage manifests */
