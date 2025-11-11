@@ -1655,1358 +1655,969 @@
 </div>
 
 
-  <script id="tc-data" type="application/json">{{ data_json | replace("</script>","<\\ /script>") }}</script>
+ <!-- Keep this data tag as you have it -->
+<script id="tc-data" type="application/json">{{ data_json | replace("</script>","<\\ /script>") }}</script>
 
-    <script>
-      /* ------------ Data ------------ */
-      const DATA = JSON.parse(document.getElementById('tc-data').textContent);
+<script>
+/* ======================== Truth Capsules SPA (cleaned) ======================== */
+/* Data */
+const DATA = JSON.parse(document.getElementById('tc-data').textContent);
 
+/* State + tiny helpers */
+const STATE = {
+  selectedBundles: new Set(),
+  selectedCaps: new Set(),
+  manualCaps: new Set(),
+  order: [],
+  profile: null,
+  filter: '',
+  domainOpen: {},     // domain -> boolean
+};
 
+const $   = (id) => document.getElementById(id);
+const esc = (s) => (s == null ? "" : String(s).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])));
 
-      // Derive posture/witness_count if missing; keep raw yaml if provided upstream
-      (function hydrateCapsules() {
-        const caps = DATA.capsules || {};
-        for (const [id, c] of Object.entries(caps)) {
-          c._id = id;
-          c._witness_count = Array.isArray(c.witnesses) ? c.witnesses.length : (c._witness_count || 0);
-          if (!c.posture) c.posture = c._witness_count > 0 ? 'witnessed' : 'informational';
-          // keep any existing c._raw for modal; nothing to do if not present
-        }
-      })();
+/* ---------- One-time capsule hydration ---------- */
+(function hydrateCapsules() {
+  const caps = DATA.capsules || {};
+  for (const [id, c] of Object.entries(caps)) {
+    c._id = id;
+    c._witness_count = Array.isArray(c.witnesses) ? c.witnesses.length : (c._witness_count || 0);
+    if (!c.posture) c.posture = c._witness_count > 0 ? 'witnessed' : 'informational';
+  }
+})();
 
-    </script>
+/* ---------- Theme ---------- */
+(function themeController() {
+  const STORAGE_KEY = 'tc_theme';
+  const root = document.documentElement;
 
-    <script>
-      /* ------------ State & helpers ------------ */
-      const STATE = { selectedBundles: new Set(), selectedCaps: new Set(), order: [], manualCaps: new Set(), profile: null, filter: "" };
-      const $ = id => document.getElementById(id);
-      const esc = s => (s == null ? "" : String(s).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])));
+  function apply(theme) {
+    const isLight = theme === 'light';
+    root.setAttribute('data-theme', isLight ? 'light' : 'dark');
+    const btn = $('themeBtn');
+    if (!btn) return;
+    btn.textContent = isLight ? '☀️' : '🌙';
+    btn.setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
+  }
 
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved === 'light' || saved === 'dark') {
+    apply(saved);
+  } else {
+    const systemDark = matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
+    apply(systemDark ? 'dark' : 'light');
+  }
 
+  if (!saved && matchMedia && matchMedia('(prefers-color-scheme: dark)').addEventListener) {
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => apply(e.matches ? 'dark' : 'light'));
+  }
 
-      // ---- Theme Controller ----
-      (function themeController() {
-        const STORAGE_KEY = 'tc_theme'; // 'light' | 'dark'
-        const root = document.documentElement;
+  const btn = $('themeBtn');
+  if (btn) btn.addEventListener('click', () => {
+    const next = (root.getAttribute('data-theme') === 'dark') ? 'light' : 'dark';
+    localStorage.setItem(STORAGE_KEY, next);
+    apply(next);
+  });
+})();
 
-        function apply(theme) {
-          if (theme === 'light') {
-            root.setAttribute('data-theme', 'light');
-            $('themeBtn').textContent = '☀️';
-            $('themeBtn').setAttribute('aria-label', 'Switch to dark mode');
-          } else {
-            root.setAttribute('data-theme', 'dark');
-            $('themeBtn').textContent = '🌙';
-            $('themeBtn').setAttribute('aria-label', 'Switch to light mode');
-          }
-        }
+/* ---------- Persisted domain open/closed ---------- */
+STATE.domainOpen = JSON.parse(localStorage.getItem('tc_domain_open') || '{}');
+const DOMAIN_DEFAULT_OPEN = false;
 
-        // initial theme: saved → system → dark fallback
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved === 'light' || saved === 'dark') {
-          apply(saved);
-        } else {
-          const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-          apply(systemDark ? 'dark' : 'light');
-        }
+function setDomainOpen(domain, open) {
+  const key = String(domain || 'misc').toLowerCase();
+  STATE.domainOpen[key] = !!open;
+  localStorage.setItem('tc_domain_open', JSON.stringify(STATE.domainOpen));
+}
+function getDomainOpen(domain) {
+  const key = String(domain || 'misc').toLowerCase();
+  return Object.prototype.hasOwnProperty.call(STATE.domainOpen, key)
+    ? !!STATE.domainOpen[key]
+    : DOMAIN_DEFAULT_OPEN;
+}
 
-        // respond to future system changes if user hasn't chosen
-        const mql = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
-        if (!saved && mql && mql.addEventListener) {
-          mql.addEventListener('change', e => apply(e.matches ? 'dark' : 'light'));
-        }
+/* ---------- Toast ---------- */
+function toast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 1800);
+}
 
-        // wire up button
-        window.addEventListener('DOMContentLoaded', () => {
-          const btn = document.getElementById('themeBtn');
-          if (!btn) return;
-          btn.addEventListener('click', () => {
-            const next = (root.getAttribute('data-theme') === 'dark') ? 'light' : 'dark';
-            localStorage.setItem(STORAGE_KEY, next);
-            apply(next);
+/* ---------- Digest helpers ---------- */
+const tenc = s => new TextEncoder().encode(s);
+async function sha256(s) {
+  const buf = await crypto.subtle.digest('SHA-256', tenc(s));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+function canonicalJSON(x) {
+  if (Array.isArray(x)) return "[" + x.map(canonicalJSON).join(",") + "]";
+  if (x && typeof x === "object") {
+    const keys = Object.keys(x).sort();
+    return "{" + keys.map(k => JSON.stringify(k) + ":" + canonicalJSON(x[k])).join(",") + "}";
+  }
+  return JSON.stringify(x);
+}
+function coreForDigest(c) {
+  return {
+    id: c.id, version: c.version, domain: c.domain, title: c.title, statement: c.statement,
+    assumptions: Array.isArray(c.assumptions) ? c.assumptions : [],
+    pedagogy: Array.isArray(c.pedagogy) ? c.pedagogy.map(p => ({ kind: p.kind, text: p.text })) : []
+  };
+}
+function digestCore(c) { return canonicalJSON(coreForDigest(c)); }
+async function validateDigest(c) {
+  const have = await sha256(digestCore(c));
+  const want = (((c.provenance || {}).signing || {}).digest) || '';
+  if (!want) return { ok: true, na: true, have, want };
+  return { ok: (have === want), na: false, have, want };
+}
+function badgeDigest(c) {
+  const b = document.createElement('span');
+  b.className = 'badge';
+  b.textContent = 'digest…';
+  validateDigest(c).then(r => {
+    if (r.na) { b.textContent = 'digest n/a'; b.title = 'No reference digest in capsule'; return; }
+    b.textContent = r.ok ? 'digest✓' : 'digest✗';
+    b.className = 'badge ' + (r.ok ? 'ok' : 'err');
+    b.title = r.ok ? 'Digest OK' : 'Have ' + r.have + ' want ' + r.want;
+  });
+  return b;
+}
+function badgeAuthor(c) {
+  const p = c.provenance || {};
+  const b = document.createElement('span');
+  b.className = 'badge';
+  b.textContent = (p.author || '?');
+  return b;
+}
+function badgePosture(c) {
+  const b = document.createElement('span');
+  const isWitnessed = (c.posture === 'witnessed');
+  b.className = 'badge' + (isWitnessed ? ' witnessed' : '');
+  b.textContent = isWitnessed ? 'witnessed' : 'informational';
+  const n = (typeof c._witness_count === 'number') ? c._witness_count : 0;
+  b.title = isWitnessed ? `${n} witness${n === 1 ? '' : 'es'}` : 'No witnesses';
+  return b;
+}
+
+/* ---------- Generic Modal (capsule/profile/bundle) ---------- */
+let MODAL_CTX = null;
+function openModal(title, data, { kind = 'capsule' } = {}) {
+  let raw = (data && data._raw) ? String(data._raw) : null;
+  let lang = 'yaml';
+  if (!raw) { raw = JSON.stringify(data || {}, null, 2); lang = 'json'; }
+  MODAL_CTX = { kind, data, raw };
+
+  $('m_title').textContent = title || (kind === 'bundle' ? 'Bundle' : kind === 'profile' ? 'Profile' : 'Capsule');
+
+  const showProv = (kind === 'capsule');
+  $('m_copy_prov').style.display = showProv ? '' : 'none';
+  $('m_validate').style.display = showProv ? '' : 'none';
+
+  const code = $('m_body_code');
+  code.className = 'language-' + lang;
+  code.textContent = raw;
+  if (window.Prism && Prism.highlightElement) Prism.highlightElement(code);
+
+  $('m_result').textContent = 'idle';
+  $('m_result').className = 'badge';
+  $('modal').style.display = 'flex';
+}
+function closeModal() { $('modal').style.display = 'none'; MODAL_CTX = null; }
+if ($('m_close')) $('m_close').addEventListener('click', closeModal);
+if ($('modal')) $('modal').addEventListener('click', e => { if (e.target && e.target.id === 'modal') closeModal(); });
+if ($('m_copy_yaml')) $('m_copy_yaml').addEventListener('click', () => {
+  if (!MODAL_CTX) return;
+  navigator.clipboard.writeText(MODAL_CTX.raw || '').then(() => toast('YAML/JSON copied'));
+});
+if ($('m_copy_prov')) $('m_copy_prov').addEventListener('click', () => {
+  if (!MODAL_CTX || MODAL_CTX.kind !== 'capsule') { toast('No provenance for this type'); return; }
+  navigator.clipboard.writeText(JSON.stringify((MODAL_CTX.data && MODAL_CTX.data.provenance) || {}, null, 2))
+    .then(() => toast('Provenance copied'));
+});
+if ($('m_validate')) $('m_validate').addEventListener('click', async () => {
+  if (!MODAL_CTX || MODAL_CTX.kind !== 'capsule') {
+    const tag = $('m_result'); tag.textContent = 'n/a'; tag.className = 'badge'; tag.title = 'Capsules only'; return;
+  }
+  const r = await validateDigest(MODAL_CTX.data);
+  const tag = $('m_result');
+  tag.textContent = r.ok ? 'digest✓' : 'digest✗';
+  tag.className = 'badge ' + (r.ok ? 'ok' : 'err');
+  tag.title = r.ok ? 'OK' : ('have:' + r.have + ' want:' + r.want);
+});
+
+/* ---------- Profiles ---------- */
+function renderProfiles() {
+  const sel = $('profiles');
+  const descEl = $('profileDesc');
+  if (!sel) return;
+
+  const pmap = DATA.profiles || {};
+  const keys = Object.keys(pmap).sort();
+
+  sel.textContent = '';
+  for (const k of keys) {
+    const p = pmap[k] || {};
+    const o = document.createElement('option');
+    o.value = k;
+    o.textContent = (p.title || k) + ' (' + (p.version || '1.0.0') + ')';
+    o.dataset.desc = p.description || '';
+    sel.appendChild(o);
+  }
+
+  // Resolve target profile: STATE.profile > localStorage > first key
+  const saved = localStorage.getItem('tc_profile');
+  let target = (STATE.profile && pmap[STATE.profile]) ? STATE.profile
+             : (saved && pmap[saved]) ? saved
+             : (keys[0] || '');
+
+  sel.value = target;
+  STATE.profile = target;
+  if (descEl) {
+    const p0 = pmap[target] || {};
+    descEl.textContent = p0.description ? (' -  ' + p0.description) : '';
+  }
+
+  sel.onchange = () => {
+    STATE.profile = sel.value;
+    localStorage.setItem('tc_profile', STATE.profile);
+    const p = pmap[STATE.profile] || {};
+    if (descEl) descEl.textContent = p.description ? (' -  ' + p.description) : '';
+    compose();
+  };
+}
+
+(function wireProfileView() {
+  const btn = $('profileView');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    const id = STATE.profile;
+    const p = (DATA.profiles || {})[id];
+    if (!p) { toast('No profile selected'); return; }
+    openModal(p.title || id || 'Profile', p, { kind: 'profile' });
+  });
+})();
+
+/* ---------- Capsules ---------- */
+function capsuleRow(c, id, opts = {}) {
+  const showDomainChip = !!opts.showDomainChip;
+
+  const item = document.createElement('div');
+  item.className = 'item';
+  item.dataset.id = id;
+
+  const top = document.createElement('div'); top.className = 'row'; item.appendChild(top);
+
+  const cb = document.createElement('input');
+  cb.type = 'checkbox';
+  cb.checked = STATE.selectedCaps.has(id);
+  cb.addEventListener('change', () => {
+    if (cb.checked) {
+      STATE.selectedCaps.add(id);
+      STATE.manualCaps.add(id);
+      if (!STATE.order.includes(id)) STATE.order.push(id);
+    } else {
+      STATE.selectedCaps.delete(id);
+      STATE.manualCaps.delete(id);
+      STATE.order = STATE.order.filter(x => x !== id);
+    }
+    renderCapsules(); renderPreview(); compose();
+  });
+  top.appendChild(cb);
+
+  const title = document.createElement('div');
+  title.className = 'title';
+  title.textContent = (c.title || id);
+  top.appendChild(title);
+
+  if (showDomainChip) {
+    const dchip = document.createElement('span');
+    dchip.className = 'chip domain';
+    dchip.textContent = c.domain || 'misc';
+    dchip.title = 'domain';
+    top.appendChild(dchip);
+  }
+
+  top.appendChild(badgeAuthor(c));
+  top.appendChild(badgeDigest(c));
+  top.appendChild(badgePosture(c));
+
+  const btn = document.createElement('button');
+  btn.className = 'btn small';
+  btn.textContent = 'View';
+  btn.onclick = () => openModal(c.title || id, c, { kind: 'capsule' });
+  top.appendChild(btn);
+
+  const stmt = document.createElement('div');
+  stmt.className = 'small clamp-2';
+  stmt.textContent = (c.statement || '');
+  item.appendChild(stmt);
+
+  if (Array.isArray(c.applies_to) && c.applies_to.length) {
+    const chips = document.createElement('div'); chips.className = 'row-chips';
+    c.applies_to.forEach(tag => {
+      const chip = document.createElement('span'); chip.className = 'chip applies';
+      chip.textContent = tag; chips.appendChild(chip);
+    });
+    item.appendChild(chips);
+  }
+
+  return item;
+}
+
+function renderCapsules() {
+  const list = $('capsules'); if (!list) return;
+  list.innerHTML = '';
+
+  const f = (STATE.filter || '').toLowerCase();
+  const caps = DATA.capsules || {};
+  const byDomain = new Map();
+
+  for (const id of Object.keys(caps)) {
+    const c = caps[id] || {};
+    const hay = (id + ' ' + (c.title || '') + ' ' + (c.domain || '') + ' ' + (c.statement || '')).toLowerCase();
+    if (!hay.includes(f)) continue;
+    const d = (c.domain || 'misc').toLowerCase();
+    if (!byDomain.has(d)) byDomain.set(d, []);
+    byDomain.get(d).push(id);
+  }
+
+  const domains = Array.from(byDomain.keys()).sort();
+  let total = 0;
+
+  domains.forEach(domain => {
+    const ids = byDomain.get(domain).sort((a, b) =>
+      (caps[a].title || a).toLowerCase().localeCompare((caps[b].title || b).toLowerCase())
+    );
+    total += ids.length;
+
+    const group = document.createElement('details');
+    group.className = 'domain-group';
+    group.dataset.domain = domain;
+    group.open = getDomainOpen(domain);
+    group.addEventListener('toggle', () => setDomainOpen(domain, group.open));
+
+    const sum = document.createElement('summary');
+
+    const title = document.createElement('span');
+    title.className = 'domain-title';
+    title.textContent = domain;
+
+    const count = document.createElement('span');
+    count.className = 'badge';
+    count.textContent = String(ids.length);
+
+    const spacer = document.createElement('span');
+    spacer.className = 'domain-spacer';
+
+    const selAll = document.createElement('input');
+    selAll.type = 'checkbox';
+    selAll.title = 'Select all in domain';
+    const allSelected = ids.every(cid => STATE.selectedCaps.has(cid));
+    const someSelected = ids.some(cid => STATE.selectedCaps.has(cid));
+    selAll.checked = allSelected;
+    selAll.indeterminate = !allSelected && someSelected;
+    selAll.addEventListener('click', e => e.stopPropagation());
+    selAll.addEventListener('mousedown', e => e.stopPropagation());
+    selAll.addEventListener('change', () => {
+      if (selAll.checked) {
+        ids.forEach(cid => {
+          STATE.selectedCaps.add(cid);
+          if (!STATE.order.includes(cid)) STATE.order.push(cid);
+        });
+      } else {
+        ids.forEach(cid => {
+          STATE.selectedCaps.delete(cid);
+          STATE.manualCaps.delete(cid);
+        });
+        STATE.order = STATE.order.filter(x => STATE.selectedCaps.has(x));
+      }
+      renderCapsules(); renderPreview(); compose();
+    });
+
+    sum.appendChild(title);
+    sum.appendChild(count);
+    sum.appendChild(spacer);
+    sum.appendChild(selAll);
+    group.appendChild(sum);
+
+    const body = document.createElement('div');
+    body.className = 'domain-body';
+    ids.forEach(cid => body.appendChild(capsuleRow(caps[cid], cid, { showDomainChip: false })));
+    group.appendChild(body);
+
+    list.appendChild(group);
+  });
+
+  $('capsulesCount') && ($('capsulesCount').textContent = total);
+}
+
+/* ---------- Bundles ---------- */
+function renderBundles() {
+  const list = $('bundles'); if (!list) return;
+  list.innerHTML = '';
+  const bundles = DATA.bundles || {};
+  const keys = Object.keys(bundles)
+    .sort((a,b) => (bundles[a].name || a).localeCompare(bundles[b].name || b));
+
+  for (const k of keys) {
+    const b = bundles[k] || {};
+    const item = document.createElement('div'); item.className = 'item';
+    const row = document.createElement('div'); row.className = 'row'; item.appendChild(row);
+
+    const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = STATE.selectedBundles.has(k);
+    cb.addEventListener('change', () => {
+      if (cb.checked) {
+        STATE.selectedBundles.add(k);
+        (b.capsules || []).forEach(cid => { STATE.selectedCaps.add(cid); if (!STATE.order.includes(cid)) STATE.order.push(cid); });
+      } else {
+        STATE.selectedBundles.delete(k);
+        const others = [...STATE.selectedBundles];
+        (b.capsules || []).forEach(cid => {
+          const elsewhere = others.some(name => {
+            const b2 = DATA.bundles[name];
+            return b2 && Array.isArray(b2.capsules) && b2.capsules.includes(cid);
           });
-        });
-      })();
-
-      // persist domain open/closed state across renders + reloads
-      STATE.domainOpen = JSON.parse(localStorage.getItem('tc_domain_open') || '{}');
-      const DOMAIN_DEFAULT_OPEN = false; // first render behavior
-
-      function setDomainOpen(domain, open) {
-        const key = String(domain || 'misc').toLowerCase();
-        STATE.domainOpen[key] = !!open;
-        localStorage.setItem('tc_domain_open', JSON.stringify(STATE.domainOpen));
-      }
-
-      function getDomainOpen(domain) {
-        const key = String(domain || 'misc').toLowerCase();
-        return Object.prototype.hasOwnProperty.call(STATE.domainOpen, key)
-          ? !!STATE.domainOpen[key]
-          : DOMAIN_DEFAULT_OPEN;
-      }
-
-      // Bundles panel open/closed state
-      // Bundles open/closed state
-      STATE.bundlesOpen = (localStorage.getItem('tc_bundles_open') !== '0'); // default open
-
-      function setBundlesOpen(open) {
-        STATE.bundlesOpen = !!open;
-        localStorage.setItem('tc_bundles_open', STATE.bundlesOpen ? '1' : '0');
-        const body = document.getElementById('bundlesBody');
-        const btn = document.getElementById('bundlesToggle');
-        if (!body || !btn) return;
-        if (STATE.bundlesOpen) {
-          body.hidden = false;
-          btn.textContent = 'Hide';
-          btn.setAttribute('aria-expanded', 'true');
-          // restore previous height if we have it, else whatever Split already has
-          const last = Number(localStorage.getItem('tc_bundles_height') || '45');
-          if (window.__subsplit) {
-            const sizes = window.__subsplit.getSizes();
-            const target = isFinite(last) ? last : sizes[0];
-            const other = 100 - target;
-            window.__subsplit.setSizes([target, other]);
-            localStorage.setItem('tc_split_sub', JSON.stringify([target, other]));
-            }
-        } else {
-          body.hidden = true;
-          btn.textContent = 'Show';
-          btn.setAttribute('aria-expanded', 'false');
-          // remember current height, then collapse
-          if (window.__subsplit) {
-            const sizes = window.__subsplit.getSizes();   // [bundles%, capsules%]
-            localStorage.setItem('tc_bundles_height', String(sizes[0])); // remember bundles height
-            window.__subsplit.setSizes([0, 100]);
-            localStorage.setItem('tc_split_sub', JSON.stringify([0, 100]));
-            }          
-        }
-      }
-
-      const header = document.querySelector('#bundlesPanel .collapsible-header');
-      if (header) {
-        header.addEventListener('click', (e) => {
-          // don’t double-handle if the explicit Hide/Show button was clicked
-          if (e.target.closest('#bundlesToggle')) return;
-          setBundlesOpen(!STATE.bundlesOpen);
+          if (!elsewhere && !STATE.manualCaps.has(cid)) STATE.selectedCaps.delete(cid);
+          STATE.order = STATE.order.filter(x => STATE.selectedCaps.has(x));
         });
       }
+      renderCapsules(); renderPreview(); compose();
+    });
+    row.appendChild(cb);
 
+    const ttl = document.createElement('div'); ttl.textContent = (b.name || k); row.appendChild(ttl);
 
-      function initBundlesCollapsibleSimple() {
-        const btn = document.getElementById('bundlesToggle');
-        if (!btn) return;
-        setBundlesOpen(STATE.bundlesOpen);      // apply initial state
-        btn.onclick = () => setBundlesOpen(!STATE.bundlesOpen);
+    const viewBtn = document.createElement('button');
+    viewBtn.className = 'btn small';
+    viewBtn.textContent = 'View';
+    viewBtn.onclick = () => openModal(b.name || k || 'Bundle', b, { kind: 'bundle' });
+    row.appendChild(viewBtn);
+
+    if (b.description) {
+      const desc = document.createElement('div'); desc.className = 'small'; desc.textContent = b.description; item.appendChild(desc);
+    }
+
+    list.appendChild(item);
+  }
+  $('bundlesCount') && ($('bundlesCount').textContent = keys.length);
+}
+
+/* ---------- Preview ---------- */
+function renderPreview() {
+  const list = $('preview'); if (!list) return;
+  list.innerHTML = '';
+  const ids = STATE.order.filter(id => STATE.selectedCaps.has(id));
+  ids.forEach(id => {
+    const c = DATA.capsules[id]; if (!c) return;
+    const item = document.createElement('div'); item.className = 'item'; item.dataset.id = id;
+    const row = document.createElement('div'); row.className = 'row'; item.appendChild(row);
+    const handle = document.createElement('span'); handle.className = 'chip drag'; handle.textContent = '☰'; row.appendChild(handle);
+    const ttl = document.createElement('div');
+    ttl.className = 'title';
+    ttl.innerHTML = esc(c.title || id) + ' <span class="muted"> -  ' + esc(c.domain || '') + '</span>';
+    row.appendChild(ttl);
+    const btn = document.createElement('button'); btn.className = 'btn small'; btn.textContent = 'View';
+    btn.onclick = () => openModal(c.title || id, c, { kind: 'capsule' }); row.appendChild(btn);
+    list.appendChild(item);
+  });
+
+  // Sortable
+  if (window.__sortable) window.__sortable.destroy();
+  if (window.Sortable) {
+    window.__sortable = new Sortable(list, {
+      animation: 120,
+      handle: '.drag',
+      ghostClass: 'ghost',
+      onEnd: (evt) => {
+        const old = STATE.order.filter(id => STATE.selectedCaps.has(id));
+        const moved = old.splice(evt.oldIndex, 1)[0];
+        old.splice(evt.newIndex, 0, moved);
+        STATE.order = old.concat(STATE.order.filter(x => !STATE.selectedCaps.has(x)));
+        compose();
       }
+    });
+  }
+}
 
+/* ---------- Canonical id helpers ---------- */
+function canonicalizeId(s) {
+  return String(s || '').trim().replace(/^.*[\\/]/, '').replace(/\.(yaml|yml|json)$/i, '');
+}
+function toIdSet(x) {
+  if (x instanceof Set) return new Set([...x].map(canonicalizeId));
+  if (x && typeof x === 'object') return new Set(Object.keys(x).filter(k => x[k]).map(canonicalizeId));
+  return new Set();
+}
+function getCapsuleByAnyId(anyId) {
+  const canon = canonicalizeId(anyId);
+  const store = (DATA && DATA.capsules) || {};
+  if (store[anyId]) return store[anyId];
+  for (const k in store) {
+    const cap = store[k];
+    const capIdCanon = canonicalizeId(cap.id || '');
+    const keyCanon   = canonicalizeId(k);
+    if (capIdCanon === canon || keyCanon === canon) return cap;
+  }
+  return null;
+}
+function getSelectedIdsSafe() {
+  const order = Array.isArray(STATE.order) ? STATE.order.slice() : [];
+  const sel = toIdSet(STATE.selectedCaps);
+  const ordered = []; const seen = new Set();
+  for (const raw of order) {
+    const canon = canonicalizeId(raw);
+    if (sel.has(canon) && !seen.has(canon)) { ordered.push(canon); seen.add(canon); }
+  }
+  for (const canon of sel) if (!seen.has(canon)) ordered.push(canon);
+  return ordered;
+}
 
-      /* Toast */
-      function toast(msg) {
-        const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t);
-        setTimeout(() => t.remove(), 1800);
+/* ---------- Pedagogy normalization ---------- */
+function normalizePedagogy(capsule) {
+  const out = { socratic: [], aphorisms: [] };
+  const p = capsule && capsule.pedagogy;
+  if (!p) return out;
+  if (Array.isArray(p)) {
+    for (const item of p) {
+      if (!item) continue;
+      const kind = String(item.kind || '').toLowerCase();
+      const text = (item.text == null) ? '' : String(item.text);
+      if (!text) continue;
+      if (kind === 'socratic') out.socratic.push(text);
+      else if (kind === 'aphorism' || kind === 'aphorisms') out.aphorisms.push(text);
+    }
+  } else if (typeof p === 'object') {
+    if (Array.isArray(p.socratic))  out.socratic.push(...p.socratic.map(String));
+    if (Array.isArray(p.aphorisms)) out.aphorisms.push(...p.aphorisms.map(String));
+  }
+  return out;
+}
+
+/* ---------- Simple templating ---------- */
+function applyTemplate(tpl, dict) {
+  return String(tpl).replace(/\{([\w.]+)\}/g, (_, k) => {
+    const v = dict[k];
+    return (v === undefined || v === null) ? '' : String(v);
+  });
+}
+function parseInclude(spec) {
+  const s = String(spec);
+  const m = s.match(/^([\w.]+)(\[(?::?\d*)?(?::\d*)?\])?$/);
+  const path = m ? m[1] : s;
+  let sliceFrom = null, sliceTo = null;
+  const slice = m && m[2] ? m[2].slice(1, -1) : null;
+  if (slice != null && slice.length) {
+    const parts = slice.split(':');
+    if (parts.length === 2) {
+      sliceFrom = parts[0].length ? parseInt(parts[0], 10) : null;
+      sliceTo = parts[1].length ? parseInt(parts[1], 10) : null;
+    } else if (parts.length === 1 && parts[0].length) {
+      const idx = parseInt(parts[0], 10);
+      sliceFrom = isNaN(idx) ? null : idx;
+      sliceTo   = isNaN(idx) ? null : (idx + 1);
+    }
+  }
+  return { path, sliceFrom, sliceTo };
+}
+function sliceArray(arr, from, to) {
+  const n = Array.isArray(arr) ? arr.length : 0;
+  const start = (from == null) ? 0 : Math.max(0, from);
+  const end   = (to == null)   ? n : Math.max(start, Math.min(n, to));
+  return arr.slice(start, end);
+}
+function getByPath(obj, path) {
+  if (!obj || !path) return null;
+  const parts = path.split('.');
+  let cur = obj;
+  for (const p of parts) { if (cur == null) return null; cur = cur[p]; }
+  return cur;
+}
+
+/* ---------- Projection / Compose ---------- */
+function applyProjection(capsule, projection, withPed) {
+  const lines = [];
+
+  const headerTpl = (projection.render && typeof projection.render.capsule_header === 'string')
+    ? projection.render.capsule_header : null;
+  if (headerTpl && headerTpl.length > 0) {
+    lines.push(applyTemplate(headerTpl, {
+      id: capsule.id || '',
+      version: capsule.version || '',
+      domain: capsule.domain || '',
+      title: capsule.title || capsule.TITLE || '',
+      statement: capsule.statement || capsule.STATEMENT || ''
+    }).trim());
+  }
+
+  const ped = normalizePedagogy(capsule);
+
+  let includes = Array.isArray(projection.include) ? projection.include.slice() : [];
+  const forcePed = !!(projection && projection.force_pedagogy);
+  const hasPedInList = includes.some(s => String(s).startsWith('pedagogy.'));
+  if (forcePed && !hasPedInList) includes.push('pedagogy.socratic', 'pedagogy.aphorisms');
+
+  for (const inc of includes) {
+    const { path, sliceFrom, sliceTo } = parseInclude(inc);
+    if (!withPed && path.startsWith('pedagogy.')) continue;
+
+    let val = null;
+    if (path === 'pedagogy.socratic') val = ped.socratic;
+    else if (path === 'pedagogy.aphorisms') val = ped.aphorisms;
+    else val = getByPath(capsule, path);
+
+    if (val == null) continue;
+
+    if (Array.isArray(val)) {
+      const sub = sliceArray(val, sliceFrom, sliceTo);
+      const bulletKey = path.endsWith('socratic') ? 'socratic_bullet'
+                     : path.endsWith('aphorisms') ? 'aphorism_bullet' : null;
+      const bulletTpl = (projection.render && projection.render[bulletKey]) || '  - {text}';
+      for (const item of sub) lines.push(applyTemplate(bulletTpl, { text: String(item) }));
+      continue;
+    }
+
+    if (typeof val === 'string') {
+      const lineTpl = (projection.render && projection.render[`${path}_line`]) || null;
+      lines.push(lineTpl ? applyTemplate(lineTpl, { text: val }) : val);
+    }
+  }
+
+  const footer = projection.render ? projection.render.enforcement_footer : null;
+  if (typeof footer === 'string' && footer.trim().length > 0) lines.push(footer.trim());
+
+  return lines.join("\n").trim();
+}
+
+function composeLegacy(c, includePedagogy) {
+  const lines = [];
+  lines.push(
+    "BEGIN CAPSULE id=" + (c.id || '') +
+    " version=" + (c.version || '1.0.0') +
+    " domain=" + (c.domain || '') +
+    " posture=" + (c.posture || 'informational')
+  );
+  if (c.statement) lines.push("STATEMENT: " + c.statement);
+  if (includePedagogy && c.pedagogy) {
+    const ped = normalizePedagogy(c);
+    const body = []
+      .concat(ped.socratic.map(t => "Socratic: " + t))
+      .concat(ped.aphorisms.map(t => "Aphorism: " + t))
+      .join('\n');
+    if (body) lines.push('PEDAGOGY:\n' + body);
+  }
+  lines.push('END CAPSULE');
+  return lines.join("\n");
+}
+
+function compose() {
+  try {
+    const prof = (DATA && DATA.profiles && STATE.profile && DATA.profiles[STATE.profile]) || {};
+    const response = prof.response || {};
+    const projection = response.projection || {};
+    const blocks = [];
+
+    const overrideDefaults = !!response.override_compose_defaults;
+    const fragments = Array.isArray(response.fragments) ? response.fragments : [];
+
+    const sysFragments = fragments.filter(f => f && f.include !== false && f.kind === 'system');
+    if (sysFragments.length) {
+      for (const f of sysFragments) blocks.push(String(f.content || '').trim());
+    } else {
+      const policy = response.policy || 'Cite or abstain; follow Plan→Verify→Answer; ask ONE crisp follow-up if required.';
+      const format = response.format || 'natural';
+      const system_block = response.system_block ||
+        ("SYSTEM: Profile=" + (prof.title || 'unknown') + "\nPOLICY: " + policy + "\nFORMAT: " + format);
+      blocks.push(system_block);
+    }
+
+    const auxFragments = fragments.filter(f => f && f.include !== false && f.kind !== 'system');
+    if (auxFragments.length) {
+      for (const f of auxFragments) blocks.push(String(f.content || '').trim());
+    } else if (!overrideDefaults) {
+      blocks.push("SYSTEM: Truth Capsules Loader v1\nPURPOSE: Use curated capsules to scaffold reasoning and enforce acceptance rules.\nMETHOD:\n  1) Load capsule rules (below).\n  2) For each task, follow Plan → Verify → Answer.\n  3) If required fields are missing, ask ONE concise follow-up.\n  4) Cite sources or abstain. Redact PII. Validate tool JSON before calling.\n  5) Emit a JSON report when asked (see REPORT SCHEMA).\nFAILURE POLICY: If a capsule cannot be satisfied, abstain + explain what is missing.");
+      blocks.push("SYSTEM: Bootstrap Discipline\n• Curation is king - prefer curated fixtures/evidence; abstain when unsure.\n• Show your work - reference evidence in answers.\n• Make failures explicit and reversible - choose tiny experiments.");
+    }
+
+    const heading = response.capsules_heading || 'SYSTEM: Capsule Rules (Selected)';
+    const wantsPedInProfile = Array.isArray(projection.include) && projection.include.some(s => String(s).startsWith('pedagogy.'));
+    const forcePed = !!(projection && projection.force_pedagogy) || !!response.force_pedagogy;
+    const withPedUI = !!($('includePed') && $('includePed').checked);
+    const withPed = forcePed || withPedUI || wantsPedInProfile;
+
+    const idsCanon = getSelectedIdsSafe();
+    if (!idsCanon.length) {
+      blocks.push(heading + "\n- (No capsules selected)");
+    } else {
+      blocks.push(heading);
+      for (const canon of idsCanon) {
+        const cap = getCapsuleByAnyId(canon);
+        if (!cap) continue;
+        if (projection && projection.include) blocks.push(applyProjection(cap, projection, withPed));
+        else blocks.push(composeLegacy(cap, withPed));
       }
+    }
 
-      function initBundlesCollapsible() {
-        const d = $('bundlesSection');
-        if (!d) return;
-        d.open = getBundlesOpen();
-        d.addEventListener('toggle', () => setBundlesOpen(d.open));
+    if (typeof response.footer === 'string' && response.footer.trim().length) {
+      blocks.push(response.footer.trim());
+    }
+
+    const wrapDefault = !!response.markdown_wrap_default;
+    const wrapUI = !!($('markdown') && $('markdown').checked);
+    const wrap = wrapUI || (wrapDefault && !$('markdown'));
+    let out = blocks.filter(Boolean).join("\n\n").trim();
+    if (wrap) out = "```\n" + out + "\n```";
+    $('out').value = out;
+  } catch (err) {
+    console.error(err);
+    $('out').value = "ERROR composing prompt: " + (err && err.message ? err.message : String(err));
+  }
+}
+
+/* ---------- Manifests / Share ---------- */
+const MANIFEST_NS = 'tc_manifests_v1';
+
+function readAllManifests() { try { return JSON.parse(localStorage.getItem(MANIFEST_NS) || '{}'); } catch { return {}; } }
+function writeAllManifests(obj) { localStorage.setItem(MANIFEST_NS, JSON.stringify(obj || {})); }
+function listManifestNames() { return Object.keys(readAllManifests()).sort((a,b)=>a.localeCompare(b)); }
+
+function tsCompact(d = new Date()) {
+  const p2 = n => String(n).padStart(2, '0');
+  return [ d.getFullYear(), p2(d.getMonth()+1), p2(d.getDate()), '_', p2(d.getHours()), p2(d.getMinutes()), p2(d.getSeconds()) ].join('');
+}
+function suggestedManifestName() {
+  const prof = STATE.profile || 'default';
+  const nCaps = STATE.order.filter(id => STATE.selectedCaps.has(id)).length;
+  return `${tsCompact()}__${prof}__n${nCaps}`;
+}
+function getCurrentSystemPrompt() {
+  let prompt = $('out').value;
+  if ($('markdown') && $('markdown').checked) {
+    prompt = prompt.replace(/^```\n/, '').replace(/\n```$/, '');
+  }
+  return prompt;
+}
+function buildManifest() {
+  return {
+    schema: 'tc.manifest.v1',
+    ts: new Date().toISOString(),
+    profile: STATE.profile,
+    bundles: [...STATE.selectedBundles],
+    order: STATE.order.filter(id => STATE.selectedCaps.has(id)),
+    includePed: $('includePed')?.checked ? 1 : 0,
+    markdown: $('markdown')?.checked ? 1 : 0,
+    prompt: getCurrentSystemPrompt()
+  };
+}
+function exportState() {
+  return {
+    profile: STATE.profile,
+    bundles: [...STATE.selectedBundles],
+    order: STATE.order.filter(id => STATE.selectedCaps.has(id))
+  };
+}
+function encodeStateToUrl() {
+  const s = btoa(unescape(encodeURIComponent(JSON.stringify(exportState()))));
+  const url = new URL(window.location.href);
+  url.searchParams.set('s', s);
+  return url.toString();
+}
+function importState(obj) {
+  if (!obj) return;
+
+  const prof = (obj.profile && DATA.profiles && DATA.profiles[obj.profile]) ? obj.profile
+             : (Object.keys(DATA.profiles || {})[0] || null);
+
+  STATE.profile = prof;
+  STATE.selectedBundles = new Set();
+  STATE.selectedCaps = new Set();
+  STATE.manualCaps = new Set();
+  STATE.order = [];
+
+  (obj.bundles || []).forEach(b => { if (DATA.bundles && DATA.bundles[b]) STATE.selectedBundles.add(b); });
+  STATE.selectedBundles.forEach(b => {
+    const caps = (DATA.bundles[b] && DATA.bundles[b].capsules) || [];
+    caps.forEach(cid => {
+      if (DATA.capsules && DATA.capsules[cid]) {
+        STATE.selectedCaps.add(cid);
+        if (!STATE.order.includes(cid)) STATE.order.push(cid);
       }
-
-      /* Hashing for digest */
-      const tenc = s => new TextEncoder().encode(s);
-      async function sha256(s) { const buf = await crypto.subtle.digest('SHA-256', tenc(s)); return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''); }
-      function canonicalJSON(x) {
-        if (Array.isArray(x)) return "[" + x.map(canonicalJSON).join(",") + "]";
-        if (x && typeof x === "object") { const keys = Object.keys(x).sort(); return "{" + keys.map(k => JSON.stringify(k) + ":" + canonicalJSON(x[k])).join(",") + "}"; }
-        return JSON.stringify(x);
-      }
-      function coreForDigest(c) {
-        return {
-          id: c.id, version: c.version, domain: c.domain, title: c.title, statement: c.statement,
-          assumptions: Array.isArray(c.assumptions) ? c.assumptions : [],
-          pedagogy: Array.isArray(c.pedagogy) ? c.pedagogy.map(p => ({ kind: p.kind, text: p.text })) : []
-        };
-      }
-      function digestCore(c) { return canonicalJSON(coreForDigest(c)); }
-      async function validateDigest(c) {
-        const have = await sha256(digestCore(c));
-        const want = (((c.provenance || {}).signing || {}).digest) || '';
-        if (!want) return { ok: true, na: true, have, want };
-        return { ok: (have === want), na: false, have, want };
-      }
-      function badgeDigest(c) {
-        const b = document.createElement('span'); b.className = 'badge'; b.textContent = 'digest…';
-        validateDigest(c).then(r => {
-          if (r.na) { b.textContent = 'digest n/a'; b.title = 'No reference digest in capsule'; return; }
-          b.textContent = r.ok ? 'digest✓' : 'digest✗'; b.className = 'badge ' + (r.ok ? 'ok' : 'err');
-          b.title = r.ok ? 'Digest OK' : 'Have ' + r.have + ' want ' + r.want;
-        });
-        return b;
-      }
-      function badgeAuthor(c) {
-        const p = c.provenance || {}; const b = document.createElement('span'); b.className = 'badge'; b.textContent = (p.author || '?'); return b;
-      }
-
-      function badgePosture(c) {
-        const b = document.createElement('span');
-        const isWitnessed = (c.posture === 'witnessed');
-        b.className = 'badge' + (isWitnessed ? ' witnessed' : '');
-        b.textContent = isWitnessed ? 'witnessed' : 'informational';
-        const n = (typeof c._witness_count === 'number') ? c._witness_count : 0;
-        b.title = isWitnessed ? `${n} witness${n === 1 ? '' : 'es'}` : 'No witnesses';
-        return b;
-      }
-
-
-      /* ------------ Modal (upgraded: capsules + profiles + bundles) ------------ */
-      let MODAL_CTX = null;
-      // kind ∈ {'capsule','profile','bundle'}
-      // data = the object (capsule/profile/bundle)
-      // raw  = preferred text to show (YAML if available; JSON pretty as fallback)
-      function openModal(title, data, { kind = 'capsule' } = {}) {
-        // Prefer YAML when provided as _raw; else pretty JSON
-        let raw = (data && data._raw) ? String(data._raw) : null;
-        let lang = 'yaml';
-        if (!raw) {
-          raw = JSON.stringify(data || {}, null, 2);
-          lang = 'json';
-        }
-
-        MODAL_CTX = { kind, data, raw };
-
-        $('m_title').textContent = title || (kind === 'bundle' ? 'Bundle' : kind === 'profile' ? 'Profile' : 'Capsule');
-
-        // Toggle controls based on kind
-        const showProv = (kind === 'capsule');
-        const showValidate = (kind === 'capsule');
-        $('m_copy_prov').style.display = showProv ? '' : 'none';
-        $('m_validate').style.display = showValidate ? '' : 'none';
-
-        // Set code block + highlight
-        const code = $('m_body_code');
-        code.className = 'language-' + lang;
-        code.textContent = raw;
-        if (window.Prism && Prism.highlightElement) Prism.highlightElement(code);
-
-        $('m_result').textContent = 'idle';
-        $('m_result').className = 'badge';
-        $('modal').style.display = 'flex';
-      }
-
-      function closeModal() { $('modal').style.display = 'none'; MODAL_CTX = null; }
-
-      $('m_close').addEventListener('click', closeModal);
-      $('modal').addEventListener('click', e => { if (e.target && e.target.id === 'modal') closeModal(); });
-
-      $('m_copy_yaml').addEventListener('click', () => {
-        if (!MODAL_CTX) return;
-        navigator.clipboard.writeText(MODAL_CTX.raw || '').then(() => toast('YAML/JSON copied'));
-      });
-
-      $('m_copy_prov').addEventListener('click', () => {
-        if (!MODAL_CTX) return;
-        if (MODAL_CTX.kind !== 'capsule') { toast('No provenance for this type'); return; }
-        navigator.clipboard.writeText(JSON.stringify((MODAL_CTX.data && MODAL_CTX.data.provenance) || {}, null, 2))
-          .then(() => toast('Provenance copied'));
-      });
-
-      $('m_validate').addEventListener('click', async () => {
-        if (!MODAL_CTX) return;
-        const tag = $('m_result');
-        if (MODAL_CTX.kind !== 'capsule') {
-          tag.textContent = 'n/a';
-          tag.className = 'badge';
-          tag.title = 'Validation only applies to capsules';
-          return;
-        }
-        const r = await validateDigest(MODAL_CTX.data);
-        tag.textContent = r.ok ? 'digest✓' : 'digest✗';
-        tag.className = 'badge ' + (r.ok ? 'ok' : 'err');
-        tag.title = r.ok ? 'OK' : ('have:' + r.have + ' want:' + r.want);
-      });
-
-
-
-
-      /* ------------ Renderers ------------ */
-      function renderProfiles() {
-        const sel = $('profiles');
-        const descEl = $('profileDesc');
-        const pmap = DATA.profiles || {};
-        const keys = Object.keys(pmap).sort();
-
-        // rebuild options
-        sel.textContent = '';
-        for (const k of keys) {
-          const p = pmap[k] || {};
-          const o = document.createElement('option');
-          o.value = k;
-          o.textContent = (p.title || k) + ' (' + (p.version || '1.0.0') + ')';
-          o.dataset.desc = p.description || '';
-          sel.appendChild(o);
-        }
-
-        // Choose target  -  IMPORTANT: prefer STATE.profile (e.g., set by importState)
-        const saved = localStorage.getItem('tc_profile');
-        let target =
-          (STATE.profile && pmap[STATE.profile]) ? STATE.profile :
-            (saved && pmap[saved]) ? saved :
-              (sel.value && pmap[sel.value]) ? sel.value :
-                (keys[0] || '');
-
-        sel.value = target;
-        STATE.profile = target;
-
-        // description
-        if (descEl) {
-          const p0 = pmap[target] || {};
-          descEl.textContent = p0.description ? (' -  ' + p0.description) : '';
-        }
-
-        // change handler (unchanged)
-        sel.onchange = () => {
-          STATE.profile = sel.value;
-          const p = pmap[STATE.profile] || {};
-          if (descEl) descEl.textContent = p.description ? (' -  ' + p.description) : '';
-          if (typeof compose === 'function') compose();
-        };
-
-        // Fire one change event to initialize downstream (no fake toggle)
-        sel.dispatchEvent(new Event('change', { bubbles: true }));
-      }
-
-      // Profile YAML/JSON modal
-      (function wireProfileView() {
-        const btn = $('profileView');
-        if (!btn) return;
-        btn.addEventListener('click', () => {
-          const id = STATE.profile;
-          const p = (DATA.profiles || {})[id];
-          if (!p) { toast('No profile selected'); return; }
-          openModal(p.title || id || 'Profile', p, { kind: 'profile' });
-        });
-      })();
-
-      function capsuleRow(c, id, opts = {}) {
-        const showDomainChip = !!opts.showDomainChip;
-
-        const item = document.createElement('div');
-        item.className = 'item';
-        item.dataset.id = id;
-
-        const top = document.createElement('div'); // title + controls row
-        top.className = 'row';
-        item.appendChild(top);
-
-        const cb = document.createElement('input');
-        cb.type = 'checkbox';
-        cb.checked = STATE.selectedCaps.has(id);
-        cb.addEventListener('change', () => {
-          if (cb.checked) {
-            STATE.selectedCaps.add(id);
-            STATE.manualCaps.add(id);
-            if (!STATE.order.includes(id)) STATE.order.push(id);
-          } else {
-            STATE.selectedCaps.delete(id);
-            STATE.manualCaps.delete(id);
-            STATE.order = STATE.order.filter(x => x !== id);
-          }
-          renderCapsules();
-          renderPreview();
-          compose();
-        });
-        top.appendChild(cb);
-
-        const title = document.createElement('div');
-        title.className = 'title';
-        title.textContent = (c.title || id);
-        top.appendChild(title);
-
-        if (showDomainChip) {
-          const dchip = document.createElement('span');
-          dchip.className = 'chip domain';
-          dchip.textContent = c.domain || 'misc';
-          dchip.title = 'domain';
-          top.appendChild(dchip);
-        }
-
-        top.appendChild(badgeAuthor(c));
-        top.appendChild(badgeDigest(c));
-        top.appendChild(badgePosture(c));
-
-        const btn = document.createElement('button');
-        btn.className = 'btn small';
-        btn.textContent = 'View';
-        btn.onclick = () => openModal(c.title || id, c, { kind: 'capsule' });
-        top.appendChild(btn);
-
-        const stmt = document.createElement('div');
-        stmt.className = 'small clamp-2';
-        stmt.textContent = (c.statement || '');
-        item.appendChild(stmt);
-
-        // Optional applies_to chips (tiny, muted)
-        if (Array.isArray(c.applies_to) && c.applies_to.length) {
-          const chips = document.createElement('div');
-          chips.className = 'row-chips';
-          c.applies_to.forEach(tag => {
-            const chip = document.createElement('span');
-            chip.className = 'chip applies';
-            chip.textContent = tag;
-            chips.appendChild(chip);
-          });
-          item.appendChild(chips);
-        }
-
-        return item;
-      }
-
-
-      function renderCapsules() {
-        const list = $('capsules');
-        list.innerHTML = '';
-
-        const f = (STATE.filter || '').toLowerCase();
-        const byDomain = new Map(); // domain => [ids]
-
-        const caps = DATA.capsules || {};
-        for (const id of Object.keys(caps)) {
-          const c = caps[id] || {};
-          const hay = (id + ' ' + (c.title || '') + ' ' + (c.domain || '') + ' ' + (c.statement || '')).toLowerCase();
-          if (hay.includes(f)) {
-            const d = (c.domain || 'misc').toLowerCase();
-            if (!byDomain.has(d)) byDomain.set(d, []);
-            byDomain.get(d).push(id);
-          }
-        }
-
-        // sort domains; and titles within domain
-        const domains = Array.from(byDomain.keys()).sort();
-        let total = 0;
-
-        domains.forEach(domain => {
-          const ids = byDomain.get(domain).sort((a, b) => {
-            const A = (caps[a].title || a).toLowerCase();
-            const B = (caps[b].title || b).toLowerCase();
-            return A.localeCompare(B);
-          });
-          total += ids.length;
-
-          // Group container
-          const group = document.createElement('details');
-          group.className = 'domain-group';
-          group.dataset.domain = domain;             // allow global toggles to persist state
-          group.open = getDomainOpen(domain);
-          group.addEventListener('toggle', () => { setDomainOpen(domain, group.open); });
-
-
-          // Summary header
-          const sum = document.createElement('summary');
-          const title = document.createElement('span');
-          title.className = 'domain-title';
-          title.textContent = domain;
-
-          const count = document.createElement('span');
-          count.className = 'badge';
-          count.textContent = String(ids.length);
-
-          const spacer = document.createElement('span');
-          spacer.className = 'domain-spacer';
-
-          const selAll = document.createElement('input');
-          selAll.type = 'checkbox';
-          selAll.addEventListener('click', e => e.stopPropagation());
-          selAll.addEventListener('mousedown', e => e.stopPropagation());
-          const allSelected = ids.every(cid => STATE.selectedCaps.has(cid));
-          const someSelected = ids.some(cid => STATE.selectedCaps.has(cid));
-          selAll.checked = allSelected;
-          selAll.indeterminate = !allSelected && someSelected;
-          selAll.title = 'Select all in domain';
-
-          selAll.addEventListener('change', () => {
-            if (selAll.checked) {
-              ids.forEach(cid => {
-                STATE.selectedCaps.add(cid);
-                if (!STATE.order.includes(cid)) STATE.order.push(cid);
-              });
-            } else {
-              ids.forEach(cid => {
-                STATE.selectedCaps.delete(cid);
-                STATE.manualCaps.delete(cid);
-              });
-              STATE.order = STATE.order.filter(x => STATE.selectedCaps.has(x));
-            }
-            renderCapsules();
-            renderPreview();
-            compose();
-          });
-
-          sum.appendChild(title);
-          sum.appendChild(count);
-          sum.appendChild(spacer);
-          sum.appendChild(selAll);
-          group.appendChild(sum);
-
-          // Body
-          const body = document.createElement('div');
-          body.className = 'domain-body';
-          ids.forEach(cid => {
-            body.appendChild(capsuleRow(caps[cid], cid, { showDomainChip: false }));
-          });
-          group.appendChild(body);
-
-          list.appendChild(group);
-        });
-
-        $('capsulesCount').textContent = total;
-      }
-
-
-      function renderBundles() {
-        const list = $('bundles'); list.innerHTML = '';
-        const keys = Object.keys(DATA.bundles || {}).sort((a, b) => (DATA.bundles[a].name || a).localeCompare(DATA.bundles[b].name || b));
-
-        for (const k of keys) {
-          const b = DATA.bundles[k] || {};
-          const item = document.createElement('div'); item.className = 'item';
-          const row = document.createElement('div'); row.className = 'row'; item.appendChild(row);
-
-          const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = STATE.selectedBundles.has(k);
-          cb.addEventListener('change', () => {
-            if (cb.checked) {
-              STATE.selectedBundles.add(k);
-              (b.capsules || []).forEach(cid => { STATE.selectedCaps.add(cid); if (!STATE.order.includes(cid)) STATE.order.push(cid); });
-            } else {
-              STATE.selectedBundles.delete(k);
-              const others = [...STATE.selectedBundles];
-              (b.capsules || []).forEach(cid => {
-                const elsewhere = others.some(name => {
-                  const b2 = DATA.bundles[name];
-                  return b2 && Array.isArray(b2.capsules) && b2.capsules.includes(cid);
-                });
-                const manual = STATE.manualCaps.has(cid);
-                if (!elsewhere && !manual) STATE.selectedCaps.delete(cid);
-                STATE.order = STATE.order.filter(x => STATE.selectedCaps.has(x));
-              });
-            }
-            renderCapsules(); renderPreview(); compose();
-          });
-          row.appendChild(cb);
-
-          const ttl = document.createElement('div'); ttl.textContent = (b.name || k); row.appendChild(ttl);
-
-          // NEW: "View" button for bundle YAML/JSON
-          const viewBtn = document.createElement('button');
-          viewBtn.className = 'btn small';
-          viewBtn.textContent = 'View';
-          viewBtn.onclick = () => openModal(b.name || k || 'Bundle', b, { kind: 'bundle' });
-          row.appendChild(viewBtn);
-
-          // optional description
-          if (b.description) {
-            const desc = document.createElement('div'); desc.className = 'small'; desc.textContent = b.description; item.appendChild(desc);
-          }
-
-          list.appendChild(item);
-        }
-        $('bundlesCount').textContent = keys.length;
-      }
-
-
-      function renderPreview() {
-        const list = $('preview'); list.innerHTML = '';
-        const ids = STATE.order.filter(id => STATE.selectedCaps.has(id));
-        ids.forEach(id => {
-          const c = DATA.capsules[id]; if (!c) return;
-          const item = document.createElement('div'); item.className = 'item'; item.dataset.id = id;
-
-          const row = document.createElement('div'); row.className = 'row'; item.appendChild(row);
-          const handle = document.createElement('span'); handle.className = 'chip drag'; handle.textContent = '☰'; row.appendChild(handle);
-          const ttl = document.createElement('div');
-          ttl.className = 'title';
-          ttl.innerHTML = esc(c.title || id) + ' <span class="muted"> -  ' + esc(c.domain || '') + '</span>';
-          row.appendChild(ttl);
-
-          const btn = document.createElement('button');
-          btn.className = 'btn small';
-          btn.textContent = 'View';
-          btn.onclick = () => openModal(c.title || id, c, { kind: 'capsule' });
-          row.appendChild(btn);
-
-
-          list.appendChild(item);
-        });
-
-        // Sortable (drag to reorder)
-        if (window.__sortable) window.__sortable.destroy();
-        window.__sortable = new Sortable(list, {
-          animation: 120,
-          handle: '.drag',
-          ghostClass: 'ghost',
-          onEnd: (evt) => {
-            const old = STATE.order.filter(id => STATE.selectedCaps.has(id));
-            const moved = old.splice(evt.oldIndex, 1)[0];
-            old.splice(evt.newIndex, 0, moved);
-            STATE.order = old.concat(STATE.order.filter(x => !STATE.selectedCaps.has(x)));
-            compose();
-          }
-        });
-      }
-      /* ------------ Composition (hardened) ------------ */
-
-      /* Canonicalize ids so filenames/paths/exts match capsule ids/keys */
-      function canonicalizeId(s) {
-        return String(s || '')
-          .trim()
-          .replace(/^.*[\\/]/, '')              // strip any leading path
-          .replace(/\.(yaml|yml|json)$/i, '');  // strip extension
-      }
-
-      /* Turn a Set or object-map of selections into a canonical Set of ids */
-      function toIdSet(x) {
-        if (x instanceof Set) return new Set([...x].map(canonicalizeId));
-        if (x && typeof x === 'object') {
-          return new Set(Object.keys(x).filter(k => x[k]).map(canonicalizeId));
-        }
-        return new Set();
-      }
-
-      /* Find a capsule by id, key, or filename-like string */
-      function getCapsuleByAnyId(anyId) {
-        const canon = canonicalizeId(anyId);
-        const store = (DATA && DATA.capsules) || {};
-        if (store[anyId]) return store[anyId]; // exact key hit
-        for (const k in store) {
-          const cap = store[k];
-          const capIdCanon = canonicalizeId(cap.id || '');
-          const keyCanon = canonicalizeId(k);
-          if (capIdCanon === canon || keyCanon === canon) return cap;
-        }
-        return null;
-      }
-
-      /* Selection that survives order/selected mismatches */
-      function getSelectedIdsSafe() {
-        const order = Array.isArray(STATE.order) ? STATE.order.slice() : [];
-        const sel = toIdSet(STATE.selectedCaps);
-        const ordered = [];
-        const seen = new Set();
-
-        for (const raw of order) {
-          const canon = canonicalizeId(raw);
-          if (sel.has(canon) && !seen.has(canon)) {
-            ordered.push(canon);
-            seen.add(canon);
-          }
-        }
-        for (const canon of sel) {
-          if (!seen.has(canon)) ordered.push(canon);
-        }
-        return ordered;
-      }
-
-      /* Optional legacy helper (kept for completeness if you use it elsewhere) */
-      function parseFieldSpec(spec) {
-        const m = String(spec).match(/^([a-z_.]+)(?:\[:(\d+)\])?$/i);
-        return {
-          path: m ? m[1].toLowerCase() : String(spec).toLowerCase(),
-          limit: m && m[2] ? parseInt(m[2], 10) : null
-        };
-      }
-
-      /* ---------- Pedagogy normalization (supports both schemas) ---------- */
-      function normalizePedagogy(capsule) {
-        // A) pedagogy: [{kind:'Socratic'|'Aphorism', text:'...'}, ...]
-        // B) pedagogy: { socratic:[...], aphorisms:[...] }
-        const out = { socratic: [], aphorisms: [] };
-        const p = capsule && capsule.pedagogy;
-        if (!p) return out;
-
-        if (Array.isArray(p)) {
-          for (const item of p) {
-            if (!item) continue;
-            const kind = String(item.kind || '').toLowerCase();
-            const text = (item.text == null) ? '' : String(item.text);
-            if (!text) continue;
-            if (kind === 'socratic') out.socratic.push(text);
-            else if (kind === 'aphorism' || kind === 'aphorisms') out.aphorisms.push(text);
-          }
-        } else if (typeof p === 'object') {
-          if (Array.isArray(p.socratic)) out.socratic.push(...p.socratic.map(String));
-          if (Array.isArray(p.aphorisms)) out.aphorisms.push(...p.aphorisms.map(String));
-        }
-        return out;
-      }
-
-      /* ---------- Projection Renderer (profile-driven) ---------- */
-      function applyProjection(capsule, projection, withPed) {
-        const lines = [];
-
-        // Header (supports {title}/{statement})
-        const headerTpl = (projection.render && typeof projection.render.capsule_header === 'string')
-          ? projection.render.capsule_header
-          : null;
-
-        if (headerTpl && headerTpl.length > 0) {
-          lines.push(applyTemplate(headerTpl, {
-            id: capsule.id || '',
-            version: capsule.version || '',
-            domain: capsule.domain || '',
-            title: capsule.title || capsule.TITLE || '',
-            statement: capsule.statement || capsule.STATEMENT || ''
-          }).trim());
-        }
-
-        // Normalize pedagogy for consistent addressing
-        const ped = normalizePedagogy(capsule);
-
-        // Build include list; ensure pedagogy is present when forced
-        let includes = Array.isArray(projection.include) ? projection.include.slice() : [];
-        const forcePed = !!(projection && projection.force_pedagogy);
-        const hasPedInList = includes.some(s => String(s).startsWith('pedagogy.'));
-        if (forcePed && !hasPedInList) {
-          includes.push('pedagogy.socratic', 'pedagogy.aphorisms');
-        }
-
-        for (const inc of includes) {
-          const { path, sliceFrom, sliceTo } = parseInclude(inc);
-
-          // Respect UI/profile gating
-          if (!withPed && path.startsWith('pedagogy.')) continue;
-
-          let val = null;
-          if (path === 'pedagogy.socratic') val = ped.socratic;
-          else if (path === 'pedagogy.aphorisms') val = ped.aphorisms;
-          else val = getByPath(capsule, path);
-
-          if (val == null) continue;
-
-          if (Array.isArray(val)) {
-            const sub = sliceArray(val, sliceFrom, sliceTo);
-            const bulletKey = path.endsWith('socratic') ? 'socratic_bullet'
-              : path.endsWith('aphorisms') ? 'aphorism_bullet'
-                : null;
-            const bulletTpl = (projection.render && projection.render[bulletKey]) || '  - {text}';
-            for (const item of sub) lines.push(applyTemplate(bulletTpl, { text: String(item) }));
-            continue;
-          }
-
-          if (typeof val === 'string') {
-            const lineTpl = (projection.render && projection.render[`${path}_line`]) || null;
-            lines.push(lineTpl ? applyTemplate(lineTpl, { text: val }) : val);
-          }
-        }
-
-        // Footer (suppressed when empty string)
-        const footer = projection.render ? projection.render.enforcement_footer : null;
-        if (typeof footer === 'string' && footer.trim().length > 0) lines.push(footer.trim());
-
-        return lines.join("\n").trim();
-      }
-
-      /* ---------- Legacy capsule composer (only used if no projection provided) ---------- */
-      function composeLegacy(c, includePedagogy) {
-        const lines = [];
-        lines.push(
-          "BEGIN CAPSULE id=" + (c.id || '') +
-          " version=" + (c.version || '1.0.0') +
-          " domain=" + (c.domain || '') +
-          " posture=" + (c.posture || 'informational')
-        );
-        if (c.statement) lines.push("STATEMENT: " + c.statement);
-        if (includePedagogy && c.pedagogy) {
-          const ped = normalizePedagogy(c);
-          const body = []
-            .concat(ped.socratic.map(t => "Socratic: " + t))
-            .concat(ped.aphorisms.map(t => "Aphorism: " + t))
-            .join('\n');
-          if (body) lines.push('PEDAGOGY:\n' + body);
-        }
-        lines.push('END CAPSULE');
-        return lines.join("\n");
-      }
-
-      /* ---------- Main compose ---------- */
-      function compose() {
-        try {
-          const prof = (DATA && DATA.profiles && STATE.profile && DATA.profiles[STATE.profile]) || {};
-          const response = prof.response || {};
-          const projection = response.projection || {};
-          const blocks = [];
-
-          // Fragments / system
-          const overrideDefaults = !!response.override_compose_defaults;
-          const fragments = Array.isArray(response.fragments) ? response.fragments : [];
-
-          const sysFragments = fragments.filter(f => f && f.include !== false && f.kind === 'system');
-          if (sysFragments.length) {
-            for (const f of sysFragments) blocks.push(String(f.content || '').trim());
-          } else {
-            const policy = response.policy || 'Cite or abstain; follow Plan→Verify→Answer; ask ONE crisp follow-up if required.';
-            const format = response.format || 'natural';
-            const system_block = response.system_block ||
-              ("SYSTEM: Profile=" + (prof.title || 'unknown') + "\nPOLICY: " + policy + "\nFORMAT: " + format);
-            blocks.push(system_block);
-          }
-
-          const auxFragments = fragments.filter(f => f && f.include !== false && f.kind !== 'system');
-          if (auxFragments.length) {
-            for (const f of auxFragments) blocks.push(String(f.content || '').trim());
-          } else if (!overrideDefaults) {
-            // Legacy defaults only if profile does not override
-            blocks.push("SYSTEM: Truth Capsules Loader v1\nPURPOSE: Use curated capsules to scaffold reasoning and enforce acceptance rules.\nMETHOD:\n  1) Load capsule rules (below).\n  2) For each task, follow Plan → Verify → Answer.\n  3) If required fields are missing, ask ONE concise follow-up.\n  4) Cite sources or abstain. Redact PII. Validate tool JSON before calling.\n  5) Emit a JSON report when asked (see REPORT SCHEMA).\nFAILURE POLICY: If a capsule cannot be satisfied, abstain + explain what is missing.");
-            blocks.push("SYSTEM: Bootstrap Discipline\n• Curation is king - prefer curated fixtures/evidence; abstain when unsure.\n• Show your work - reference evidence in answers.\n• Make failures explicit and reversible - choose tiny experiments.");
-          }
-
-          // Heading + pedagogy policy
-          const heading = response.capsules_heading || 'SYSTEM: Capsule Rules (Selected)';
-          const wantsPedInProfile = Array.isArray(projection.include) && projection.include.some(s => String(s).startsWith('pedagogy.'));
-          const forcePed = !!(projection && projection.force_pedagogy) || !!response.force_pedagogy;
-          const withPedUI = !!($('includePed') && $('includePed').checked);
-          const withPed = forcePed || withPedUI || wantsPedInProfile;
-
-          // Robust selected ids
-          const idsCanon = getSelectedIdsSafe();
-          if (!idsCanon.length) {
-            blocks.push(heading + "\n- (No capsules selected)");
-          } else {
-            blocks.push(heading);
-            for (const canon of idsCanon) {
-              const cap = getCapsuleByAnyId(canon);
-              if (!cap) continue;
-              if (projection && projection.include) blocks.push(applyProjection(cap, projection, withPed));
-              else blocks.push(composeLegacy(cap, withPed));
-            }
-          }
-
-          // --- footer (profile-controlled) ---
-          if (typeof response.footer === 'string' && response.footer.trim().length) {
-            blocks.push(response.footer.trim());
-          }
-
-          // Markdown wrap choice: UI wins; otherwise profile default (if provided)
-          const wrapDefault = !!response.markdown_wrap_default;
-          const wrapUI = !!($('markdown') && $('markdown').checked);
-          const wrap = wrapUI || (wrapDefault && !$('markdown'));
-          let out = blocks.filter(Boolean).join("\n\n").trim();
-          if (wrap) out = "```\n" + out + "\n```";
-          $('out').value = out;
-
-        } catch (err) {
-          console.error(err);
-          $('out').value = "ERROR composing prompt: " + (err && err.message ? err.message : String(err));
-        }
-      }
-
-      /* ---------- Small templating & structure helpers ---------- */
-      function applyTemplate(tpl, dict) {
-        return String(tpl).replace(/\{([\w.]+)\}/g, (_, k) => {
-          const v = dict[k];
-          return (v === undefined || v === null) ? '' : String(v);
-        });
-      }
-      function parseInclude(spec) {
-        // e.g., "pedagogy.socratic[:2]" or "pedagogy.aphorisms[1:3]"
-        const s = String(spec);
-        const m = s.match(/^([\w.]+)(\[(?::?\d*)?(?::\d*)?\])?$/);
-        const path = m ? m[1] : s;
-        let sliceFrom = null, sliceTo = null;
-        const slice = m && m[2] ? m[2].slice(1, -1) : null;
-        if (slice != null && slice.length) {
-          const parts = slice.split(':');
-          if (parts.length === 2) {
-            sliceFrom = parts[0].length ? parseInt(parts[0], 10) : null;
-            sliceTo = parts[1].length ? parseInt(parts[1], 10) : null;
-          } else if (parts.length === 1 && parts[0].length) {
-            const idx = parseInt(parts[0], 10);
-            sliceFrom = isNaN(idx) ? null : idx;
-            sliceTo = isNaN(idx) ? null : (idx + 1);
-          }
-        }
-        return { path, sliceFrom, sliceTo };
-      }
-      function sliceArray(arr, from, to) {
-        const n = Array.isArray(arr) ? arr.length : 0;
-        const start = (from == null) ? 0 : Math.max(0, from);
-        const end = (to == null) ? n : Math.max(start, Math.min(n, to));
-        return arr.slice(start, end);
-      }
-      function getByPath(obj, path) {
-        if (!obj || !path) return null;
-        const parts = path.split('.');
-        let cur = obj;
-        for (const p of parts) {
-          if (cur == null) return null;
-          cur = cur[p];
-        }
-        return cur;
-      }
-
-      /* ------------ Manifest + share ------------ */
-
-      /* Namespace for LocalStorage manifests */
-      const MANIFEST_NS = 'tc_manifests_v1'; // value: { [name: string]: Manifest }
-
-      /* Helpers */
-      function readAllManifests() {
-        try { return JSON.parse(localStorage.getItem(MANIFEST_NS) || '{}'); }
-        catch { return {}; }
-      }
-      function writeAllManifests(obj) {
-        localStorage.setItem(MANIFEST_NS, JSON.stringify(obj || {}));
-      }
-      function listManifestNames() {
-        return Object.keys(readAllManifests()).sort((a, b) => a.localeCompare(b));
-      }
-
-      /* Filename-ish, human friendly */
-      function tsCompact(d = new Date()) {
-        const p2 = n => String(n).padStart(2, '0');
-        return [
-          d.getFullYear(),
-          p2(d.getMonth() + 1),
-          p2(d.getDate()),
-          '_',
-          p2(d.getHours()),
-          p2(d.getMinutes()),
-          p2(d.getSeconds())
-        ].join('');
-      }
-      function suggestedManifestName() {
-        const prof = STATE.profile || 'default';
-        const nCaps = STATE.order.filter(id => STATE.selectedCaps.has(id)).length;
-        return `${tsCompact()}__${prof}__n${nCaps}`;
-      }
-
-      /* Build a complete, safe-to-JSON manifest (includes the composed system prompt) */
-      function buildManifest() {
-        return {
-          schema: 'tc.manifest.v1',
-          ts: new Date().toISOString(),
-          profile: STATE.profile,
-          bundles: [...STATE.selectedBundles],
-          order: STATE.order.filter(id => STATE.selectedCaps.has(id)),
-          includePed: $('includePed').checked ? 1 : 0,
-          markdown: $('markdown').checked ? 1 : 0,
-          // Save the current composed system prompt WITHOUT markdown fences
-          prompt: getCurrentSystemPrompt()
-        };
-      }
-
-      /* Export-only (for URL deeplinks) */
-      function exportState() {
-        return {
-          profile: STATE.profile,
-          bundles: [...STATE.selectedBundles],
-          order: STATE.order.filter(id => STATE.selectedCaps.has(id))
-        };
-      }
-
-      /* Share-link (does not include prompt; keeps links light) */
-      function encodeStateToUrl() {
-        const s = btoa(unescape(encodeURIComponent(JSON.stringify(exportState()))));
-        const url = new URL(window.location.href);
-        url.searchParams.set('s', s);
-        return url.toString();
-      }
-
-      /* Import state/manifest (from file or LocalStorage). Also applies prompt after render. */
-      function importState(obj) {
-        if (!obj) return;
-
-        // Choose a valid profile (fallback to first available)
-        const prof = (obj.profile && DATA.profiles[obj.profile]) ? obj.profile
-          : (Object.keys(DATA.profiles || {})[0] || null);
-
-        STATE.profile = prof;
-        STATE.selectedBundles = new Set();
-        STATE.selectedCaps = new Set();
-        STATE.manualCaps = new Set();
-        STATE.order = [];
-
-        // Bundles → selectedCaps/ORDER
-        (obj.bundles || []).forEach(b => { if (DATA.bundles[b]) STATE.selectedBundles.add(b); });
-        STATE.selectedBundles.forEach(b => {
-          const caps = (DATA.bundles[b] && DATA.bundles[b].capsules) || [];
-          caps.forEach(cid => {
-            if (DATA.capsules[cid]) {
-              STATE.selectedCaps.add(cid);
-              if (!STATE.order.includes(cid)) STATE.order.push(cid);
-            }
-          });
-        });
-
-        // Manual order/caps (explicit)
-        (obj.order || []).forEach(cid => {
-          if (DATA.capsules[cid]) {
-            if (!STATE.order.includes(cid)) STATE.order.push(cid);
-            STATE.selectedCaps.add(cid);
-          }
-        });
-
-        // Render everything (this will call compose(), which would normally overwrite #out)
-        render();
-
-        // Restore checkboxes from the manifest (optional, but nice to have)
-        if (Object.prototype.hasOwnProperty.call(obj, 'includePed')) {
-          $('includePed').checked = !!obj.includePed;
-        }
-        if (Object.prototype.hasOwnProperty.call(obj, 'markdown')) {
-          $('markdown').checked = !!obj.markdown;
-        }
-
-        // Apply prompt AFTER render/compose so the loaded prompt wins on load
-        if (typeof obj.prompt === 'string') {
-          $('out').value = obj.prompt;
-        }
-
-        // Update the profile select’s remembered value for future sessions
-        if (STATE.profile) localStorage.setItem('tc_profile', STATE.profile);
-      }
-
-      /* Hydrate state from ?s=... link */
-      function tryHydrateFromUrl() {
-        const url = new URL(window.location.href);
-        const s = url.searchParams.get('s');
-        if (!s) return;
-        try {
-          const json = decodeURIComponent(escape(atob(s)));
-          importState(JSON.parse(json));
-        } catch (e) {
-          console.error('bad s param', e);
-        }
-      }
-
-      /* LocalStorage manifests – UI binding */
-      function refreshManifestSelect() {
-        const sel = $('manifestSelect');
-        if (!sel) return;
-        sel.innerHTML = '';
-        const names = listManifestNames();
-        if (names.length === 0) {
-          const opt = document.createElement('option');
-          opt.value = '';
-          opt.textContent = '(no saved manifests)';
-          sel.appendChild(opt);
-          sel.disabled = true;
-        } else {
-          sel.disabled = false;
-          names.forEach(n => {
-            const opt = document.createElement('option');
-            opt.value = n;
-            opt.textContent = n;
-            sel.appendChild(opt);
-          });
-        }
-      }
-
-      function saveManifestToLocalStorage() {
-        const manifest = buildManifest();
-        const defaultName = suggestedManifestName();
-        const name = prompt('Save manifest as:', defaultName);
-        if (!name) return;
-
-        const all = readAllManifests();
-        const exists = Object.prototype.hasOwnProperty.call(all, name);
-        if (exists) {
-          const ok = confirm(`A manifest named "${name}" already exists. Overwrite?`);
-          if (!ok) return;
-        }
-
-        all[name] = manifest;
-        writeAllManifests(all);
-        refreshManifestSelect();
-        // Preselect the saved item
-        const sel = $('manifestSelect');
-        if (sel && !sel.disabled) sel.value = name;
-        toast(`Saved manifest "${name}"`);
-      }
-
-      function loadSelectedManifestFromLocalStorage() {
-        const sel = $('manifestSelect');
-        if (!sel || sel.disabled || !sel.value) {
-          toast('No saved manifest selected');
-          return;
-        }
-        const all = readAllManifests();
-        const m = all[sel.value];
-        if (!m) { toast('Manifest not found'); return; }
-        importState(m);
-        toast(`Loaded "${sel.value}"`);
-      }
-
-      function deleteSelectedManifestFromLocalStorage() {
-        const sel = $('manifestSelect');
-        if (!sel || sel.disabled || !sel.value) {
-          toast('No saved manifest selected');
-          return;
-        }
-        const name = sel.value;
-        const ok = confirm(`Delete saved manifest "${name}"? This cannot be undone.`);
-        if (!ok) return;
-
-        const all = readAllManifests();
-        delete all[name];
-        writeAllManifests(all);
-        refreshManifestSelect();
-        toast(`Deleted "${name}"`);
-      }
-
-      /* Wire buttons (file import already exists, we keep it) */
-      $('dlJsonBtn').addEventListener('click', () => {
-        const blob = new Blob([JSON.stringify(buildManifest(), null, 2)], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'system_prompt.manifest.json';
-        a.click();
-      });
-
-      $('loadJsonBtn').addEventListener('click', () => {
-        const inp = document.createElement('input');
-        inp.type = 'file';
-        inp.accept = 'application/json';
-        inp.onchange = async () => {
-          const f = inp.files[0];
-          if (!f) return;
-          try {
-            const txt = await f.text();
-            const obj = JSON.parse(txt);
-            importState(obj);
-            toast('Manifest loaded from file');
-          } catch (e) {
-            console.error(e);
-            toast('Invalid JSON manifest');
-          }
-        };
-        inp.click();
-      });
-
-      /* New LS controls */
-      $('manifestSaveBtn').addEventListener('click', saveManifestToLocalStorage);
-      $('manifestLoadBtn').addEventListener('click', loadSelectedManifestFromLocalStorage);
-      $('manifestDeleteBtn').addEventListener('click', deleteSelectedManifestFromLocalStorage);
-
-      /* Populate the manifest list on load */
-      window.addEventListener('load', refreshManifestSelect);
-
-
-      /* ------------ LLM Command Composition ------------ */
-      function shQuoteLiteral(s) {
-        // POSIX-safe single-quote wrapper: ' becomes '\''
-        return "'" + String(s).replace(/'/g, "'\\''") + "'";
-      }
-
-      function buildSysHeredoc(promptText) {
-        // Use single-quoted heredoc label to disable interpolation/globbing
-        // Use TC_SYSTEM to avoid conflicts with user's shell variables
-        const label = "__TC_SYSTEM__";
-        return [
-          `read -r -d '' TC_SYSTEM <<'${label}'`,
-          promptText,
-          label
-        ].join("\n");
-      }
-
-      function buildInputFragment(tpl, userText, filePath) {
-        const flags = (tpl.extra_flags || []).join(' ');
-
-        if (tpl.input_mode === 'arg') {
-          return {
-            EXTRA_FLAGS: flags,
-            INPUT_FRAGMENT: `<<< ${shQuoteLiteral(userText || "")}`
-          };
-        }
-
-        if (tpl.input_mode === 'stdin') {
-          return {
-            EXTRA_FLAGS: flags,
-            STDIN_PIPE: `printf %s ${shQuoteLiteral(userText || "")} |`,
-            INPUT_FRAGMENT: ""
-          };
-        }
-
-        if (tpl.input_mode === 'file') {
-          return {
-            EXTRA_FLAGS: flags,
-            FILE_PATH: shQuoteLiteral(filePath || "input.txt"),
-            INPUT_FRAGMENT: ""
-          };
-        }
-
-        return { EXTRA_FLAGS: flags, INPUT_FRAGMENT: "" };
-      }
-
-      function composeLlmCommand(tpl, systemPrompt, userText, filePath, minify) {
-        const sysText = minify ? systemPrompt.replace(/\s+/g, ' ').trim() : systemPrompt;
-        const sysHeredoc = buildSysHeredoc(sysText);
-        const frags = buildInputFragment(tpl, userText, filePath);
-
-        // Build the command by replacing all placeholders
-        let cmd = String(tpl.cmd_template || '');
-
-        // Replace required placeholders
-        cmd = cmd.replace(/\{\{SYS_HEREDOC\}\}/g, sysHeredoc);
-        cmd = cmd.replace(/\{\{MODEL\}\}/g, tpl.model || '');
-        cmd = cmd.replace(/\{\{INPUT_FRAGMENT\}\}/g, frags.INPUT_FRAGMENT || '');
-
-        // Replace optional placeholders
-        cmd = cmd.replace(/\{\{EXTRA_FLAGS\}\}/g, frags.EXTRA_FLAGS || '');
-        cmd = cmd.replace(/\{\{STDIN_PIPE\}\}/g, frags.STDIN_PIPE || '');
-        cmd = cmd.replace(/\{\{FILE_PATH\}\}/g, frags.FILE_PATH || '');
-
-        // Clean up:
-        // 1. Collapse multiple spaces into single space
-        cmd = cmd.replace(/ {2,}/g, ' ');
-        // 2. Remove trailing spaces on lines
-        cmd = cmd.replace(/[ \t]+$/gm, '');
-        // 3. Ensure final newline
-        cmd = cmd.trim() + "\n";
-
-        return cmd;
-      }
-
-      function getCurrentSystemPrompt() {
-        // Get the current composed prompt, stripping markdown fences if present
-        let prompt = $('out').value;
-        if ($('markdown').checked) {
-          // Remove leading ``` and trailing ```
-          prompt = prompt.replace(/^```\n/, '').replace(/\n```$/, '');
-        }
-        return prompt;
-      }
-
-      function updateLlmPreview() {
-        const templates = DATA.llm_templates || [];
-        const selectedId = $('llm_template').value;
-        const tpl = templates.find(t => t.id === selectedId);
-
-        if (!tpl) {
-          $('llm_preview').value = '';
-          return;
-        }
-
-        const systemPrompt = getCurrentSystemPrompt();
-        const userText = $('llm_user_input').value;
-        const filePath = $('llm_file_path').value;
-        const minify = $('llm_minify').checked;
-
-        const command = composeLlmCommand(tpl, systemPrompt, userText, filePath, minify);
-        $('llm_preview').value = command;
-      }
-
-      function openLlmModal() {
-        const templates = DATA.llm_templates || [];
-
-        if (templates.length === 0) {
-          toast('No LLM templates found');
-          return;
-        }
-
-        // Populate template selector
-        const sel = $('llm_template');
-        sel.innerHTML = '';
-        templates.forEach(tpl => {
-          const opt = document.createElement('option');
-          opt.value = tpl.id;
-          opt.textContent = tpl.label;
-          sel.appendChild(opt);
-        });
-
-        // Restore last used template from localStorage
-        const lastTemplate = localStorage.getItem('llm_last_template');
-        if (lastTemplate && templates.find(t => t.id === lastTemplate)) {
-          sel.value = lastTemplate;
-        }
-
-        // Update description and input mode on template change
-        const updateTemplateUI = () => {
-          const selectedId = sel.value;
-          const tpl = templates.find(t => t.id === selectedId);
-          if (!tpl) return;
-
-          $('llm_template_desc').textContent = tpl.description || '';
-
-          // Show/hide input fields based on input_mode
-          if (tpl.input_mode === 'file') {
-            $('llm_input_row').style.display = 'none';
-            $('llm_file_row').style.display = 'flex';
-          } else {
-            $('llm_input_row').style.display = 'flex';
-            $('llm_file_row').style.display = 'none';
-
-            if (tpl.input_mode === 'stdin') {
-              $('llm_input_hint').textContent = 'Will be piped to stdin';
-            } else {
-              $('llm_input_hint').textContent = 'Will be passed as bash here-string (<<<)';
-            }
-          }
-
-          // Update preview whenever template changes
-          updateLlmPreview();
-        };
-
-        sel.onchange = updateTemplateUI;
-
-        // Update preview on input changes
-        $('llm_user_input').oninput = updateLlmPreview;
-        $('llm_file_path').oninput = updateLlmPreview;
-        $('llm_minify').onchange = updateLlmPreview;
-
-        updateTemplateUI();
-
-        // Clear inputs (but preserve file path default)
-        $('llm_user_input').value = '';
-        $('llm_file_path').value = 'input.txt';
-        $('llm_minify').checked = false;
-
-        // Initial preview
-        updateLlmPreview();
-
-        $('llmModal').style.display = 'flex';
-      }
-
-      function closeLlmModal() {
-        $('llmModal').style.display = 'none';
-      }
-
-      function copyLlmCommand() {
-        const command = $('llm_preview').value;
-
-        if (!command) {
-          toast('No command to copy');
-          return;
-        }
-
-        // Save the selected template to localStorage
-        const selectedId = $('llm_template').value;
-        if (selectedId) {
-          localStorage.setItem('llm_last_template', selectedId);
-        }
-
-        navigator.clipboard.writeText(command).then(() => {
-          toast('Command copied to clipboard!');
-          // Don't close the modal - let user copy again or review
-        }).catch(err => {
-          console.error('Copy failed:', err);
-          toast('Copy failed - see console');
-        });
-      }
-
-      // Save the generated command as a runnable bash script
-      function saveLlmScript() {
-        const command = $('llm_preview').value;
-        if (!command) {
-          toast('No command to save');
-          return;
-        }
-
-        const tplId = $('llm_template').value || 'cmd';
-        const nowIso = new Date().toISOString();
-        const filename = `llm_${tplId}_${nowIso.replace(/[:.]/g, '-')}.sh`;
-
-        const header =
-          `#!/usr/bin/env bash
+    });
+  });
+
+  (obj.order || []).forEach(cid => {
+    if (DATA.capsules && DATA.capsules[cid]) {
+      if (!STATE.order.includes(cid)) STATE.order.push(cid);
+      STATE.selectedCaps.add(cid);
+    }
+  });
+
+  render(); // render will compose
+
+  if (Object.prototype.hasOwnProperty.call(obj, 'includePed') && $('includePed')) {
+    $('includePed').checked = !!obj.includePed;
+  }
+  if (Object.prototype.hasOwnProperty.call(obj, 'markdown') && $('markdown')) {
+    $('markdown').checked = !!obj.markdown;
+  }
+  if (typeof obj.prompt === 'string') $('out').value = obj.prompt;
+
+  if (STATE.profile) localStorage.setItem('tc_profile', STATE.profile);
+}
+function tryHydrateFromUrl() {
+  const url = new URL(window.location.href);
+  const s = url.searchParams.get('s');
+  if (!s) return;
+  try {
+    const json = decodeURIComponent(escape(atob(s)));
+    importState(JSON.parse(json));
+  } catch (e) { console.error('bad s param', e); }
+}
+function refreshManifestSelect() {
+  const sel = $('manifestSelect'); if (!sel) return;
+  sel.innerHTML = '';
+  const names = listManifestNames();
+  if (names.length === 0) {
+    const opt = document.createElement('option'); opt.value=''; opt.textContent='(no saved manifests)';
+    sel.appendChild(opt); sel.disabled = true;
+  } else {
+    sel.disabled = false;
+    names.forEach(n => { const opt = document.createElement('option'); opt.value = n; opt.textContent = n; sel.appendChild(opt); });
+  }
+}
+function saveManifestToLocalStorage() {
+  const manifest = buildManifest();
+  const defaultName = suggestedManifestName();
+  const name = prompt('Save manifest as:', defaultName);
+  if (!name) return;
+  const all = readAllManifests();
+  const exists = Object.prototype.hasOwnProperty.call(all, name);
+  if (exists && !confirm(`A manifest named "${name}" already exists. Overwrite?`)) return;
+  all[name] = manifest; writeAllManifests(all); refreshManifestSelect();
+  const sel = $('manifestSelect'); if (sel && !sel.disabled) sel.value = name;
+  toast(`Saved manifest "${name}"`);
+}
+function loadSelectedManifestFromLocalStorage() {
+  const sel = $('manifestSelect');
+  if (!sel || sel.disabled || !sel.value) { toast('No saved manifest selected'); return; }
+  const all = readAllManifests();
+  const m = all[sel.value];
+  if (!m) { toast('Manifest not found'); return; }
+  importState(m);
+  toast(`Loaded "${sel.value}"`);
+}
+function deleteSelectedManifestFromLocalStorage() {
+  const sel = $('manifestSelect');
+  if (!sel || sel.disabled || !sel.value) { toast('No saved manifest selected'); return; }
+  const name = sel.value;
+  if (!confirm(`Delete saved manifest "${name}"? This cannot be undone.`)) return;
+  const all = readAllManifests(); delete all[name]; writeAllManifests(all);
+  refreshManifestSelect(); toast(`Deleted "${name}"`);
+}
+
+/* ---------- LLM Modal ---------- */
+function shQuoteLiteral(s) { return "'" + String(s).replace(/'/g, "'\\''") + "'"; }
+function buildSysHeredoc(promptText) {
+  const label = "__TC_SYSTEM__";
+  return [`read -r -d '' TC_SYSTEM <<'${label}'`, promptText, label].join("\n");
+}
+function buildInputFragment(tpl, userText, filePath) {
+  const flags = (tpl.extra_flags || []).join(' ');
+  if (tpl.input_mode === 'arg') {
+    return { EXTRA_FLAGS: flags, INPUT_FRAGMENT: `<<< ${shQuoteLiteral(userText || "")}` };
+  }
+  if (tpl.input_mode === 'stdin') {
+    return { EXTRA_FLAGS: flags, STDIN_PIPE: `printf %s ${shQuoteLiteral(userText || "")} |`, INPUT_FRAGMENT: "" };
+  }
+  if (tpl.input_mode === 'file') {
+    return { EXTRA_FLAGS: flags, FILE_PATH: shQuoteLiteral(filePath || "input.txt"), INPUT_FRAGMENT: "" };
+  }
+  return { EXTRA_FLAGS: flags, INPUT_FRAGMENT: "" };
+}
+function composeLlmCommand(tpl, systemPrompt, userText, filePath, minify) {
+  const sysText = minify ? systemPrompt.replace(/\s+/g, ' ').trim() : systemPrompt;
+  const sysHeredoc = buildSysHeredoc(sysText);
+  const frags = buildInputFragment(tpl, userText, filePath);
+  let cmd = String(tpl.cmd_template || '');
+  cmd = cmd.replace(/\{\{SYS_HEREDOC\}\}/g, sysHeredoc)
+           .replace(/\{\{MODEL\}\}/g, tpl.model || '')
+           .replace(/\{\{INPUT_FRAGMENT\}\}/g, frags.INPUT_FRAGMENT || '')
+           .replace(/\{\{EXTRA_FLAGS\}\}/g, frags.EXTRA_FLAGS || '')
+           .replace(/\{\{STDIN_PIPE\}\}/g, frags.STDIN_PIPE || '')
+           .replace(/\{\{FILE_PATH\}\}/g, frags.FILE_PATH || '');
+  cmd = cmd.replace(/ {2,}/g, ' ').replace(/[ \t]+$/gm, '');
+  return cmd.trim() + "\n";
+}
+function updateLlmPreview() {
+  const templates = DATA.llm_templates || [];
+  const selectedId = $('llm_template').value;
+  const tpl = templates.find(t => t.id === selectedId);
+  if (!tpl) { $('llm_preview').value = ''; return; }
+  const systemPrompt = getCurrentSystemPrompt();
+  const userText = $('llm_user_input').value;
+  const filePath = $('llm_file_path').value;
+  const minify = $('llm_minify').checked;
+  const command = composeLlmCommand(tpl, systemPrompt, userText, filePath, minify);
+  $('llm_preview').value = command;
+}
+function openLlmModal() {
+  const templates = DATA.llm_templates || [];
+  if (templates.length === 0) { toast('No LLM templates found'); return; }
+
+  const sel = $('llm_template'); sel.innerHTML = '';
+  templates.forEach(tpl => { const opt = document.createElement('option'); opt.value = tpl.id; opt.textContent = tpl.label; sel.appendChild(opt); });
+
+  const lastTemplate = localStorage.getItem('llm_last_template');
+  if (lastTemplate && templates.find(t => t.id === lastTemplate)) sel.value = lastTemplate;
+
+  const updateTemplateUI = () => {
+    const selectedId = sel.value;
+    const tpl = templates.find(t => t.id === selectedId);
+    if (!tpl) return;
+    $('llm_template_desc').textContent = tpl.description || '';
+    if (tpl.input_mode === 'file') {
+      $('llm_input_row').style.display = 'none';
+      $('llm_file_row').style.display  = 'flex';
+    } else {
+      $('llm_input_row').style.display = 'flex';
+      $('llm_file_row').style.display  = 'none';
+      $('llm_input_hint').textContent = (tpl.input_mode === 'stdin') ? 'Will be piped to stdin' : 'Will be passed as bash here-string (<<<)';
+    }
+    updateLlmPreview();
+  };
+
+  sel.onchange = updateTemplateUI;
+  $('llm_user_input').oninput = updateLlmPreview;
+  $('llm_file_path').oninput = updateLlmPreview;
+  $('llm_minify').onchange   = updateLlmPreview;
+
+  $('llm_user_input').value = '';
+  $('llm_file_path').value  = 'input.txt';
+  $('llm_minify').checked   = false;
+
+  updateTemplateUI();
+  $('llmModal').style.display = 'flex';
+}
+function closeLlmModal() { $('llmModal').style.display = 'none'; }
+function copyLlmCommand() {
+  const command = $('llm_preview').value;
+  if (!command) { toast('No command to copy'); return; }
+  const selectedId = $('llm_template').value;
+  if (selectedId) localStorage.setItem('llm_last_template', selectedId);
+  navigator.clipboard.writeText(command).then(() => toast('Command copied to clipboard!'))
+    .catch(err => { console.error('Copy failed:', err); toast('Copy failed - see console'); });
+}
+function saveLlmScript() {
+  const command = $('llm_preview').value;
+  if (!command) { toast('No command to save'); return; }
+  const tplId = $('llm_template').value || 'cmd';
+  const nowIso = new Date().toISOString();
+  const filename = `llm_${tplId}_${nowIso.replace(/[:.]/g, '-')}.sh`;
+  const header =
+`#!/usr/bin/env bash
 # Generated by Truth Capsule Composer
 # Template: ${tplId}
 # Date: ${nowIso}
@@ -3014,346 +2625,266 @@ set -Eeuo pipefail
 IFS=$'\\n\\t'
 
 `;
+  const blob = new Blob([header, command], { type: 'text/x-shellscript' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  a.remove();
+  toast(`Saved ${filename} (remember: chmod +x ${filename})`);
+}
 
-        const blob = new Blob([header, command], { type: 'text/x-shellscript' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-        a.remove();
-        toast(`Saved ${filename} (remember: chmod +x ${filename})`);
-      }
-      function copyLlmCommand() {
-        const command = $('llm_preview').value;
+/* ---------- Split panes + Collapsers ---------- */
+function getSubGutter() {
+  return document.querySelector('#bundlesWrap + .gutter.gutter-vertical')
+      || document.querySelector('.gutter.gutter-vertical');
+}
+function updateGutterVisibility() {
+  if (!window.__subsplit) return;
+  const gutter = getSubGutter(); if (!gutter) return;
+  const [topPct, botPct] = window.__subsplit.getSizes();
+  const hidden = (topPct <= 0.5) || (botPct <= 0.5);
+  gutter.classList.toggle('is-hidden', hidden);
+}
+function setBundlesOpen(open, opts={}) {
+  const wrap = $('bundlesWrap'); const other = $('capsulesWrap');
+  if (!wrap || !other) return;
+  const last = Number(localStorage.getItem('tc_bundles_height') || '45');
+  if (open) {
+    wrap.classList.remove('is-collapsed');
+    if (window.__subsplit) {
+      const target = Number.isFinite(last) ? Math.min(Math.max(last, 10), 90) : 45;
+      window.__subsplit.setSizes([target, 100 - target]);
+      localStorage.setItem('tc_split_sub', JSON.stringify([target, 100 - target]));
+    }
+    localStorage.setItem('tc_bundles_open', '1');
+  } else {
+    if (window.__subsplit) {
+      const [curTop] = window.__subsplit.getSizes();
+      localStorage.setItem('tc_bundles_height', String(curTop));
+      window.__subsplit.setSizes([0, 100]);
+      localStorage.setItem('tc_split_sub', JSON.stringify([0, 100]));
+    }
+    wrap.classList.add('is-collapsed');
+    localStorage.setItem('tc_bundles_open', '0');
+  }
+  if (!opts.silent) updateGutterVisibility();
+}
+function setCapsulesOpen(open, opts={}) {
+  const wrap = $('capsulesWrap');
+  if (!wrap) return;
+  const bodyNodes = Array.from(wrap.children).filter(n => !n.classList.contains('section-title'));
+  const last = Number(localStorage.getItem('tc_capsules_height') || '55');
+  if (open) {
+    wrap.classList.remove('is-collapsed');
+    bodyNodes.forEach(n => n.hidden = false);
+    if (window.__subsplit) {
+      const target = Number.isFinite(last) ? Math.min(Math.max(last, 10), 90) : 55;
+      window.__subsplit.setSizes([100 - target, target]);
+      localStorage.setItem('tc_split_sub', JSON.stringify([100 - target, target]));
+    }
+    localStorage.setItem('tc_capsules_open', '1');
+  } else {
+    bodyNodes.forEach(n => n.hidden = true);
+    if (window.__subsplit) {
+      const [, curBot] = window.__subsplit.getSizes();
+      localStorage.setItem('tc_capsules_height', String(curBot));
+      window.__subsplit.setSizes([100, 0]);
+      localStorage.setItem('tc_split_sub', JSON.stringify([100, 0]));
+    }
+    wrap.classList.add('is-collapsed');
+    localStorage.setItem('tc_capsules_open', '0');
+  }
+  if (!opts.silent) updateGutterVisibility();
+}
 
-        if (!command) {
-          toast('No command to copy');
-          return;
-        }
+/* ---------- Details menus closer ---------- */
+(function menuCloser() {
+  const menus = () => Array.from(document.querySelectorAll('details.menu'));
+  function closeAll(except = null) { menus().forEach(d => { if (d !== except) d.removeAttribute('open'); }); }
 
-        // Save the selected template to localStorage
-        const selectedId = $('llm_template').value;
-        if (selectedId) {
-          localStorage.setItem('llm_last_template', selectedId);
-        }
+  document.addEventListener('click', (e) => {
+    const keep = e.target.closest('details.menu');
+    closeAll(keep || null);
+  });
 
-        navigator.clipboard.writeText(command).then(() => {
-          toast('Command copied to clipboard!');
-          // Don't close the modal - let user copy again or review
-        }).catch(err => {
-          console.error('Copy failed:', err);
-          toast('Copy failed - see console');
-        });
-      }
+  document.addEventListener('toggle', (e) => {
+    const el = e.target;
+    if (el instanceof HTMLDetailsElement && el.classList.contains('menu') && el.open) {
+      closeAll(el);
+    }
+  }, true);
 
-      // Wire up LLM modal events
-      $('copyLlmBtn').addEventListener('click', openLlmModal);
-      $('llm_close').addEventListener('click', closeLlmModal);
-      $('llm_cancel').addEventListener('click', closeLlmModal);
-      $('llm_copy').addEventListener('click', copyLlmCommand);
-      $('llm_save').addEventListener('click', saveLlmScript)
-      $('llmModal').addEventListener('click', e => {
-        if (e.target && e.target.id === 'llmModal') closeLlmModal();
-      });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAll(); });
 
-      /* ------------ Wire up UI ------------ */
-      $('search').addEventListener('input', () => { STATE.filter = $('search').value; renderCapsules(); });
-      $('clearBtn').addEventListener('click', () => { STATE.selectedBundles = new Set(); STATE.selectedCaps = new Set(); STATE.manualCaps = new Set(); STATE.order = []; render(); toast('Cleared'); });
-      $('composeBtn').addEventListener('click', compose);
-      $('copyBtn').addEventListener('click', () => { navigator.clipboard.writeText($('out').value); toast('Prompt copied'); });
-      $('dlBtn').addEventListener('click', () => { const blob = new Blob([$('out').value], { type: 'text/plain' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'system_prompt.txt'; a.click(); });
-      $('dlJsonBtn').addEventListener('click', () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(buildManifest(), null, 2)], { type: 'application/json' })); a.download = 'system_prompt.manifest.json'; a.click(); });
-      $('shareLinkBtn').addEventListener('click', () => { const url = encodeStateToUrl(); navigator.clipboard.writeText(url).then(() => toast('Share link copied')).catch(() => { prompt('Copy link:', url); }); });
-      $('loadJsonBtn').addEventListener('click', () => { const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'application/json'; inp.onchange = async () => { const f = inp.files[0]; if (!f) return; const txt = await f.text(); importState(JSON.parse(txt)); toast('State loaded'); }; inp.click(); });
-      $('validateAllBtn').addEventListener('click', async () => {
-        const ids = STATE.order.filter(id => STATE.selectedCaps.has(id)); const results = [];
-        for (const id of ids) { const c = DATA.capsules[id]; if (!c) continue; const v = await validateDigest(c); results.push({ id, ok: v.ok }); }
-        const ok = results.filter(r => r.ok).length; const fail = results.length - ok;
-        toast(`Digests: ${ok} ok, ${fail} fail`); try { await navigator.clipboard.writeText(results.map(r => (r.ok ? '✓ ' : '✗ ') + r.id).join('\n')); } catch { }
-      });
-      $('includePed').addEventListener('change', compose);
-      $('markdown').addEventListener('change', compose);
+  document.addEventListener('click', (e) => {
+    const item = e.target.closest('.menu-item');
+    if (!item) return;
+    const d = item.closest('details.menu');
+    if (d) setTimeout(() => d.removeAttribute('open'), 0);
+  });
+})();
 
-      /* Keyboard shortcuts */
-      document.addEventListener('keydown', (e) => {
-        if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { compose(); }
-        if (e.key === '/') { e.preventDefault(); $('search').focus(); }
-        if (e.key === 'm') { $('markdown').checked = !$('markdown').checked; compose(); }
-        if (e.key === 'p') { $('includePed').checked = !$('includePed').checked; compose(); }
-      });
+/* ---------- Help modal ('?' shortcut) ---------- */
+(function helpModal() {
+  const modal = $('helpModal'); const btn = $('helpBtn');
+  if (!modal) return;
+  let lastFocus = null;
 
-      function render() { renderProfiles(); renderBundles(); renderCapsules(); renderPreview(); compose(); }
-      render();
-      tryHydrateFromUrl();
-      initBundlesCollapsibleSimple();
+  function open() {
+    lastFocus = document.activeElement;
+    modal.hidden = false; modal.setAttribute('aria-hidden', 'false');
+    const first = modal.querySelector('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
+    (first || modal).focus();
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('click', onOutside, true);
+  }
+  function close() {
+    modal.hidden = true; modal.setAttribute('aria-hidden', 'true');
+    document.removeEventListener('keydown', onKey);
+    document.removeEventListener('click', onOutside, true);
+    if (lastFocus) lastFocus.focus();
+  }
+  function onKey(e) {
+    if (e.key === 'Escape') close();
+    if ((e.key === '?') || (e.key === '/' && e.shiftKey)) {
+      const t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      e.preventDefault(); e.stopPropagation();
+      if (modal.hidden) open();
+    }
+  }
+  function onOutside(e) {
+    if (e.target.closest('[data-close]')) { e.preventDefault(); close(); return; }
+    if (!e.target.closest('.modal-card') && !modal.hidden) close();
+  }
+  if (btn) btn.addEventListener('click', open);
+  document.addEventListener('keydown', onKey);
+})();
 
-      // Remember splits
-      const mainSizes = JSON.parse(localStorage.getItem('tc_split_main') || '[40,60]');
-      Split(['#left', '#right'], { sizes: mainSizes, minSize: 240, gutterSize: 8, onDragEnd: s => localStorage.setItem('tc_split_main', JSON.stringify(s)) });
+/* ---------- UI wiring ---------- */
+if ($('search')) $('search').addEventListener('input', () => { STATE.filter = $('search').value; renderCapsules(); });
+if ($('clearBtn')) $('clearBtn').addEventListener('click', () => {
+  STATE.selectedBundles = new Set(); STATE.selectedCaps = new Set(); STATE.manualCaps = new Set(); STATE.order = [];
+  render(); toast('Cleared');
+});
+if ($('composeBtn')) $('composeBtn').addEventListener('click', compose);
+if ($('copyBtn')) $('copyBtn').addEventListener('click', () => { navigator.clipboard.writeText($('out').value); toast('Prompt copied'); });
+if ($('dlBtn')) $('dlBtn').addEventListener('click', () => {
+  const blob = new Blob([$('out').value], { type: 'text/plain' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'system_prompt.txt'; a.click();
+});
+if ($('dlJsonBtn')) $('dlJsonBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(buildManifest(), null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'system_prompt.manifest.json'; a.click();
+});
+if ($('shareLinkBtn')) $('shareLinkBtn').addEventListener('click', () => {
+  const url = encodeStateToUrl();
+  navigator.clipboard.writeText(url).then(() => toast('Share link copied')).catch(() => { prompt('Copy link:', url); });
+});
+if ($('loadJsonBtn')) $('loadJsonBtn').addEventListener('click', () => {
+  const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'application/json';
+  inp.onchange = async () => {
+    const f = inp.files[0]; if (!f) return;
+    try { importState(JSON.parse(await f.text())); toast('Manifest loaded'); }
+    catch (e) { console.error(e); toast('Invalid JSON manifest'); }
+  };
+  inp.click();
+});
+if ($('validateAllBtn')) $('validateAllBtn').addEventListener('click', async () => {
+  const ids = STATE.order.filter(id => STATE.selectedCaps.has(id));
+  const results = [];
+  for (const id of ids) { const c = DATA.capsules[id]; if (!c) continue; const v = await validateDigest(c); results.push({ id, ok: v.ok }); }
+  const ok = results.filter(r => r.ok).length; const fail = results.length - ok;
+  toast(`Digests: ${ok} ok, ${fail} fail`);
+  try { await navigator.clipboard.writeText(results.map(r => (r.ok ? '✓ ' : '✗ ') + r.id).join('\n')); } catch {}
+});
+if ($('includePed')) $('includePed').addEventListener('change', () => { localStorage.setItem('tc_inc_ped', $('includePed').checked ? '1' : '0'); compose(); });
+if ($('markdown'))  $('markdown').addEventListener('change', () => { localStorage.setItem('tc_md', $('markdown').checked ? '1' : '0'); compose(); });
 
-      const subSizes = JSON.parse(localStorage.getItem('tc_split_sub') || '[45,55]');
-      window.__subsplit = Split(
-        ['#bundlesWrap', '#capsulesWrap'],
-        {
-          direction: 'vertical',
-          sizes: subSizes,
-          minSize: [0, 120],                // allow collapsing bundles pane to 0
-          gutterSize: 8,
-          onDragEnd: s => localStorage.setItem('tc_split_sub', JSON.stringify(s))
-        }
-      );
-      // Remember profile + checkboxes
-      $('profiles').addEventListener('change', () => localStorage.setItem('tc_profile', $('profiles').value));
-      $('includePed').addEventListener('change', () => localStorage.setItem('tc_inc_ped', $('includePed').checked ? '1' : '0'));
-      $('markdown').addEventListener('change', () => localStorage.setItem('tc_md', $('markdown').checked ? '1' : '0'));
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') compose();
+  if (e.key === '/') { e.preventDefault(); $('search')?.focus(); }
+  if (e.key === 'm' && $('markdown')) { $('markdown').checked = !$('markdown').checked; compose(); }
+  if (e.key === 'p' && $('includePed')) { $('includePed').checked = !$('includePed').checked; compose(); }
+});
 
-      function getGutter() {
-        // gutter sits between the two panes
-        return document.querySelector('#bundlesWrap + .gutter.gutter-vertical')
-            || document.querySelector('.gutter.gutter-vertical');
-      }
+/* Expand/collapse all domain groups */
+if ($('expandAllBtn'))   $('expandAllBtn').addEventListener('click', () => {
+  document.querySelectorAll('#capsules details.domain-group').forEach(d => { d.open = true; setDomainOpen(d.dataset.domain || (d.querySelector('.domain-title')?.textContent || 'misc'), true); });
+});
+if ($('collapseAllBtn')) $('collapseAllBtn').addEventListener('click', () => {
+  document.querySelectorAll('#capsules details.domain-group').forEach(d => { d.open = false; setDomainOpen(d.dataset.domain || (d.querySelector('.domain-title')?.textContent || 'misc'), false); });
+});
 
-      function updateGutterVisibility() {
-        if (!window.__subsplit) return;
-        const gutter = getGutter();
-        if (!gutter) return;
-        const [topPct, botPct] = window.__subsplit.getSizes();
-        const hidden = (topPct <= 0.5) || (botPct <= 0.5);
-        gutter.classList.toggle('is-hidden', hidden);
-      }
+/* LLM modal wires */
+if ($('copyLlmBtn')) $('copyLlmBtn').addEventListener('click', openLlmModal);
+if ($('llm_close'))  $('llm_close').addEventListener('click', closeLlmModal);
+if ($('llm_cancel')) $('llm_cancel').addEventListener('click', closeLlmModal);
+if ($('llm_copy'))   $('llm_copy').addEventListener('click', copyLlmCommand);
+if ($('llm_save'))   $('llm_save').addEventListener('click', saveLlmScript);
+if ($('llmModal'))   $('llmModal').addEventListener('click', e => { if (e.target && e.target.id === 'llmModal') closeLlmModal(); });
 
-      function setBundlesOpen(open, opts={}) {
-        const wrap = document.getElementById('bundlesWrap');
-        const other = document.getElementById('capsulesWrap');
-        if (!wrap || !other) return;
+/* Manifest LS wires */
+if ($('manifestSaveBtn'))   $('manifestSaveBtn').addEventListener('click', saveManifestToLocalStorage);
+if ($('manifestLoadBtn'))   $('manifestLoadBtn').addEventListener('click', loadSelectedManifestFromLocalStorage);
+if ($('manifestDeleteBtn')) $('manifestDeleteBtn').addEventListener('click', deleteSelectedManifestFromLocalStorage);
+window.addEventListener('load', refreshManifestSelect);
 
-        const last = Number(localStorage.getItem('tc_bundles_height') || '45'); // %
-        if (open) {
-          wrap.classList.remove('is-collapsed');
-          if (window.__subsplit) {
-            const target = Number.isFinite(last) ? Math.min(Math.max(last, 10), 90) : 45;
-            window.__subsplit.setSizes([target, 100 - target]);
-            localStorage.setItem('tc_split_sub', JSON.stringify([target, 100 - target]));
-          }
-          localStorage.setItem('tc_bundles_open', '1');
-        } else {
-          // remember then collapse to 0
-          if (window.__subsplit) {
-            const [curTop] = window.__subsplit.getSizes();
-            localStorage.setItem('tc_bundles_height', String(curTop));
-            window.__subsplit.setSizes([0, 100]);
-            localStorage.setItem('tc_split_sub', JSON.stringify([0, 100]));
-          }
-          wrap.classList.add('is-collapsed');
-          localStorage.setItem('tc_bundles_open', '0');
-        }
-        if (!opts.silent) updateGutterVisibility();
-      }
+/* Restore toggles, then render, then hydrate from URL if present */
+function render() { renderProfiles(); renderBundles(); renderCapsules(); renderPreview(); compose(); }
 
-      function setCapsulesOpen(open, opts={}) {
-        const wrap = document.getElementById('capsulesWrap');
-        if (!wrap) return;
+(function bootstrap() {
+  // Restore basic toggles
+  if ($('includePed')) $('includePed').checked = localStorage.getItem('tc_inc_ped') !== '0';
+  if ($('markdown'))   $('markdown').checked   = localStorage.getItem('tc_md') === '1';
 
-        // body = everything except the header row (keep header visible)
-        const bodyNodes = Array.from(wrap.children).filter(n => !n.classList.contains('section-title'));
+  // Prepare splits
+  const mainSizes = JSON.parse(localStorage.getItem('tc_split_main') || '[40,60]');
+  if (window.Split) {
+    Split(['#left', '#right'], { sizes: mainSizes, minSize: 240, gutterSize: 8,
+      onDragEnd: s => localStorage.setItem('tc_split_main', JSON.stringify(s)) });
+    const subSizes = JSON.parse(localStorage.getItem('tc_split_sub') || '[45,55]');
+    window.__subsplit = Split(['#bundlesWrap', '#capsulesWrap'], {
+      direction: 'vertical',
+      sizes: subSizes,
+      minSize: [0, 120],
+      gutterSize: 8,
+      onDragEnd: s => { localStorage.setItem('tc_split_sub', JSON.stringify(s)); updateGutterVisibility(); }
+    });
+  }
 
-        const last = Number(localStorage.getItem('tc_capsules_height') || '55'); // %
+  // Header click to collapse panes
+  const bundlesHeader = document.querySelector('#bundlesWrap .section-title');
+  if (bundlesHeader) bundlesHeader.addEventListener('click', (e) => {
+    if (e.target.closest('#bundlesToggle')) return;
+    const open = localStorage.getItem('tc_bundles_open') !== '0';
+    setBundlesOpen(!open);
+  });
+  const capsulesHeader = document.querySelector('#capsulesWrap .section-title');
+  if (capsulesHeader) capsulesHeader.addEventListener('click', (e) => {
+    if (e.target.closest('#expandAllBtn, #collapseAllBtn')) return;
+    const open = localStorage.getItem('tc_capsules_open') !== '0';
+    setCapsulesOpen(!open);
+  });
 
-        if (open) {
-          wrap.classList.remove('is-collapsed');
-          bodyNodes.forEach(n => n.hidden = false);
-          if (window.__subsplit) {
-            const target = Number.isFinite(last) ? Math.min(Math.max(last, 10), 90) : 55;
-            window.__subsplit.setSizes([100 - target, target]);
-            localStorage.setItem('tc_split_sub', JSON.stringify([100 - target, target]));
-          }
-          localStorage.setItem('tc_capsules_open', '1');
-        } else {
-          // hide body and collapse bottom pane to 0
-          bodyNodes.forEach(n => n.hidden = true);
-          if (window.__subsplit) {
-            const [, curBot] = window.__subsplit.getSizes();
-            localStorage.setItem('tc_capsules_height', String(curBot));
-            window.__subsplit.setSizes([100, 0]);
-            localStorage.setItem('tc_split_sub', JSON.stringify([100, 0]));
-          }
-          wrap.classList.add('is-collapsed');
-          localStorage.setItem('tc_capsules_open', '0');
-        }
-        if (!opts.silent) updateGutterVisibility();
-      }
+  // Initial open/close restore
+  const bundlesOpen = localStorage.getItem('tc_bundles_open') !== '0';
+  setBundlesOpen(bundlesOpen, {silent:true});
+  const capsulesOpen = localStorage.getItem('tc_capsules_open') !== '0';
+  setCapsulesOpen(capsulesOpen, {silent:true});
+  updateGutterVisibility();
 
-      // Hook up header clicks
-      (function wireCollapsers() {
-        const bundlesHeader = document.querySelector('#bundlesWrap .section-title');
-        if (bundlesHeader) {
-          bundlesHeader.addEventListener('click', (e) => {
-            // ignore clicks on dedicated buttons if you have them
-            if (e.target.closest('#bundlesToggle')) return;
-            const open = localStorage.getItem('tc_bundles_open') !== '0';
-            setBundlesOpen(!open);
-          });
-        }
+  // Render once with whatever profile is saved
+  const savedProfile = localStorage.getItem('tc_profile');
+  if (savedProfile && DATA.profiles && DATA.profiles[savedProfile]) STATE.profile = savedProfile;
 
-        const capsulesHeader = document.querySelector('#capsulesWrap .section-title');
-        if (capsulesHeader) {
-          capsulesHeader.addEventListener('click', (e) => {
-            if (e.target.closest('#expandAllBtn, #collapseAllBtn')) return; // keep those working
-            const open = localStorage.getItem('tc_capsules_open') !== '0';
-            setCapsulesOpen(!open);
-          });
-        }
-
-        // Initial restore
-        const bundlesOpen = localStorage.getItem('tc_bundles_open') !== '0';
-        setBundlesOpen(bundlesOpen, {silent:true});
-        const capsulesOpen = localStorage.getItem('tc_capsules_open') !== '0';
-        setCapsulesOpen(capsulesOpen, {silent:true});
-        updateGutterVisibility();
-      })();
-
-
-
-      window.addEventListener('load', () => {
-        const p = localStorage.getItem('tc_profile'); if (p && DATA.profiles[p]) $('profiles').value = p;
-        $('includePed').checked = localStorage.getItem('tc_inc_ped') !== '0';
-        $('markdown').checked = localStorage.getItem('tc_md') === '1';
-      });
-
-      (function profileHelp() {
-        const sel = document.getElementById('profiles');
-        const desc = document.getElementById('profileDesc');
-        const help = document.getElementById('profileHelp');
-        const btn = document.getElementById('profileInfo');
-
-        // Always show the selected profile's description (from <option data-desc="...">)
-        function renderDesc() {
-          if (!sel || !desc) return;
-          const opt = sel.options[sel.selectedIndex];
-          const d = opt && opt.dataset ? (opt.dataset.desc || '').trim() : '';
-          desc.textContent = d ? ` -  ${d}` : '';   // always visible, empty if none
-        }
-
-        // Wire events (guarded)
-        if (sel) {
-          sel.addEventListener('change', renderDesc);
-          // Schedule initial render after options are populated by your code
-          requestAnimationFrame(renderDesc);
-        }
-
-        // Help button toggles the explanatory panel (general concept of profiles)
-        if (btn && help) {
-          btn.addEventListener('click', () => {
-            const hidden = help.hasAttribute('hidden');
-            if (hidden) help.removeAttribute('hidden'); else help.setAttribute('hidden', '');
-            btn.setAttribute('aria-expanded', String(hidden));
-          });
-        }
-      })();
-
-      function toggleAllDomainGroups(open) {
-        document.querySelectorAll('#capsules details.domain-group').forEach(d => {
-          d.open = open;
-          const dom =
-            d.dataset.domain ||
-            (d.querySelector('.domain-title')?.textContent || 'misc');
-          setDomainOpen(dom, open);
-        });
-      }
-
-      $('expandAllBtn').addEventListener('click', () => toggleAllDomainGroups(true));
-      $('collapseAllBtn').addEventListener('click', () => toggleAllDomainGroups(false));
-
-
-      /* Close <details.menu> when clicking elsewhere, Esc, or when another opens */
-      (function menuCloser() {
-        const menus = () => Array.from(document.querySelectorAll('details.menu'));
-
-        function closeAll(except = null) {
-          menus().forEach(d => { if (d !== except) d.removeAttribute('open'); });
-        }
-
-        // 1) Click anywhere: keep the menu under the click, close the rest
-        document.addEventListener('click', (e) => {
-          const keep = e.target.closest('details.menu');
-          closeAll(keep || null);
-        });
-
-        // 2) When a menu toggles open, close the others
-        // Use capture to be safe across browsers.
-        document.addEventListener('toggle', (e) => {
-          const el = e.target;
-          if (el instanceof HTMLDetailsElement && el.classList.contains('menu') && el.open) {
-            closeAll(el);
-          }
-        }, true);
-
-        // 3) Esc closes all menus
-        document.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape') closeAll();
-        });
-
-        // 4) After a menu-item is activated, close its menu (let handler run first)
-        document.addEventListener('click', (e) => {
-          const item = e.target.closest('.menu-item');
-          if (!item) return;
-          const d = item.closest('details.menu');
-          if (d) setTimeout(() => d.removeAttribute('open'), 0);
-        });
-      })();
-    </script>
-
-    <script>
-    (function () {
-      const $ = (id) => document.getElementById(id);
-      const modal = $('helpModal');
-      const btn   = $('helpBtn');
-
-      let lastFocus = null;
-
-      function openModal() {
-        lastFocus = document.activeElement;
-        modal.hidden = false;
-        modal.setAttribute('aria-hidden', 'false');
-        // focus first focusable inside
-        const first = modal.querySelector('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
-        (first || modal).focus();
-        document.addEventListener('keydown', onKey);
-        document.addEventListener('click', onOutside, true);
-      }
-
-      function closeModal() {
-        modal.hidden = true;
-        modal.setAttribute('aria-hidden', 'true');
-        document.removeEventListener('keydown', onKey);
-        document.removeEventListener('click', onOutside, true);
-        if (lastFocus) lastFocus.focus();
-      }
-
-      function onKey(e) {
-        if (e.key === 'Escape') closeModal();
-        if ((e.key === '?' ) || (e.key === '/' && e.shiftKey)) {
-          // prevent typing '?' in inputs from re-opening
-          const t = e.target;
-          if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
-          e.preventDefault(); e.stopPropagation();
-          if (modal.hidden) openModal();
-        }
-      }
-
-      function onOutside(e) {
-        if (e.target.closest('[data-close]')) { e.preventDefault(); closeModal(); return; }
-        if (!e.target.closest('.modal-card') && !modal.hidden) closeModal();
-      }
-
-      // wire up
-      if (btn) btn.addEventListener('click', openModal);
-      // global '?' shortcut
-      document.addEventListener('keydown', onKey);
-    })();
-    </script>
+  render();          // base render
+  tryHydrateFromUrl(); // may import + re-render
+})();
+</script>
 
 
 </body>
