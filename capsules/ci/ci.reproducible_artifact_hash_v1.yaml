@@ -2,61 +2,37 @@ id: ci.reproducible_artifact_hash_v1
 version: 1.0.0
 domain: ci
 title: Reproducible Build — Repeatable Artifact Hash
-statement: |-
-  Running the build command twice in a clean workspace should produce byte-identical artifacts (same SHA-256).
-
+statement: Running the build command twice in a clean workspace should produce byte-identical
+  artifacts (same SHA-256).
 witnesses:
-  - name: repeatable_hash_check
-    language: python
-    entrypoint: python3
-    args: []
-    env:
-      BUILD_CMD: "bash artifacts/examples/ci/build_demo.sh"
-      ARTIFACT_PATH: artifacts/examples/ci/build/out/demo-artifact.txt
-    timeout_ms: 10000
-    memory_mb: 256
-    net: false
-    fs_mode: rw
-    code: |-
-      import os, sys, json, hashlib, subprocess, time
-
-      def sha256(path):
-          h = hashlib.sha256()
-          with open(path, "rb") as f:
-              for chunk in iter(lambda: f.read(65536), b""):
-                  h.update(chunk)
-          return h.hexdigest()
-
-      def run_cmd(cmd):
-          completed = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-          return completed.returncode, completed.stdout, completed.stderr
-
-      def main():
-          cmd = os.environ.get("BUILD_CMD", "")
-          artifact = os.environ.get("ARTIFACT_PATH", "")
-
-          if cmd:
-              rc1, out1, err1 = run_cmd(cmd)
-              rc2, out2, err2 = run_cmd(cmd)
-              build_ok = (rc1 == 0 and rc2 == 0)
-          else:
-              build_ok = True
-              out1 = out2 = err1 = err2 = ""
-
-          if not os.path.isfile(artifact):
-              print(json.dumps({"ok": False, "error": "artifact missing", "artifact": artifact, "build_ok": build_ok, "stdout": out2, "stderr": err2}, indent=2))
-              sys.exit(1)
-
-          h1 = sha256(artifact)
-          time.sleep(0.1)
-          h2 = sha256(artifact)
-
-          ok = build_ok and (h1 == h2)
-          print(json.dumps({"ok": ok, "artifact": artifact, "sha256_first": h1, "sha256_second": h2, "build_ok": build_ok}, indent=2))
-          sys.exit(0 if ok else 1)
-
-      if __name__ == "__main__":
-          main()
+- name: repeatable_hash_check
+  language: python
+  entrypoint: python3
+  args: []
+  env:
+    BUILD_CMD: bash artifacts/examples/ci/build_demo.sh
+    ARTIFACT_PATH: artifacts/examples/ci/build/out/demo-artifact.txt
+  timeout_ms: 10000
+  memory_mb: 256
+  net: false
+  fs_mode: rw
+  code: "import os, sys, json, hashlib, subprocess, time\n\ndef sha256(path):\n  \
+    \  h = hashlib.sha256()\n    with open(path, \"rb\") as f:\n        for chunk\
+    \ in iter(lambda: f.read(65536), b\"\"):\n            h.update(chunk)\n    return\
+    \ h.hexdigest()\n\ndef run_cmd(cmd):\n    completed = subprocess.run(cmd, shell=True,\
+    \ stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)\n    return completed.returncode,\
+    \ completed.stdout, completed.stderr\n\ndef main():\n    cmd = os.environ.get(\"\
+    BUILD_CMD\", \"\")\n    artifact = os.environ.get(\"ARTIFACT_PATH\", \"\")\n\n\
+    \    if cmd:\n        rc1, out1, err1 = run_cmd(cmd)\n        rc2, out2, err2\
+    \ = run_cmd(cmd)\n        build_ok = (rc1 == 0 and rc2 == 0)\n    else:\n    \
+    \    build_ok = True\n        out1 = out2 = err1 = err2 = \"\"\n\n    if not os.path.isfile(artifact):\n\
+    \        print(json.dumps({\"ok\": False, \"error\": \"artifact missing\", \"\
+    artifact\": artifact, \"build_ok\": build_ok, \"stdout\": out2, \"stderr\": err2},\
+    \ indent=2))\n        sys.exit(1)\n\n    h1 = sha256(artifact)\n    time.sleep(0.1)\n\
+    \    h2 = sha256(artifact)\n\n    ok = build_ok and (h1 == h2)\n    print(json.dumps({\"\
+    ok\": ok, \"artifact\": artifact, \"sha256_first\": h1, \"sha256_second\": h2,\
+    \ \"build_ok\": build_ok}, indent=2))\n    sys.exit(0 if ok else 1)\n\nif __name__\
+    \ == \"__main__\":\n    main()"
 provenance:
   schema: provenance.v1
   author: John Macgregor
@@ -73,11 +49,11 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: null
+    digest: 934d03f50e57c83c1cb16094f860da8419f472c7fa1417a922b9d3a3fff5af21
     signature: null
 applies_to:
 - ci
 - release
 security:
   sensitivity: medium
-  notes: "Runs in restricted CI; no network by default; read-only FS recommended."
+  notes: Runs in restricted CI; no network by default; read-only FS recommended.

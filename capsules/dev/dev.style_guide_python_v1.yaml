@@ -2,21 +2,14 @@ id: dev.style_guide_python_v1
 version: 1.0.0
 domain: dev
 title: Python Style Guide (Practical Defaults)
-statement: |-
-  Use boring, reliable defaults to keep diffs clean and onboarding fast.
-
-  Formatter & Lint
-    • Black (line-length 88), isort (profile=black), Ruff (or flake8) with error-level lint.
-    • mypy: --strict for libraries, relaxed for apps; add types for new/changed code.
-
-  Docstrings & Tests
-    • Google or NumPy style docstrings; include Args/Returns/Raises.
-    • pytest for tests; AAA pattern; prefer small, focused tests.
-
-  Examples
-    • Function signature changes require typing + tests.
-    • IO code uses context managers; network calls have timeouts.
-    • Use pathlib, not os.path string munging; f-strings over format().
+statement: "Use boring, reliable defaults to keep diffs clean and onboarding fast.\n\
+  \nFormatter & Lint\n  • Black (line-length 88), isort (profile=black), Ruff (or\
+  \ flake8) with error-level lint.\n  • mypy: --strict for libraries, relaxed for\
+  \ apps; add types for new/changed code.\n\nDocstrings & Tests\n  • Google or NumPy\
+  \ style docstrings; include Args/Returns/Raises.\n  • pytest for tests; AAA pattern;\
+  \ prefer small, focused tests.\n\nExamples\n  • Function signature changes require\
+  \ typing + tests.\n  • IO code uses context managers; network calls have timeouts.\n\
+  \  • Use pathlib, not os.path string munging; f-strings over format()."
 provenance:
   schema: provenance.v1
   author: John Macgregor
@@ -33,7 +26,7 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: null
+    digest: e3d7133a1555f6145c5fa2b7b925a777bd8d5c1ac7632e9a0bd20a10d6dafa52
     signature: null
 applies_to:
 - conversation
@@ -41,4 +34,4 @@ applies_to:
 - review
 security:
   sensitivity: medium
-  notes: ""
+  notes: ''

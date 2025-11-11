@@ -2,15 +2,13 @@ id: support.tone_style_guide_v1
 version: 1.1.0
 domain: support
 title: Tone & Style Guide (Public-Facing)
-statement: |-
-  Be empathetic, concise, specific, and action-oriented; never echo or store PII.
-  Rules:
-    • Lead with empathy and a one-sentence summary of the customer’s goal.
-    • Offer one actionable next step; avoid overwhelming lists.
-    • Prefer links to official docs; include exact anchor and version if relevant.
-    • Never guess order/account details; ask for the minimal non-sensitive clarifier.
-    • Use plain language; avoid internal acronyms or engineering jargon.
-    • Avoid absolute promises; reference policy and expected timeframes.
+statement: "Be empathetic, concise, specific, and action-oriented; never echo or store\
+  \ PII.\nRules:\n  • Lead with empathy and a one-sentence summary of the customer’s\
+  \ goal.\n  • Offer one actionable next step; avoid overwhelming lists.\n  • Prefer\
+  \ links to official docs; include exact anchor and version if relevant.\n  • Never\
+  \ guess order/account details; ask for the minimal non-sensitive clarifier.\n  •\
+  \ Use plain language; avoid internal acronyms or engineering jargon.\n  • Avoid\
+  \ absolute promises; reference policy and expected timeframes."
 provenance:
   schema: provenance.v1
   author: John Macgregor
@@ -27,11 +25,11 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: null
+    digest: 885bf054afa0146b4529ca08b2634c4f4d642f0da3c9484a071ea156c16ddb33
     signature: null
 applies_to:
 - conversation
 - support
 security:
   sensitivity: medium
-  notes: ""
+  notes: ''

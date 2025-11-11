@@ -2,17 +2,11 @@ id: dev.review_checklist_v1
 version: 1.0.0
 domain: dev
 title: PR Review Checklist (Security, Perf, i18n, Docs, Tests)
-statement: |-
-  Minimal checklist for actionable reviews.
-
-  Security
-    • Inputs validated; authz checked; secrets not logged; dependencies sane.
-  Performance
-    • No accidental N^2; hot paths measured; allocations/retries bounded.
-  i18n & UX
-    • Text externalized; RTL and accessibility considered for UI.
-  Docs & Tests
-    • README/CHANGELOG touched if behavior changes; tests added/updated; coverage stable.
+statement: "Minimal checklist for actionable reviews.\n\nSecurity\n  • Inputs validated;\
+  \ authz checked; secrets not logged; dependencies sane.\nPerformance\n  • No accidental\
+  \ N^2; hot paths measured; allocations/retries bounded.\ni18n & UX\n  • Text externalized;\
+  \ RTL and accessibility considered for UI.\nDocs & Tests\n  • README/CHANGELOG touched\
+  \ if behavior changes; tests added/updated; coverage stable."
 provenance:
   schema: provenance.v1
   author: John Macgregor
@@ -29,7 +23,7 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: null
+    digest: b03b01c3fff91ba82973361157c342a5a140a104e2da10157142ce24a2d25323
     signature: null
 applies_to:
 - conversation
@@ -37,4 +31,4 @@ applies_to:
 - review
 security:
   sensitivity: medium
-  notes: ""
+  notes: ''

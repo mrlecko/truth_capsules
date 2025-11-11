@@ -1,7 +1,6 @@
 name: macgyver_core_v1_bundle
 version: 1.0.0
 description: "MacGyver problem-solving bundle: mindset rails, SOP, safety/ethics, and practice drills."
-default_profile: conversational_macgyver.yaml
 applies_to:
   - conversation
   - planning

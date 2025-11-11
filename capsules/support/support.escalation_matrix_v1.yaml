@@ -2,31 +2,30 @@ id: support.escalation_matrix_v1
 version: 1.1.0
 domain: support
 title: Escalation Matrix & Handoffs
-statement: |-
-  Route high-risk or restricted requests to the correct queue with a crisp customer explanation.
-
-  Matrix (placeholders in braces are filled by your system):
-    +------------------------+---------------------+----------------------+---------------------------+
-    | Scenario               | Tier / Owner        | SLA                  | Customer-Facing Message   |
-    +------------------------+---------------------+----------------------+---------------------------+
-    | Outage / Sev-1         | On-call SRE         | 15m ack / hourly upd | "We're experiencing an    |
-    |                        |                     |                      | outage. Status: {status_url}"    |
-    | Billing dispute >$500  | Billing Specialist  | 1 business day       | "I've opened a ticket     |
-    |                        |                     |                      | with Billing. Ref: {ticket_id}"  |
-    | Refund exceptions      | Billing Supervisor  | 2 business days      | "I'll escalate your refund|
-    |                        |                     |                      | request for review."      |
-    | Security/Privacy       | Security Team       | 1 business day       | "Escalated to security.   |
-    |                        |                     |                      | Ref: {ticket}"          |
-    | Data deletion (GDPR)   | Data Protection Off | 72 hours             | "Deletion in progress.    |
-    |                        |                     |                      | Ref: {ticket}"          |
-    +------------------------+---------------------+----------------------+---------------------------+
-
-  Rules:
-    • If severity ≥ Sev-2 or involves legal/privacy, escalate immediately and provide a reference ID.
-    • Never modify or promise billing credits; create a ticket and route to Billing.
-    • Provide the customer with what will happen next and a timeframe.
-    • Record all escalations with ticket references; avoid free-form DMs.
-    • Do not request or store PII; use masked references only.
+statement: "Route high-risk or restricted requests to the correct queue with a crisp\
+  \ customer explanation.\n\nMatrix (placeholders in braces are filled by your system):\n\
+  \  +------------------------+---------------------+----------------------+---------------------------+\n\
+  \  | Scenario               | Tier / Owner        | SLA                  | Customer-Facing\
+  \ Message   |\n  +------------------------+---------------------+----------------------+---------------------------+\n\
+  \  | Outage / Sev-1         | On-call SRE         | 15m ack / hourly upd | \"We're\
+  \ experiencing an    |\n  |                        |                     |     \
+  \                 | outage. Status: {status_url}\"    |\n  | Billing dispute >$500\
+  \  | Billing Specialist  | 1 business day       | \"I've opened a ticket     |\n\
+  \  |                        |                     |                      | with\
+  \ Billing. Ref: {ticket_id}\"  |\n  | Refund exceptions      | Billing Supervisor\
+  \  | 2 business days      | \"I'll escalate your refund|\n  |                  \
+  \      |                     |                      | request for review.\"    \
+  \  |\n  | Security/Privacy       | Security Team       | 1 business day       |\
+  \ \"Escalated to security.   |\n  |                        |                   \
+  \  |                      | Ref: {ticket}\"          |\n  | Data deletion (GDPR)\
+  \   | Data Protection Off | 72 hours             | \"Deletion in progress.    |\n\
+  \  |                        |                     |                      | Ref:\
+  \ {ticket}\"          |\n  +------------------------+---------------------+----------------------+---------------------------+\n\
+  \nRules:\n  • If severity ≥ Sev-2 or involves legal/privacy, escalate immediately\
+  \ and provide a reference ID.\n  • Never modify or promise billing credits; create\
+  \ a ticket and route to Billing.\n  • Provide the customer with what will happen\
+  \ next and a timeframe.\n  • Record all escalations with ticket references; avoid\
+  \ free-form DMs.\n  • Do not request or store PII; use masked references only."
 provenance:
   schema: provenance.v1
   author: John Macgregor
@@ -43,11 +42,11 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: null
+    digest: 38e41edd3de593b2c56abf91e6f3444749893114a0212bd68beac478bb5eca53
     signature: null
 applies_to:
 - conversation
 - support
 security:
   sensitivity: medium
-  notes: ""
+  notes: ''

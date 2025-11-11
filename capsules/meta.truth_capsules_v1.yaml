@@ -2,127 +2,100 @@ id: meta.truth_capsules_v1
 version: 1.0.0
 domain: meta
 title: Truth Capsules — Golden Explainer (v1)
-statement: |-
-  TRUTH CAPSULES (v1): What they are, why they matter, and how to use them.
-
-  — WHAT —
-  Truth Capsules are small, signed YAML knowledge objects that bundle:
-    • A clear normative STATEMENT (human-readable rule, method, or explainer)
-    • PEDAGOGY (Socratic prompts + aphorisms for fast onboarding)
-    • Optional WITNESSES (executable checks that emit machine-readable JSON and GREEN/RED outcomes)
-  They are designed to be “projection-friendly”: profiles decide which fields to render (usually just `title` + `statement`), while witnesses provide proof-carrying automation for CI, codereview, or ops.
-
-  — WHY (Proof-carrying knowledge) —
-    1) Reproducibility: capsules can include runnable checks; outputs are JSON with crisp GREEN/RED.
-    2) Composability: bundles group capsules into kits (e.g., CI gates, MacGyver pedagogy, Code Assistant).
-    3) Safety: witnesses run in locked-down sandboxes; provenance+signing provide audit trails.
-    4) Projection discipline: a profile creates consistent system prompts from the same source of truth.
-    5) Career/Org leverage: “show, don’t tell” — every claim can ship with a verifiable witness.
-
-  — HOW (Views, Bundles, Witnesses) —
-    • Profiles (view): define which capsule fields are projected (e.g., title+statement) and output style (e.g., “fail fast on RED”).
-    • Bundles (kit): ordered lists of capsules for a task/context (e.g., ci_quality_gates_v1).
-    • Capsules: information-only (explainer/guidance) or witnessed (proof-carrying).
-      – Information-only: pedagogy-forward explainers for onboarding and conversation quality.
-      – Witnessed: executable checks (python/node/bash) with `code: |-` blocks and explicit `env` mappings.
-    • Execution model: a runner loads capsule YAML, extracts each witness, executes in a constrained environment, captures `{ok: bool, ...}` JSON, and returns exit code 0 (GREEN) or 1 (RED/error). CI treats any RED as a failing gate.
-
-  — SCHEMA V1 (essentials) —
-    Required: `id`, `version`, `domain`, `statement`.
-    Recommended: `title`, `pedagogy`, `provenance`, `applies_to`, `security`.
-    Witnesses use inline code and should specify: `name`, `language`, `entrypoint`, `env` (mapping), `timeout_ms`, and `fs_mode`.
-    All human-visible guidance should live in `statement` so profiles can project a single coherent explainer.
-
-  — SECURITY & OPERATIONAL NOTES —
-    • Run witnesses in containers (non-root, no network, read-only FS unless explicitly required).
-    • Use minimal `env:` allowlists; record provenance, review status, and signing metadata.
-    • Prefer deterministic fixtures for demo reliability; keep failure modes crisp and legible.
-
-  — QUICKSTART (mental model) —
-    1) Choose a profile (view): e.g., conversational explainer vs CI gate reporter.
-    2) Load a bundle (kit): the ordered set of capsules for your task.
-    3) Project → the profile renders title+statement for humans; optionally execute witnesses for proofs.
-    4) Read the JSON evidence; GREEN/RED is the contract.
-
-  — THIS GOLDEN EXPLAINER —
-    This capsule is the “rootmost” documentary explainer for the v1 demo. It’s informational (pedagogy-heavy) and ships with a tiny, self-contained witness that demonstrates canonicalization and hashing of “core content” (the proof-carrying ethos) without requiring any external files. Use it to sanity-test your runner and to onboard readers to the Truth Capsules approach.
-
+statement: "TRUTH CAPSULES (v1): What they are, why they matter, and how to use them.\n\
+  \n— WHAT —\nTruth Capsules are small, signed YAML knowledge objects that bundle:\n\
+  \  • A clear normative STATEMENT (human-readable rule, method, or explainer)\n \
+  \ • PEDAGOGY (Socratic prompts + aphorisms for fast onboarding)\n  • Optional WITNESSES\
+  \ (executable checks that emit machine-readable JSON and GREEN/RED outcomes)\nThey\
+  \ are designed to be “projection-friendly”: profiles decide which fields to render\
+  \ (usually just `title` + `statement`), while witnesses provide proof-carrying automation\
+  \ for CI, codereview, or ops.\n\n— WHY (Proof-carrying knowledge) —\n  1) Reproducibility:\
+  \ capsules can include runnable checks; outputs are JSON with crisp GREEN/RED.\n\
+  \  2) Composability: bundles group capsules into kits (e.g., CI gates, MacGyver\
+  \ pedagogy, Code Assistant).\n  3) Safety: witnesses run in locked-down sandboxes;\
+  \ provenance+signing provide audit trails.\n  4) Projection discipline: a profile\
+  \ creates consistent system prompts from the same source of truth.\n  5) Career/Org\
+  \ leverage: “show, don’t tell” — every claim can ship with a verifiable witness.\n\
+  \n— HOW (Views, Bundles, Witnesses) —\n  • Profiles (view): define which capsule\
+  \ fields are projected (e.g., title+statement) and output style (e.g., “fail fast\
+  \ on RED”).\n  • Bundles (kit): ordered lists of capsules for a task/context (e.g.,\
+  \ ci_quality_gates_v1).\n  • Capsules: information-only (explainer/guidance) or\
+  \ witnessed (proof-carrying).\n    – Information-only: pedagogy-forward explainers\
+  \ for onboarding and conversation quality.\n    – Witnessed: executable checks (python/node/bash)\
+  \ with `code: |-` blocks and explicit `env` mappings.\n  • Execution model: a runner\
+  \ loads capsule YAML, extracts each witness, executes in a constrained environment,\
+  \ captures `{ok: bool, ...}` JSON, and returns exit code 0 (GREEN) or 1 (RED/error).\
+  \ CI treats any RED as a failing gate.\n\n— SCHEMA V1 (essentials) —\n  Required:\
+  \ `id`, `version`, `domain`, `statement`.\n  Recommended: `title`, `pedagogy`, `provenance`,\
+  \ `applies_to`, `security`.\n  Witnesses use inline code and should specify: `name`,\
+  \ `language`, `entrypoint`, `env` (mapping), `timeout_ms`, and `fs_mode`.\n  All\
+  \ human-visible guidance should live in `statement` so profiles can project a single\
+  \ coherent explainer.\n\n— SECURITY & OPERATIONAL NOTES —\n  • Run witnesses in\
+  \ containers (non-root, no network, read-only FS unless explicitly required).\n\
+  \  • Use minimal `env:` allowlists; record provenance, review status, and signing\
+  \ metadata.\n  • Prefer deterministic fixtures for demo reliability; keep failure\
+  \ modes crisp and legible.\n\n— QUICKSTART (mental model) —\n  1) Choose a profile\
+  \ (view): e.g., conversational explainer vs CI gate reporter.\n  2) Load a bundle\
+  \ (kit): the ordered set of capsules for your task.\n  3) Project → the profile\
+  \ renders title+statement for humans; optionally execute witnesses for proofs.\n\
+  \  4) Read the JSON evidence; GREEN/RED is the contract.\n\n— THIS GOLDEN EXPLAINER\
+  \ —\n  This capsule is the “rootmost” documentary explainer for the v1 demo. It’s\
+  \ informational (pedagogy-heavy) and ships with a tiny, self-contained witness that\
+  \ demonstrates canonicalization and hashing of “core content” (the proof-carrying\
+  \ ethos) without requiring any external files. Use it to sanity-test your runner\
+  \ and to onboard readers to the Truth Capsules approach."
 assumptions:
-  - Profiles will project `statement` (and optionally `title`) to build consistent, reproducible prompts.
-  - Witnesses execute in a minimal sandbox with explicit env allowlists and short timeouts.
-  - Readers value GREEN/RED + JSON evidence over prose alone.
-
+- Profiles will project `statement` (and optionally `title`) to build consistent,
+  reproducible prompts.
+- Witnesses execute in a minimal sandbox with explicit env allowlists and short timeouts.
+- Readers value GREEN/RED + JSON evidence over prose alone.
 pedagogy:
-  - kind: Socratic
-    text: What decision becomes safer or faster if it ships with a GREEN/RED witness instead of prose claims?
-  - kind: Socratic
-    text: Which part of our process needs an explainer (info) versus a gate (witnessed)?
-  - kind: Socratic
-    text: If this statement were wrong, what short witness would falsify it?
-  - kind: Socratic
-    text: What minimal JSON evidence would convince a skeptical reviewer?
-  - kind: Socratic
-    text: Which fields should your profile project so prompts stay stable across tools?
-
-  - kind: Aphorism
-    text: No witness, no claim.
-  - kind: Aphorism
-    text: Project once, reuse everywhere.
-  - kind: Aphorism
-    text: Small gates, big safety.
-  - kind: Aphorism
-    text: Prose persuades; proofs endure.
-  - kind: Aphorism
-    text: One JSON beats ten opinions.
-
+- kind: Socratic
+  text: What decision becomes safer or faster if it ships with a GREEN/RED witness
+    instead of prose claims?
+- kind: Socratic
+  text: Which part of our process needs an explainer (info) versus a gate (witnessed)?
+- kind: Socratic
+  text: If this statement were wrong, what short witness would falsify it?
+- kind: Socratic
+  text: What minimal JSON evidence would convince a skeptical reviewer?
+- kind: Socratic
+  text: Which fields should your profile project so prompts stay stable across tools?
+- kind: Aphorism
+  text: No witness, no claim.
+- kind: Aphorism
+  text: Project once, reuse everywhere.
+- kind: Aphorism
+  text: Small gates, big safety.
+- kind: Aphorism
+  text: Prose persuades; proofs endure.
+- kind: Aphorism
+  text: One JSON beats ten opinions.
 witnesses:
-  - name: canonical_digest_demo
-    language: python
-    entrypoint: python3
-    args: []
-    env: {}
-    timeout_ms: 3000
-    memory_mb: 128
-    net: false
-    fs_mode: ro
-    stdin: ""
-    code: |-
-      import json, hashlib, sys
-
-      # Minimal “core content” sample to demonstrate canonicalization & digesting,
-      # mirroring what a real signing step would cover.
-      core = {
-        "id": "meta.truth_capsules_v1",
-        "version": "1.0.0",
-        "domain": "meta",
-        "title": "Truth Capsules — Golden Explainer (v1)",
-        "statement": "Proof-carrying explainer capsule demo (canonical digest).",
-        "assumptions": [
-          "Profiles project `statement`",
-          "Witnesses run in sandbox"
-        ],
-        "pedagogy": [
-          {"kind": "Aphorism", "text": "No witness, no claim."},
-          {"kind": "Socratic", "text": "What would falsify this?"}
-        ]
-      }
-
-      def canonical_json(obj):
-        # Deterministic JSON (keys sorted, no spaces beyond separators)
-        return json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-
-      cj = canonical_json(core)
-      digest = hashlib.sha256(cj.encode("utf-8")).hexdigest()
-
-      out = {
-        "ok": True,
-        "canonical_size": len(cj),
-        "sha256": digest,
-        "canonical_keys": list(sorted(core.keys()))
-      }
-      print(json.dumps(out, indent=2))
-      sys.exit(0)
-
+- name: canonical_digest_demo
+  language: python
+  entrypoint: python3
+  args: []
+  env: {}
+  timeout_ms: 3000
+  memory_mb: 128
+  net: false
+  fs_mode: ro
+  stdin: ''
+  code: "import json, hashlib, sys\n\n# Minimal “core content” sample to demonstrate\
+    \ canonicalization & digesting,\n# mirroring what a real signing step would cover.\n\
+    core = {\n  \"id\": \"meta.truth_capsules_v1\",\n  \"version\": \"1.0.0\",\n \
+    \ \"domain\": \"meta\",\n  \"title\": \"Truth Capsules — Golden Explainer (v1)\"\
+    ,\n  \"statement\": \"Proof-carrying explainer capsule demo (canonical digest).\"\
+    ,\n  \"assumptions\": [\n    \"Profiles project `statement`\",\n    \"Witnesses\
+    \ run in sandbox\"\n  ],\n  \"pedagogy\": [\n    {\"kind\": \"Aphorism\", \"text\"\
+    : \"No witness, no claim.\"},\n    {\"kind\": \"Socratic\", \"text\": \"What would\
+    \ falsify this?\"}\n  ]\n}\n\ndef canonical_json(obj):\n  # Deterministic JSON\
+    \ (keys sorted, no spaces beyond separators)\n  return json.dumps(obj, ensure_ascii=False,\
+    \ sort_keys=True, separators=(\",\", \":\"))\n\ncj = canonical_json(core)\ndigest\
+    \ = hashlib.sha256(cj.encode(\"utf-8\")).hexdigest()\n\nout = {\n  \"ok\": True,\n\
+    \  \"canonical_size\": len(cj),\n  \"sha256\": digest,\n  \"canonical_keys\":\
+    \ list(sorted(core.keys()))\n}\nprint(json.dumps(out, indent=2))\nsys.exit(0)"
 provenance:
   schema: provenance.v1
   author: John Macgregor
@@ -139,19 +112,16 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: null
+    digest: 923348389d6d5727bfeb720cad36bdc1414a2682e60a5dbb4ed69c9e13c2495e
     signature: null
-
 applies_to:
-  - conversation
-  - code_assistant
-  - ci
-  - release
-  - education
-
+- conversation
+- code_assistant
+- ci
+- release
+- education
 dependencies: []
 incompatible_with: []
-
 security:
   sensitivity: low
-  notes: "Witness is self-contained, reads no files, produces JSON only. Safe for demo."
+  notes: Witness is self-contained, reads no files, produces JSON only. Safe for demo.

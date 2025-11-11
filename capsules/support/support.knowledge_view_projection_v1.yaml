@@ -2,21 +2,15 @@ id: support.knowledge_view_projection_v1
 version: 1.1.0
 domain: support
 title: Knowledge View & Citation Policy
-statement: |-
-  Cite official docs with exact anchors; avoid paraphrasing policy-sensitive pages.
-
-  Sources policy:
-    • Prefer official docs, status pages, and signed announcements. Avoid blog posts for policy.
-
-  Citation rules:
-    • Link the exact doc section and version (e.g., /docs/billing#refunds v3.1).
-    • Summarize in one sentence, then provide the link; do not copy large passages.
-    • If doc is gated, describe the path (Settings → Billing → Invoices).
-    • For outages, always include {status_url} and the last update time.
-
-  Link policy:
-    • Never link to internal-only resources in public responses.
-    • If a page moves, provide both old and new paths during the transition.
+statement: "Cite official docs with exact anchors; avoid paraphrasing policy-sensitive\
+  \ pages.\n\nSources policy:\n  • Prefer official docs, status pages, and signed\
+  \ announcements. Avoid blog posts for policy.\n\nCitation rules:\n  • Link the exact\
+  \ doc section and version (e.g., /docs/billing#refunds v3.1).\n  • Summarize in\
+  \ one sentence, then provide the link; do not copy large passages.\n  • If doc is\
+  \ gated, describe the path (Settings → Billing → Invoices).\n  • For outages, always\
+  \ include {status_url} and the last update time.\n\nLink policy:\n  • Never link\
+  \ to internal-only resources in public responses.\n  • If a page moves, provide\
+  \ both old and new paths during the transition."
 provenance:
   schema: provenance.v1
   author: John Macgregor
@@ -33,11 +27,11 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: null
+    digest: 1ff40c3adfa3542f2b3a513ccf92770f29e2da883c97e401be55b75ef823ee19
     signature: null
 applies_to:
 - conversation
 - support
 security:
   sensitivity: medium
-  notes: ""
+  notes: ''

@@ -27,7 +27,7 @@ provenance:
     method: null
     key_id: null
     pubkey: null
-    digest: null
+    digest: e96ffcd1cc860332f20a1b6723e7c4db199d672c20ce70f0dbfff7a6f6a91964
     signature: null
 applies_to:
 - life

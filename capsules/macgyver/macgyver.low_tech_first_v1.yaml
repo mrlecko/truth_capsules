@@ -28,7 +28,7 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: null
+    digest: 5c8b7053216935c8f66bc2f9ca3d31436f188f13849ee82b6b9970b42116b440
     signature: null
 applies_to:
 - conversation

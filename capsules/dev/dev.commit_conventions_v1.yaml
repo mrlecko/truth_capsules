@@ -2,23 +2,14 @@ id: dev.commit_conventions_v1
 version: 1.0.0
 domain: dev
 title: Conventional Commits (with Examples)
-statement: |-
-  Consistent messages → better changelogs, semantic versioning, and easier reviews.
-
-  Types
-    • feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
-
-  Format
-    • type(scope): brief imperative summary
-    • Blank line, then optional body; footer for BREAKING CHANGE or issues.
-
-  Examples
-    • feat(api): add pagination to listUsers
-    • fix(auth): handle expired refresh tokens
-    • docs(readme): add quickstart docker commands
-
-  Diff etiquette
-    • Keep PRs small; isolate unrelated changes; include before/after snippets when helpful.
+statement: "Consistent messages → better changelogs, semantic versioning, and easier\
+  \ reviews.\n\nTypes\n  • feat, fix, docs, style, refactor, perf, test, build, ci,\
+  \ chore, revert\n\nFormat\n  • type(scope): brief imperative summary\n  • Blank\
+  \ line, then optional body; footer for BREAKING CHANGE or issues.\n\nExamples\n\
+  \  • feat(api): add pagination to listUsers\n  • fix(auth): handle expired refresh\
+  \ tokens\n  • docs(readme): add quickstart docker commands\n\nDiff etiquette\n \
+  \ • Keep PRs small; isolate unrelated changes; include before/after snippets when\
+  \ helpful."
 provenance:
   schema: provenance.v1
   author: John Macgregor
@@ -35,7 +26,7 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: null
+    digest: 685c06dfbcd130c549f29223d40f5cfdf065f5f23491e062c94a7ff4143f8cc7
     signature: null
 applies_to:
 - conversation
@@ -43,4 +34,4 @@ applies_to:
 - review
 security:
   sensitivity: medium
-  notes: ""
+  notes: ''

@@ -2,20 +2,14 @@ id: dev.style_guide_js_v1
 version: 1.0.0
 domain: dev
 title: JS/TS Style Guide (Practical Defaults)
-statement: |-
-  Keep the surface consistent; let tools fight bikeshedding.
-
-  Formatter & Lint
-    • Prettier; ESLint with recommended + security (eslint-plugin-security) + import/order.
-    • TypeScript strict for libraries; app code minimally typed but typed at boundaries.
-
-  Testing & UI
-    • Jest/Vitest + Testing Library; prefer role-based queries; avoid brittle snapshots.
-    • Keep components pure; derive state; lift state when two consumers need it.
-
-  Examples
-    • API calls have abort controllers and sane timeouts.
-    • Avoid implicit any; prefer union types to magic strings.
+statement: "Keep the surface consistent; let tools fight bikeshedding.\n\nFormatter\
+  \ & Lint\n  • Prettier; ESLint with recommended + security (eslint-plugin-security)\
+  \ + import/order.\n  • TypeScript strict for libraries; app code minimally typed\
+  \ but typed at boundaries.\n\nTesting & UI\n  • Jest/Vitest + Testing Library; prefer\
+  \ role-based queries; avoid brittle snapshots.\n  • Keep components pure; derive\
+  \ state; lift state when two consumers need it.\n\nExamples\n  • API calls have\
+  \ abort controllers and sane timeouts.\n  • Avoid implicit any; prefer union types\
+  \ to magic strings."
 provenance:
   schema: provenance.v1
   author: John Macgregor
@@ -32,7 +26,7 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: null
+    digest: 99566355eb75d3bcfca8060e63bac49a6b1a13aec374e3ab3426349bba7dfaf9
     signature: null
 applies_to:
 - conversation
@@ -40,4 +34,4 @@ applies_to:
 - review
 security:
   sensitivity: medium
-  notes: ""
+  notes: ''

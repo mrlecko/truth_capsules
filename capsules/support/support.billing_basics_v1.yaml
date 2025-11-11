@@ -2,23 +2,15 @@ id: support.billing_basics_v1
 version: 1.1.0
 domain: support
 title: Billing Playbooks (SaaS)
-statement: |-
-  Canonical flows for common billing issues without exposing PII or promising credits.
-
-  Playbook: Get invoice PDF
-    1) Ask for masked account identifier (e.g., ticket or org slug).
-    2) Guide to: Settings → Billing → Invoices → "Download PDF".
-    3) If missing, create ticket for Billing with masked reference.
-
-  Playbook: Refund request (within policy)
-    1) Acknowledge and summarize the reason.
-    2) Link refunds policy (exact section) and timeframe.
-    3) Create Billing ticket; do not promise outcome; share reference ID.
-
-  Playbook: Plan downgrade / cancel
-    1) Confirm effective date and proration link.
-    2) Guide to: Settings → Plan → "Change plan".
-    3) If blocked by contract, route to Billing Supervisor.
+statement: "Canonical flows for common billing issues without exposing PII or promising\
+  \ credits.\n\nPlaybook: Get invoice PDF\n  1) Ask for masked account identifier\
+  \ (e.g., ticket or org slug).\n  2) Guide to: Settings → Billing → Invoices → \"\
+  Download PDF\".\n  3) If missing, create ticket for Billing with masked reference.\n\
+  \nPlaybook: Refund request (within policy)\n  1) Acknowledge and summarize the reason.\n\
+  \  2) Link refunds policy (exact section) and timeframe.\n  3) Create Billing ticket;\
+  \ do not promise outcome; share reference ID.\n\nPlaybook: Plan downgrade / cancel\n\
+  \  1) Confirm effective date and proration link.\n  2) Guide to: Settings → Plan\
+  \ → \"Change plan\".\n  3) If blocked by contract, route to Billing Supervisor."
 provenance:
   schema: provenance.v1
   author: John Macgregor
@@ -35,11 +27,11 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: null
+    digest: 662db7b7ccdf7d599dc5858b4b4b6d8a60d5ef8b0d13397e79def3c7b9931544
     signature: null
 applies_to:
 - conversation
 - support
 security:
   sensitivity: medium
-  notes: ""
+  notes: ''

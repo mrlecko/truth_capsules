@@ -2,64 +2,36 @@ id: ci.container_hardening_v1
 version: 1.0.0
 domain: ci
 title: Container Hardening — Non-Root + No-Cache + Version Pins
-statement: |-
-  The Dockerfile must:
-    1) drop privileges with a non-root USER,
-    2) avoid build-time caches for package managers (e.g., pip --no-cache-dir or apt lists cleanup),
-    3) pin versions for installed packages (e.g., pip ==, apt package=version).
-
+statement: "The Dockerfile must:\n  1) drop privileges with a non-root USER,\n  2)\
+  \ avoid build-time caches for package managers (e.g., pip --no-cache-dir or apt\
+  \ lists cleanup),\n  3) pin versions for installed packages (e.g., pip ==, apt package=version)."
 witnesses:
-  - name: dockerfile_has_nonroot_nocache_pins
-    language: python
-    entrypoint: python3
-    args: []
-    env:
-      DOCKERFILE_PATH: artifacts/examples/ci/Dockerfile
-    timeout_ms: 5000
-    memory_mb: 128
-    net: false
-    fs_mode: ro
-    code: |-
-      import os, sys, json, re
-
-      def read(path):
-          with open(path, "r", errors="ignore") as f:
-              return f.read()
-
-      def has_nonroot_user(text):
-          for m in re.finditer(r"^\s*USER\s+(.+)$", text, flags=re.M|re.I):
-              val = m.group(1).strip()
-              if re.match(r"(?i)root\b|0\b", val):
-                  return False
-              return True
-          return False
-
-      def has_no_cache(text):
-          patterns = [
-              r"pip\s+install[^\n]*--no-cache-dir",
-              r"apt-get\s+update[^\n]*\n[^\n]*apt-get\s+install[^\n]*\n[^\n]*rm\s+-rf\s+/var/lib/apt/lists/"
-          ]
-          return any(re.search(p, text, flags=re.I|re.S) for p in patterns)
-
-      def has_version_pins(text):
-          return bool(re.search(r"==\d+\.\d+|=\d+\.\d+", text))
-
-      def main():
-          path = os.environ.get("DOCKERFILE_PATH", "artifacts/examples/ci/Dockerfile")
-          content = read(path)
-
-          res = {
-              "nonroot_user": has_nonroot_user(content),
-              "no_cache": has_no_cache(content),
-              "version_pins": has_version_pins(content),
-              "path": path
-          }
-          res["ok"] = res["nonroot_user"] and res["no_cache"] and res["version_pins"]
-          print(json.dumps(res, indent=2))
-          sys.exit(0 if res["ok"] else 1)
-
-      if __name__ == "__main__":
-          main()
+- name: dockerfile_has_nonroot_nocache_pins
+  language: python
+  entrypoint: python3
+  args: []
+  env:
+    DOCKERFILE_PATH: artifacts/examples/ci/Dockerfile
+  timeout_ms: 5000
+  memory_mb: 128
+  net: false
+  fs_mode: ro
+  code: "import os, sys, json, re\n\ndef read(path):\n    with open(path, \"r\", errors=\"\
+    ignore\") as f:\n        return f.read()\n\ndef has_nonroot_user(text):\n    for\
+    \ m in re.finditer(r\"^\\s*USER\\s+(.+)$\", text, flags=re.M|re.I):\n        val\
+    \ = m.group(1).strip()\n        if re.match(r\"(?i)root\\b|0\\b\", val):\n   \
+    \         return False\n        return True\n    return False\n\ndef has_no_cache(text):\n\
+    \    patterns = [\n        r\"pip\\s+install[^\\n]*--no-cache-dir\",\n       \
+    \ r\"apt-get\\s+update[^\\n]*\\n[^\\n]*apt-get\\s+install[^\\n]*\\n[^\\n]*rm\\\
+    s+-rf\\s+/var/lib/apt/lists/\"\n    ]\n    return any(re.search(p, text, flags=re.I|re.S)\
+    \ for p in patterns)\n\ndef has_version_pins(text):\n    return bool(re.search(r\"\
+    ==\\d+\\.\\d+|=\\d+\\.\\d+\", text))\n\ndef main():\n    path = os.environ.get(\"\
+    DOCKERFILE_PATH\", \"artifacts/examples/ci/Dockerfile\")\n    content = read(path)\n\
+    \n    res = {\n        \"nonroot_user\": has_nonroot_user(content),\n        \"\
+    no_cache\": has_no_cache(content),\n        \"version_pins\": has_version_pins(content),\n\
+    \        \"path\": path\n    }\n    res[\"ok\"] = res[\"nonroot_user\"] and res[\"\
+    no_cache\"] and res[\"version_pins\"]\n    print(json.dumps(res, indent=2))\n\
+    \    sys.exit(0 if res[\"ok\"] else 1)\n\nif __name__ == \"__main__\":\n    main()"
 provenance:
   schema: provenance.v1
   author: John Macgregor
@@ -76,11 +48,11 @@ provenance:
     method: ed25519
     key_id: null
     pubkey: null
-    digest: null
+    digest: feffdc1dfbb206844975528a68b1497e436402ce14ef898303adfefcdcb70be8
     signature: null
 applies_to:
 - ci
 - release
 security:
   sensitivity: medium
-  notes: "Runs in restricted CI; no network by default; read-only FS recommended."
+  notes: Runs in restricted CI; no network by default; read-only FS recommended.
