@@ -1038,6 +1038,7 @@
     .toolbar .title-wrap {
       display: flex;
       flex-direction: column;
+      padding-left:30px;
     }
 
     .toolbar-actions {
@@ -1046,6 +1047,7 @@
       align-items: center;
       gap: 10px;
       flex-wrap: wrap;
+      margin-right:30px;
     }
 
     /* Groups = compact button clusters */
@@ -1054,7 +1056,7 @@
       align-items: center;
       gap: 4px;
       padding: 2px;
-      border: 1px solid var(--border, #3a3f55);
+      /* border: 1px solid var(--border, #3a3f55); */
       border-radius: 10px;
       background: var(--panel, rgba(127, 127, 127, 0.08));
     }
@@ -1141,6 +1143,141 @@
       opacity: 0.7;
       font-size: 12px;
     }
+
+/* === Modern ghost pills (borderless groups) === */
+:root{
+  --btn-h: 30px;
+  --btn-r: 12px;
+  --hairline: color-mix(in oklab, var(--border), transparent 35%);
+  --hover:   color-mix(in oklab, var(--accent), transparent 88%);
+  --press:   color-mix(in oklab, var(--accent), transparent 70%);
+}
+
+.toolbar { gap: 10px; padding: 6px 0; }
+.toolbar-actions { gap: 8px; }
+
+/* No chrome around clusters */
+.group{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: 0;
+}
+/* kill any old highlight rings */
+.group:has(.menu[open]){ box-shadow: none; }
+
+/* Pills */
+.btn{
+  -webkit-appearance: none;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: var(--btn-h);
+  padding: 0 12px;
+  border-radius: var(--btn-r);
+  border: 1px solid var(--hairline);         /* hairline, not heavy */
+  background: color-mix(in oklab, var(--btn-bg), transparent 10%);
+  color: var(--text);
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease,
+              box-shadow .15s ease, transform .04s ease;
+}
+
+.btn:hover{
+  background: var(--hover);
+  border-color: color-mix(in oklab, var(--border), var(--accent) 40%);
+  box-shadow: 0 2px 10px rgba(0,0,0,.12);
+}
+
+.btn:active{
+  background: var(--press);
+  transform: translateY(1px);
+  box-shadow: 0 1px 4px rgba(0,0,0,.18) inset;
+}
+
+/* Subtle, accessible focus */
+.btn:focus{ outline: none; }
+.btn:focus-visible{
+  outline: 2px solid color-mix(in oklab, var(--accent), transparent 60%);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+/* Icon-only = circular ghost */
+.btn.icon{
+  width: var(--btn-h);
+  min-width: var(--btn-h);
+  padding: 0;
+  border-radius: 999px;
+}
+
+/* Caution tone stays ghost (no filled red blob) */
+.btn.warn{
+  color: var(--danger, #e06c75);
+  background: color-mix(in oklab, var(--btn-bg), transparent 6%);
+  border-color: color-mix(in oklab, var(--danger, #e06c75), var(--border) 75%);
+}
+
+/* Details/summary dropdown matches pills */
+.menu{ position: relative; }
+.menu > summary{ list-style: none; cursor: pointer; }
+.menu > summary::-webkit-details-marker{ display: none; }
+
+/* Panel */
+.menu[open] .menu-list{ display: block; }
+.menu-list{
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 220px;
+  padding: 8px;
+  background: var(--bgElevated, var(--bg));
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  z-index: 1000;
+}
+
+.menu-item{
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  text-align: left;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.menu-item:hover{
+  background: color-mix(in oklab, var(--panel), var(--text) 4%);
+}
+.menu-item.warn{ color: var(--danger, #e06c75); }
+
+.menu-field{ padding: 6px 6px 8px; }
+.menu-row{ display: flex; gap: 6px; padding: 4px 6px; }
+.menu-row .menu-item{ flex: 1; text-align: center; }
+
+.menu-sep{
+  border: 0; height: 1px; margin: 6px 0;
+  background: linear-gradient(to right, transparent, var(--hairline), transparent);
+}
+
+/* Tiny screen tweak */
+@media (max-width: 900px){
+  :root{ --btn-h: 28px; }
+}
+
+    
   </style>
 
 
@@ -1154,9 +1291,7 @@
   <!-- split_js: sha256=c32bd277fed98cd8a04033d4eef37201d9b50886189b4bb4d099d133feaf16dc -->
   <!-- sortable_js: sha256=ca68430703c4f5960e90735867c6e94d29b5a3de37107d8100e5a301007e9e6e -->
 
-  <style>
-    code[class*=language-],pre[class*=language-]{color:#ccc;background:0 0;font-family:Consolas,Monaco,'Andale Mono','Ubuntu Mono',monospace;font-size:1em;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:1em;margin:.5em 0;overflow:auto}:not(pre)>code[class*=language-],pre[class*=language-]{background:#2d2d2d}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em;white-space:normal}.token.block-comment,.token.cdata,.token.comment,.token.doctype,.token.prolog{color:#999}.token.punctuation{color:#ccc}.token.attr-name,.token.deleted,.token.namespace,.token.tag{color:#e2777a}.token.function-name{color:#6196cc}.token.boolean,.token.function,.token.number{color:#f08d49}.token.class-name,.token.constant,.token.property,.token.symbol{color:#f8c555}.token.atrule,.token.builtin,.token.important,.token.keyword,.token.selector{color:#cc99cd}.token.attr-value,.token.char,.token.regex,.token.string,.token.variable{color:#7ec699}.token.entity,.token.operator,.token.url{color:#67cdcc}.token.bold,.token.important{font-weight:700}.token.italic{font-style:italic}.token.entity{cursor:help}.token.inserted{color:green}
-  </style>
+  <style>code[class*=language-],pre[class*=language-]{color:#ccc;background:0 0;font-family:Consolas,Monaco,'Andale Mono','Ubuntu Mono',monospace;font-size:1em;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:1em;margin:.5em 0;overflow:auto}:not(pre)>code[class*=language-],pre[class*=language-]{background:#2d2d2d}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em;white-space:normal}.token.block-comment,.token.cdata,.token.comment,.token.doctype,.token.prolog{color:#999}.token.punctuation{color:#ccc}.token.attr-name,.token.deleted,.token.namespace,.token.tag{color:#e2777a}.token.function-name{color:#6196cc}.token.boolean,.token.function,.token.number{color:#f08d49}.token.class-name,.token.constant,.token.property,.token.symbol{color:#f8c555}.token.atrule,.token.builtin,.token.important,.token.keyword,.token.selector{color:#cc99cd}.token.attr-value,.token.char,.token.regex,.token.string,.token.variable{color:#7ec699}.token.entity,.token.operator,.token.url{color:#67cdcc}.token.bold,.token.important{font-weight:700}.token.italic{font-style:italic}.token.entity{cursor:help}.token.inserted{color:green}</style>
 
   <script>
 /* **********************************************
@@ -3121,7 +3256,7 @@ Prism.languages.js = Prism.languages.javascript;
   <header class="toolbar">
     <div class="title-wrap">
       <h1>Truth Capsule Viewer & Prompt Composer</h1>
-      <div class="small" style="font-size:12px;margin-top:4px;">Generated 2025-11-11T00:00:00.950856Z</div>
+      <div class="small" style="font-size:12px;margin-top:4px;">Generated 2025-11-11T01:10:42.941585Z</div>
     </div>
 
     <nav class="toolbar-actions">
@@ -3490,6 +3625,292 @@ Prism.languages.js = Prism.languages.javascript;
       "posture": "witnessed",
       "_witness_count": 1
     },
+    "ci.container_hardening_v1": {
+      "id": "ci.container_hardening_v1",
+      "version": "1.0.0",
+      "domain": "ci",
+      "title": "Container Hardening — Non-Root + No-Cache + Version Pins",
+      "statement": "The Dockerfile must:\n  1) drop privileges with a non-root USER,\n  2) avoid build-time caches for package managers (e.g., pip --no-cache-dir or apt lists cleanup),\n  3) pin versions for installed packages (e.g., pip ==, apt package=version).",
+      "witnesses": [
+        {
+          "name": "dockerfile_has_nonroot_nocache_pins",
+          "language": "python",
+          "entrypoint": "python3",
+          "args": [],
+          "env": {
+            "DOCKERFILE_PATH": "artifacts/examples/ci/Dockerfile"
+          },
+          "timeout_ms": 5000,
+          "memory_mb": 128,
+          "net": false,
+          "fs_mode": "ro",
+          "code": "import os, sys, json, re\n\ndef read(path):\n    with open(path, \"r\", errors=\"ignore\") as f:\n        return f.read()\n\ndef has_nonroot_user(text):\n    for m in re.finditer(r\"^\\s*USER\\s+(.+)$\", text, flags=re.M|re.I):\n        val = m.group(1).strip()\n        if re.match(r\"(?i)root\\b|0\\b\", val):\n            return False\n        return True\n    return False\n\ndef has_no_cache(text):\n    patterns = [\n        r\"pip\\s+install[^\\n]*--no-cache-dir\",\n        r\"apt-get\\s+update[^\\n]*\\n[^\\n]*apt-get\\s+install[^\\n]*\\n[^\\n]*rm\\s+-rf\\s+/var/lib/apt/lists/\"\n    ]\n    return any(re.search(p, text, flags=re.I|re.S) for p in patterns)\n\ndef has_version_pins(text):\n    return bool(re.search(r\"==\\d+\\.\\d+|=\\d+\\.\\d+\", text))\n\ndef main():\n    path = os.environ.get(\"DOCKERFILE_PATH\", \"artifacts/examples/ci/Dockerfile\")\n    content = read(path)\n\n    res = {\n        \"nonroot_user\": has_nonroot_user(content),\n        \"no_cache\": has_no_cache(content),\n        \"version_pins\": has_version_pins(content),\n        \"path\": path\n    }\n    res[\"ok\"] = res[\"nonroot_user\"] and res[\"no_cache\"] and res[\"version_pins\"]\n    print(json.dumps(res, indent=2))\n    sys.exit(0 if res[\"ok\"] else 1)\n\nif __name__ == \"__main__\":\n    main()"
+        }
+      ],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/ci",
+        "created": "2025-11-10T21:10:00Z",
+        "updated": "2025-11-10T21:10:00Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "ci",
+        "release"
+      ],
+      "security": {
+        "sensitivity": "medium",
+        "notes": "Runs in restricted CI; no network by default; read-only FS recommended."
+      },
+      "_file": "./capsules/ci/ci.container_hardening_v1.yaml",
+      "_raw": "id: ci.container_hardening_v1\nversion: 1.0.0\ndomain: ci\ntitle: Container Hardening — Non-Root + No-Cache + Version Pins\nstatement: |-\n  The Dockerfile must:\n    1) drop privileges with a non-root USER,\n    2) avoid build-time caches for package managers (e.g., pip --no-cache-dir or apt lists cleanup),\n    3) pin versions for installed packages (e.g., pip ==, apt package=version).\n\nwitnesses:\n  - name: dockerfile_has_nonroot_nocache_pins\n    language: python\n    entrypoint: python3\n    args: []\n    env:\n      DOCKERFILE_PATH: artifacts/examples/ci/Dockerfile\n    timeout_ms: 5000\n    memory_mb: 128\n    net: false\n    fs_mode: ro\n    code: |-\n      import os, sys, json, re\n\n      def read(path):\n          with open(path, \"r\", errors=\"ignore\") as f:\n              return f.read()\n\n      def has_nonroot_user(text):\n          for m in re.finditer(r\"^\\s*USER\\s+(.+)$\", text, flags=re.M|re.I):\n              val = m.group(1).strip()\n              if re.match(r\"(?i)root\\b|0\\b\", val):\n                  return False\n              return True\n          return False\n\n      def has_no_cache(text):\n          patterns = [\n              r\"pip\\s+install[^\\n]*--no-cache-dir\",\n              r\"apt-get\\s+update[^\\n]*\\n[^\\n]*apt-get\\s+install[^\\n]*\\n[^\\n]*rm\\s+-rf\\s+/var/lib/apt/lists/\"\n          ]\n          return any(re.search(p, text, flags=re.I|re.S) for p in patterns)\n\n      def has_version_pins(text):\n          return bool(re.search(r\"==\\d+\\.\\d+|=\\d+\\.\\d+\", text))\n\n      def main():\n          path = os.environ.get(\"DOCKERFILE_PATH\", \"artifacts/examples/ci/Dockerfile\")\n          content = read(path)\n\n          res = {\n              \"nonroot_user\": has_nonroot_user(content),\n              \"no_cache\": has_no_cache(content),\n              \"version_pins\": has_version_pins(content),\n              \"path\": path\n          }\n          res[\"ok\"] = res[\"nonroot_user\"] and res[\"no_cache\"] and res[\"version_pins\"]\n          print(json.dumps(res, indent=2))\n          sys.exit(0 if res[\"ok\"] else 1)\n\n      if __name__ == \"__main__\":\n          main()\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/ci\n  created: '2025-11-10T21:10:00Z'\n  updated: '2025-11-10T21:10:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- ci\n- release\nsecurity:\n  sensitivity: medium\n  notes: \"Runs in restricted CI; no network by default; read-only FS recommended.\"\n",
+      "posture": "witnessed",
+      "_witness_count": 1
+    },
+    "ci.license_compliance_v1": {
+      "id": "ci.license_compliance_v1",
+      "version": "1.0.0",
+      "domain": "ci",
+      "title": "License Compliance — Allowlist Only",
+      "statement": "All package licenses in the SBOM must be on an allowlist. Fail on any package with a disallowed or unknown license.",
+      "witnesses": [
+        {
+          "name": "spdx_allowlist_only",
+          "language": "python",
+          "entrypoint": "python3",
+          "args": [],
+          "env": {
+            "SBOM_PATH": "artifacts/examples/ci/sbom.json",
+            "ALLOWED_LICENSES_JSON": "[\"MIT\",\"Apache-2.0\",\"BSD-3-Clause\",\"BSD-2-Clause\",\"ISC\",\"Python-2.0\"]",
+            "STRICT_FIELDS_ONLY": "true",
+            "IGNORE_NUMERIC_TOKENS": "true"
+          },
+          "timeout_ms": 5000,
+          "memory_mb": 128,
+          "net": false,
+          "fs_mode": "ro",
+          "code": "import os, json, sys, re\n\nVERSION_RE = re.compile(r\"^\\d+(?:\\.\\d+){0,3}$\")\n\ndef env_bool(name, default):\n    v = os.environ.get(name, str(default)).strip().lower()\n    return v in (\"1\",\"true\",\"yes\",\"on\")\n\ndef load_json(path):\n    with open(path, \"r\", errors=\"ignore\") as f:\n        return json.load(f)\n\ndef norm(s):\n    return (s or \"\").strip()\n\ndef collect_from_known_fields(sbom):\n    out = set()\n\n    # CycloneDX components\n    comps = sbom.get(\"components\") or []\n    for c in comps:\n        # CycloneDX license list format\n        lic_list = c.get(\"licenses\") or []\n        for it in lic_list:\n            if isinstance(it, dict):\n                lic = it.get(\"license\")\n                if isinstance(lic, dict):\n                    out.add(norm(lic.get(\"id\") or lic.get(\"name\")))\n                elif isinstance(lic, str):\n                    out.add(norm(lic))\n        # simple fallback: component.license\n        if isinstance(c.get(\"license\"), str):\n            out.add(norm(c[\"license\"]))\n        elif isinstance(c.get(\"license\"), dict):\n            out.add(norm(c[\"license\"].get(\"id\") or c[\"license\"].get(\"name\")))\n\n    # SPDX packages\n    pkgs = sbom.get(\"packages\") or []\n    for p in pkgs:\n        for key in (\"licenseConcluded\",\"licenseDeclared\",\"license\"):\n            if key in p and p[key]:\n                if isinstance(p[key], str):\n                    out.add(norm(p[key]))\n                elif isinstance(p[key], dict):\n                    out.add(norm(p[key].get(\"id\") or p[key].get(\"name\")))\n\n    return {x for x in out if x}\n\ndef collect_heuristic_tokens(sbom):\n    # Last-resort heuristic over raw text; may misfire.\n    # We will filter numeric/version-looking tokens below.\n    text = json.dumps(sbom, ensure_ascii=False)\n    # Simple token pass for SPDX-like ids\n    toks = set(re.findall(r\"\\b[A-Za-z][A-Za-z0-9\\.\\-\\+]{1,}\\b\", text))\n    return toks\n\ndef main():\n    sbom_path = os.environ.get(\"SBOM_PATH\", \"artifacts/examples/ci/sbom.json\")\n    try:\n        allow = set(json.loads(os.environ.get(\n            \"ALLOWED_LICENSES_JSON\",\n            '[\"MIT\",\"Apache-2.0\",\"BSD-3-Clause\",\"BSD-2-Clause\",\"ISC\",\"Python-2.0\"]'\n        )))\n    except Exception:\n        allow = {\"MIT\",\"Apache-2.0\",\"BSD-3-Clause\",\"BSD-2-Clause\",\"ISC\",\"Python-2.0\"}\n\n    STRICT = env_bool(\"STRICT_FIELDS_ONLY\", True)\n    IGN_NUM = env_bool(\"IGNORE_NUMERIC_TOKENS\", True)\n\n    try:\n        sbom = load_json(sbom_path)\n    except Exception as e:\n        print(json.dumps({\"ok\": False, \"error\": f\"load:{e}\", \"sbom_path\": sbom_path}, indent=2))\n        sys.exit(1)\n\n    licenses = set()\n    # Prefer structured fields\n    licenses |= collect_from_known_fields(sbom)\n\n    if not STRICT:\n        # Heuristic fallback (filtered)\n        licenses |= collect_heuristic_tokens(sbom)\n\n    # Filter empties and numeric/version-looking tokens\n    cleaned = []\n    for x in licenses:\n        if not x: \n            continue\n        if IGN_NUM and VERSION_RE.match(x):\n            continue\n        cleaned.append(x)\n\n    cleaned = sorted(set(map(str, cleaned)))\n    disallowed = sorted({x for x in cleaned if x not in allow})\n\n    result = {\n        \"ok\": len(disallowed) == 0,\n        \"licenses\": cleaned,\n        \"disallowed\": disallowed,\n        \"allowlist\": sorted(allow),\n        \"strict_fields_only\": STRICT,\n        \"ignore_numeric_tokens\": IGN_NUM\n    }\n    print(json.dumps(result, indent=2))\n    sys.exit(0 if result[\"ok\"] else 1)\n\nif __name__ == \"__main__\":\n    main()"
+        }
+      ],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/ci",
+        "created": "2025-11-10T21:10:00Z",
+        "updated": "2025-11-10T21:10:00Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "ci",
+        "release"
+      ],
+      "security": {
+        "sensitivity": "medium",
+        "notes": "Runs in restricted CI; no network by default; read-only FS recommended."
+      },
+      "_file": "./capsules/ci/ci.license_compliance_v1.yaml",
+      "_raw": "id: ci.license_compliance_v1\nversion: 1.0.0\ndomain: ci\ntitle: License Compliance — Allowlist Only\nstatement: |-\n  All package licenses in the SBOM must be on an allowlist. Fail on any package with a disallowed or unknown license.\n\nwitnesses:\n  - name: spdx_allowlist_only\n    language: python\n    entrypoint: python3\n    args: []\n    env:\n      SBOM_PATH: artifacts/examples/ci/sbom.json\n      ALLOWED_LICENSES_JSON: '[\"MIT\",\"Apache-2.0\",\"BSD-3-Clause\",\"BSD-2-Clause\",\"ISC\",\"Python-2.0\"]'\n      STRICT_FIELDS_ONLY: \"true\"          # prefer known SBOM fields, avoid heuristics\n      IGNORE_NUMERIC_TOKENS: \"true\"       # ignore tokens that look like versions/numbers\n    timeout_ms: 5000\n    memory_mb: 128\n    net: false\n    fs_mode: ro\n    code: |-\n      import os, json, sys, re\n\n      VERSION_RE = re.compile(r\"^\\d+(?:\\.\\d+){0,3}$\")\n\n      def env_bool(name, default):\n          v = os.environ.get(name, str(default)).strip().lower()\n          return v in (\"1\",\"true\",\"yes\",\"on\")\n\n      def load_json(path):\n          with open(path, \"r\", errors=\"ignore\") as f:\n              return json.load(f)\n\n      def norm(s):\n          return (s or \"\").strip()\n\n      def collect_from_known_fields(sbom):\n          out = set()\n\n          # CycloneDX components\n          comps = sbom.get(\"components\") or []\n          for c in comps:\n              # CycloneDX license list format\n              lic_list = c.get(\"licenses\") or []\n              for it in lic_list:\n                  if isinstance(it, dict):\n                      lic = it.get(\"license\")\n                      if isinstance(lic, dict):\n                          out.add(norm(lic.get(\"id\") or lic.get(\"name\")))\n                      elif isinstance(lic, str):\n                          out.add(norm(lic))\n              # simple fallback: component.license\n              if isinstance(c.get(\"license\"), str):\n                  out.add(norm(c[\"license\"]))\n              elif isinstance(c.get(\"license\"), dict):\n                  out.add(norm(c[\"license\"].get(\"id\") or c[\"license\"].get(\"name\")))\n\n          # SPDX packages\n          pkgs = sbom.get(\"packages\") or []\n          for p in pkgs:\n              for key in (\"licenseConcluded\",\"licenseDeclared\",\"license\"):\n                  if key in p and p[key]:\n                      if isinstance(p[key], str):\n                          out.add(norm(p[key]))\n                      elif isinstance(p[key], dict):\n                          out.add(norm(p[key].get(\"id\") or p[key].get(\"name\")))\n\n          return {x for x in out if x}\n\n      def collect_heuristic_tokens(sbom):\n          # Last-resort heuristic over raw text; may misfire.\n          # We will filter numeric/version-looking tokens below.\n          text = json.dumps(sbom, ensure_ascii=False)\n          # Simple token pass for SPDX-like ids\n          toks = set(re.findall(r\"\\b[A-Za-z][A-Za-z0-9\\.\\-\\+]{1,}\\b\", text))\n          return toks\n\n      def main():\n          sbom_path = os.environ.get(\"SBOM_PATH\", \"artifacts/examples/ci/sbom.json\")\n          try:\n              allow = set(json.loads(os.environ.get(\n                  \"ALLOWED_LICENSES_JSON\",\n                  '[\"MIT\",\"Apache-2.0\",\"BSD-3-Clause\",\"BSD-2-Clause\",\"ISC\",\"Python-2.0\"]'\n              )))\n          except Exception:\n              allow = {\"MIT\",\"Apache-2.0\",\"BSD-3-Clause\",\"BSD-2-Clause\",\"ISC\",\"Python-2.0\"}\n\n          STRICT = env_bool(\"STRICT_FIELDS_ONLY\", True)\n          IGN_NUM = env_bool(\"IGNORE_NUMERIC_TOKENS\", True)\n\n          try:\n              sbom = load_json(sbom_path)\n          except Exception as e:\n              print(json.dumps({\"ok\": False, \"error\": f\"load:{e}\", \"sbom_path\": sbom_path}, indent=2))\n              sys.exit(1)\n\n          licenses = set()\n          # Prefer structured fields\n          licenses |= collect_from_known_fields(sbom)\n\n          if not STRICT:\n              # Heuristic fallback (filtered)\n              licenses |= collect_heuristic_tokens(sbom)\n\n          # Filter empties and numeric/version-looking tokens\n          cleaned = []\n          for x in licenses:\n              if not x: \n                  continue\n              if IGN_NUM and VERSION_RE.match(x):\n                  continue\n              cleaned.append(x)\n\n          cleaned = sorted(set(map(str, cleaned)))\n          disallowed = sorted({x for x in cleaned if x not in allow})\n\n          result = {\n              \"ok\": len(disallowed) == 0,\n              \"licenses\": cleaned,\n              \"disallowed\": disallowed,\n              \"allowlist\": sorted(allow),\n              \"strict_fields_only\": STRICT,\n              \"ignore_numeric_tokens\": IGN_NUM\n          }\n          print(json.dumps(result, indent=2))\n          sys.exit(0 if result[\"ok\"] else 1)\n\n      if __name__ == \"__main__\":\n          main()\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/ci\n  created: '2025-11-10T21:10:00Z'\n  updated: '2025-11-10T21:10:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- ci\n- release\nsecurity:\n  sensitivity: medium\n  notes: \"Runs in restricted CI; no network by default; read-only FS recommended.\"\n",
+      "posture": "witnessed",
+      "_witness_count": 1
+    },
+    "ci.secrets_in_build_env_v1": {
+      "id": "ci.secrets_in_build_env_v1",
+      "version": "1.0.0",
+      "domain": "ci",
+      "title": "Build Environment — No Secrets in Env Dump",
+      "statement": "The build environment dump must not contain forbidden keys. Fail if any env var key matches a forbidden prefix or exact name.",
+      "witnesses": [
+        {
+          "name": "no_forbidden_env_keys",
+          "language": "python",
+          "entrypoint": "python3",
+          "args": [],
+          "env": {
+            "ENV_DUMP_PATH": "artifacts/examples/ci/env_dump.txt",
+            "FORBIDDEN_PREFIXES_JSON": "[\"AWS_\",\"GCP_\",\"AZURE_\",\"GH_TOKEN\",\"SLACK_\",\"PRIVATE_KEY\",\"OPENAI_API_KEY\",\"SECRET\",\"TOKEN\"]"
+          },
+          "timeout_ms": 4000,
+          "memory_mb": 128,
+          "net": false,
+          "fs_mode": "ro",
+          "code": "import os, sys, json\n\ndef parse_env_dump(path):\n    env = {}\n    with open(path, \"r\", errors=\"ignore\") as f:\n        for line in f:\n            line = line.strip()\n            if not line or line.startswith(\"#\"):\n                continue\n            if \"=\" in line:\n                k, v = line.split(\"=\", 1)\n                env[k.strip()] = v.strip()\n    return env\n\ndef main():\n    dump = os.environ.get(\"ENV_DUMP_PATH\", \"artifacts/examples/ci/env_dump.txt\")\n    pref_json = os.environ.get(\"FORBIDDEN_PREFIXES_JSON\", '[\"AWS_\",\"GCP_\",\"AZURE_\",\"GH_TOKEN\",\"SLACK_\",\"PRIVATE_KEY\",\"OPENAI_API_KEY\",\"SECRET\",\"TOKEN\"]')\n    try:\n        prefixes = json.loads(pref_json)\n    except Exception:\n        prefixes = [\"AWS_\",\"GCP_\",\"AZURE_\",\"GH_TOKEN\",\"SLACK_\",\"PRIVATE_KEY\",\"OPENAI_API_KEY\",\"SECRET\",\"TOKEN\"]\n\n    env = parse_env_dump(dump)\n    bad = []\n    for k in env.keys():\n        for p in prefixes:\n            if k == p or k.startswith(p):\n                bad.append(k)\n                break\n\n    result = {\"ok\": len(bad) == 0, \"forbidden_matches\": sorted(set(bad)), \"scanned\": len(env), \"path\": dump}\n    print(json.dumps(result, indent=2))\n    sys.exit(0 if result[\"ok\"] else 1)\n\nif __name__ == \"__main__\":\n    main()"
+        }
+      ],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/ci",
+        "created": "2025-11-10T21:10:00Z",
+        "updated": "2025-11-10T21:10:00Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "ci",
+        "release"
+      ],
+      "security": {
+        "sensitivity": "medium",
+        "notes": "Runs in restricted CI; no network by default; read-only FS recommended."
+      },
+      "_file": "./capsules/ci/ci.secrets_in_build_env_v1.yaml",
+      "_raw": "id: ci.secrets_in_build_env_v1\nversion: 1.0.0\ndomain: ci\ntitle: Build Environment — No Secrets in Env Dump\nstatement: |-\n  The build environment dump must not contain forbidden keys. Fail if any env var key matches a forbidden prefix or exact name.\nwitnesses:\n  - name: no_forbidden_env_keys\n    language: python\n    entrypoint: python3\n    args: []\n    env:\n      ENV_DUMP_PATH: artifacts/examples/ci/env_dump.txt\n      FORBIDDEN_PREFIXES_JSON: '[\"AWS_\",\"GCP_\",\"AZURE_\",\"GH_TOKEN\",\"SLACK_\",\"PRIVATE_KEY\",\"OPENAI_API_KEY\",\"SECRET\",\"TOKEN\"]'\n    timeout_ms: 4000\n    memory_mb: 128\n    net: false\n    fs_mode: ro\n    code: |-\n      import os, sys, json\n\n      def parse_env_dump(path):\n          env = {}\n          with open(path, \"r\", errors=\"ignore\") as f:\n              for line in f:\n                  line = line.strip()\n                  if not line or line.startswith(\"#\"):\n                      continue\n                  if \"=\" in line:\n                      k, v = line.split(\"=\", 1)\n                      env[k.strip()] = v.strip()\n          return env\n\n      def main():\n          dump = os.environ.get(\"ENV_DUMP_PATH\", \"artifacts/examples/ci/env_dump.txt\")\n          pref_json = os.environ.get(\"FORBIDDEN_PREFIXES_JSON\", '[\"AWS_\",\"GCP_\",\"AZURE_\",\"GH_TOKEN\",\"SLACK_\",\"PRIVATE_KEY\",\"OPENAI_API_KEY\",\"SECRET\",\"TOKEN\"]')\n          try:\n              prefixes = json.loads(pref_json)\n          except Exception:\n              prefixes = [\"AWS_\",\"GCP_\",\"AZURE_\",\"GH_TOKEN\",\"SLACK_\",\"PRIVATE_KEY\",\"OPENAI_API_KEY\",\"SECRET\",\"TOKEN\"]\n\n          env = parse_env_dump(dump)\n          bad = []\n          for k in env.keys():\n              for p in prefixes:\n                  if k == p or k.startswith(p):\n                      bad.append(k)\n                      break\n\n          result = {\"ok\": len(bad) == 0, \"forbidden_matches\": sorted(set(bad)), \"scanned\": len(env), \"path\": dump}\n          print(json.dumps(result, indent=2))\n          sys.exit(0 if result[\"ok\"] else 1)\n\n      if __name__ == \"__main__\":\n          main()\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/ci\n  created: '2025-11-10T21:10:00Z'\n  updated: '2025-11-10T21:10:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- ci\n- release\nsecurity:\n  sensitivity: medium\n  notes: \"Runs in restricted CI; no network by default; read-only FS recommended.\"\n",
+      "posture": "witnessed",
+      "_witness_count": 1
+    },
+    "ci.reproducible_artifact_hash_v1": {
+      "id": "ci.reproducible_artifact_hash_v1",
+      "version": "1.0.0",
+      "domain": "ci",
+      "title": "Reproducible Build — Repeatable Artifact Hash",
+      "statement": "Running the build command twice in a clean workspace should produce byte-identical artifacts (same SHA-256).",
+      "witnesses": [
+        {
+          "name": "repeatable_hash_check",
+          "language": "python",
+          "entrypoint": "python3",
+          "args": [],
+          "env": {
+            "BUILD_CMD": "bash artifacts/examples/ci/build_demo.sh",
+            "ARTIFACT_PATH": "artifacts/examples/ci/build/out/demo-artifact.txt"
+          },
+          "timeout_ms": 10000,
+          "memory_mb": 256,
+          "net": false,
+          "fs_mode": "rw",
+          "code": "import os, sys, json, hashlib, subprocess, time\n\ndef sha256(path):\n    h = hashlib.sha256()\n    with open(path, \"rb\") as f:\n        for chunk in iter(lambda: f.read(65536), b\"\"):\n            h.update(chunk)\n    return h.hexdigest()\n\ndef run_cmd(cmd):\n    completed = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)\n    return completed.returncode, completed.stdout, completed.stderr\n\ndef main():\n    cmd = os.environ.get(\"BUILD_CMD\", \"\")\n    artifact = os.environ.get(\"ARTIFACT_PATH\", \"\")\n\n    if cmd:\n        rc1, out1, err1 = run_cmd(cmd)\n        rc2, out2, err2 = run_cmd(cmd)\n        build_ok = (rc1 == 0 and rc2 == 0)\n    else:\n        build_ok = True\n        out1 = out2 = err1 = err2 = \"\"\n\n    if not os.path.isfile(artifact):\n        print(json.dumps({\"ok\": False, \"error\": \"artifact missing\", \"artifact\": artifact, \"build_ok\": build_ok, \"stdout\": out2, \"stderr\": err2}, indent=2))\n        sys.exit(1)\n\n    h1 = sha256(artifact)\n    time.sleep(0.1)\n    h2 = sha256(artifact)\n\n    ok = build_ok and (h1 == h2)\n    print(json.dumps({\"ok\": ok, \"artifact\": artifact, \"sha256_first\": h1, \"sha256_second\": h2, \"build_ok\": build_ok}, indent=2))\n    sys.exit(0 if ok else 1)\n\nif __name__ == \"__main__\":\n    main()"
+        }
+      ],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/ci",
+        "created": "2025-11-10T21:10:00Z",
+        "updated": "2025-11-10T21:10:00Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "ci",
+        "release"
+      ],
+      "security": {
+        "sensitivity": "medium",
+        "notes": "Runs in restricted CI; no network by default; read-only FS recommended."
+      },
+      "_file": "./capsules/ci/ci.reproducible_artifact_hash_v1.yaml",
+      "_raw": "id: ci.reproducible_artifact_hash_v1\nversion: 1.0.0\ndomain: ci\ntitle: Reproducible Build — Repeatable Artifact Hash\nstatement: |-\n  Running the build command twice in a clean workspace should produce byte-identical artifacts (same SHA-256).\n\nwitnesses:\n  - name: repeatable_hash_check\n    language: python\n    entrypoint: python3\n    args: []\n    env:\n      BUILD_CMD: \"bash artifacts/examples/ci/build_demo.sh\"\n      ARTIFACT_PATH: artifacts/examples/ci/build/out/demo-artifact.txt\n    timeout_ms: 10000\n    memory_mb: 256\n    net: false\n    fs_mode: rw\n    code: |-\n      import os, sys, json, hashlib, subprocess, time\n\n      def sha256(path):\n          h = hashlib.sha256()\n          with open(path, \"rb\") as f:\n              for chunk in iter(lambda: f.read(65536), b\"\"):\n                  h.update(chunk)\n          return h.hexdigest()\n\n      def run_cmd(cmd):\n          completed = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)\n          return completed.returncode, completed.stdout, completed.stderr\n\n      def main():\n          cmd = os.environ.get(\"BUILD_CMD\", \"\")\n          artifact = os.environ.get(\"ARTIFACT_PATH\", \"\")\n\n          if cmd:\n              rc1, out1, err1 = run_cmd(cmd)\n              rc2, out2, err2 = run_cmd(cmd)\n              build_ok = (rc1 == 0 and rc2 == 0)\n          else:\n              build_ok = True\n              out1 = out2 = err1 = err2 = \"\"\n\n          if not os.path.isfile(artifact):\n              print(json.dumps({\"ok\": False, \"error\": \"artifact missing\", \"artifact\": artifact, \"build_ok\": build_ok, \"stdout\": out2, \"stderr\": err2}, indent=2))\n              sys.exit(1)\n\n          h1 = sha256(artifact)\n          time.sleep(0.1)\n          h2 = sha256(artifact)\n\n          ok = build_ok and (h1 == h2)\n          print(json.dumps({\"ok\": ok, \"artifact\": artifact, \"sha256_first\": h1, \"sha256_second\": h2, \"build_ok\": build_ok}, indent=2))\n          sys.exit(0 if ok else 1)\n\n      if __name__ == \"__main__\":\n          main()\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/ci\n  created: '2025-11-10T21:10:00Z'\n  updated: '2025-11-10T21:10:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- ci\n- release\nsecurity:\n  sensitivity: medium\n  notes: \"Runs in restricted CI; no network by default; read-only FS recommended.\"\n",
+      "posture": "witnessed",
+      "_witness_count": 1
+    },
+    "ci.sbom_present_v1": {
+      "id": "ci.sbom_present_v1",
+      "version": "1.0.0",
+      "domain": "ci",
+      "title": "SBOM Present for the Release",
+      "statement": "A Software Bill of Materials (SBOM) must be attached to every release artifact.\nThe SBOM file must exist, be non-empty, and parse as JSON or SPDX tag-value text.",
+      "witnesses": [
+        {
+          "name": "sbom_file_exists",
+          "language": "python",
+          "entrypoint": "python3",
+          "args": [],
+          "env": {
+            "ARTIFACTS_DIR": "artifacts/examples/ci",
+            "SBOM_NAME": "sbom.json"
+          },
+          "timeout_ms": 4000,
+          "memory_mb": 128,
+          "net": false,
+          "fs_mode": "ro",
+          "code": "import os, json, sys\n\ndef is_nonempty_file(path):\n    try:\n        return os.path.isfile(path) and os.path.getsize(path) > 0\n    except Exception:\n        return False\n\ndef try_parse_json(path):\n    try:\n        with open(path, \"r\", errors=\"ignore\") as f:\n            json.load(f)\n        return True, \"json\"\n    except Exception:\n        return False, None\n\ndef try_spdx_tagvalue(path):\n    try:\n        with open(path, \"r\", errors=\"ignore\") as f:\n            head = f.read(2048)\n        return \"SPDXVersion:\" in head or \"PackageName:\" in head\n    except Exception:\n        return False\n\ndef main():\n    artifacts = os.environ.get(\"ARTIFACTS_DIR\", \"artifacts/examples/ci\")\n    name = os.environ.get(\"SBOM_NAME\", \"sbom.json\")\n    path = os.path.join(artifacts, name)\n\n    exists = is_nonempty_file(path)\n    parsed = False\n    fmt = None\n    if exists:\n        ok, fmt = try_parse_json(path)\n        if not ok:\n            if try_spdx_tagvalue(path):\n                parsed = True\n                fmt = \"spdx-tagvalue\"\n            else:\n                parsed = False\n        else:\n            parsed = True\n\n    result = {\"ok\": exists and parsed, \"path\": path, \"exists\": exists, \"parsed\": parsed, \"format\": fmt}\n    print(json.dumps(result, indent=2))\n    sys.exit(0 if result[\"ok\"] else 1)\n\nif __name__ == \"__main__\":\n    main()"
+        }
+      ],
+      "provenance": {
+        "schema": "provenance.v1",
+        "author": "John Macgregor",
+        "org": "Truth Capsules Demo",
+        "license": "MIT",
+        "source_url": "https://example.com/truth-capsules/ci",
+        "created": "2025-11-10T21:10:00Z",
+        "updated": "2025-11-10T21:10:00Z",
+        "review": {
+          "status": "draft",
+          "reviewers": [],
+          "last_reviewed": null
+        },
+        "signing": {
+          "method": "ed25519",
+          "key_id": null,
+          "pubkey": null,
+          "digest": null,
+          "signature": null
+        }
+      },
+      "applies_to": [
+        "ci",
+        "release"
+      ],
+      "security": {
+        "sensitivity": "medium",
+        "notes": "Runs in restricted CI; no network by default; read-only FS recommended."
+      },
+      "_file": "./capsules/ci/ci.sbom_present_v1.yaml",
+      "_raw": "id: ci.sbom_present_v1\nversion: 1.0.0\ndomain: ci\ntitle: SBOM Present for the Release\nstatement: |-\n  A Software Bill of Materials (SBOM) must be attached to every release artifact.\n  The SBOM file must exist, be non-empty, and parse as JSON or SPDX tag-value text.\n\nwitnesses:\n  - name: sbom_file_exists\n    language: python\n    entrypoint: python3\n    args: []\n    env:\n      ARTIFACTS_DIR: artifacts/examples/ci\n      SBOM_NAME: sbom.json\n    timeout_ms: 4000\n    memory_mb: 128\n    net: false\n    fs_mode: ro\n    code: |-\n      import os, json, sys\n\n      def is_nonempty_file(path):\n          try:\n              return os.path.isfile(path) and os.path.getsize(path) > 0\n          except Exception:\n              return False\n\n      def try_parse_json(path):\n          try:\n              with open(path, \"r\", errors=\"ignore\") as f:\n                  json.load(f)\n              return True, \"json\"\n          except Exception:\n              return False, None\n\n      def try_spdx_tagvalue(path):\n          try:\n              with open(path, \"r\", errors=\"ignore\") as f:\n                  head = f.read(2048)\n              return \"SPDXVersion:\" in head or \"PackageName:\" in head\n          except Exception:\n              return False\n\n      def main():\n          artifacts = os.environ.get(\"ARTIFACTS_DIR\", \"artifacts/examples/ci\")\n          name = os.environ.get(\"SBOM_NAME\", \"sbom.json\")\n          path = os.path.join(artifacts, name)\n\n          exists = is_nonempty_file(path)\n          parsed = False\n          fmt = None\n          if exists:\n              ok, fmt = try_parse_json(path)\n              if not ok:\n                  if try_spdx_tagvalue(path):\n                      parsed = True\n                      fmt = \"spdx-tagvalue\"\n                  else:\n                      parsed = False\n              else:\n                  parsed = True\n\n          result = {\"ok\": exists and parsed, \"path\": path, \"exists\": exists, \"parsed\": parsed, \"format\": fmt}\n          print(json.dumps(result, indent=2))\n          sys.exit(0 if result[\"ok\"] else 1)\n\n      if __name__ == \"__main__\":\n          main()\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/ci\n  created: '2025-11-10T21:10:00Z'\n  updated: '2025-11-10T21:10:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- ci\n- release\nsecurity:\n  sensitivity: medium\n  notes: \"Runs in restricted CI; no network by default; read-only FS recommended.\"\n",
+      "posture": "witnessed",
+      "_witness_count": 1
+    },
     "macgyver.world_as_typed_graph_v1": {
       "id": "macgyver.world_as_typed_graph_v1",
       "version": "1.0.0",
@@ -3542,7 +3963,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.world_as_typed_graph_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.world_as_typed_graph_v1.yaml",
       "_raw": "id: macgyver.world_as_typed_graph_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: World as a Typed Graph\nstatement: Model materials and energies as nodes with typed edges for conversions;\n  plan paths with minimal risk and cost.\nassumptions:\n- Graph mindset helps enumerate options and constraints.\npedagogy:\n- kind: Socratic\n  text: What is the next low‑risk edge from here to the goal?\n- kind: Aphorism\n  text: Map the edges; choose the gentlest path.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -3599,7 +4020,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "medium",
         "notes": "Explicitly rejects hazardous replication."
       },
-      "_file": "./capsules/macgyverisms/macgyver.reality_check_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.reality_check_v1.yaml",
       "_raw": "id: macgyver.reality_check_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Reality Check vs Fiction\nstatement: Use TV scenarios only as metaphors for safe, legal, non‑hazard practice.\n  Substitute benign analogues.\nassumptions:\n- No hazardous chemistry/electrics or bypassing of security systems.\npedagogy:\n- kind: Socratic\n  text: What benign analogue teaches the same principle?\n- kind: Aphorism\n  text: Learn the law; keep the lesson.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: medium\n  notes: Explicitly rejects hazardous replication.\n",
       "posture": "informational",
       "_witness_count": 0
@@ -3660,7 +4081,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.functional_fixedness_avoidance_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.functional_fixedness_avoidance_v1.yaml",
       "_raw": "id: macgyver.functional_fixedness_avoidance_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Avoid Functional Fixedness\nstatement: Intentionally re-label objects by their properties and verbs to unlock\n  alternative roles.\nassumptions:\n- User practices re-framing and is open to substitution.\npedagogy:\n- kind: Socratic\n  text: What else can this become if I ignore its default name?\n- kind: Socratic\n  text: Which property, not present in this item, can be paired to create a new role?\n- kind: Aphorism\n  text: Every object hides a verb.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -3717,7 +4138,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.fail_safe_defaults_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.fail_safe_defaults_v1.yaml",
       "_raw": "id: macgyver.fail_safe_defaults_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Fail‑Safe Defaults\nstatement: Design so that interruptions and errors do not cause harm; plan graceful\n  aborts.\nassumptions:\n- Interruption is likely; failure must be safe.\npedagogy:\n- kind: Socratic\n  text: What happens if we stop at Step 2? Make that harmless.\n- kind: Aphorism\n  text: If it must fail, let it fail safe.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -3774,7 +4195,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.affordance_matrix_template_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.affordance_matrix_template_v1.yaml",
       "_raw": "id: macgyver.affordance_matrix_template_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Affordance Matrix Template\nstatement: Tabulate assets→properties→law→role→risk to externalize options and surface\n  safer substitutions.\nassumptions:\n- Externalizing information reduces oversight.\npedagogy:\n- kind: Socratic\n  text: 'Fill three rows: what role can each asset play safely?'\n- kind: Aphorism\n  text: What you table, you can reason about.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -3831,7 +4252,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "medium",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.legal_ethical_guardrails_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.legal_ethical_guardrails_v1.yaml",
       "_raw": "id: macgyver.legal_ethical_guardrails_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Legal & Ethical Guardrails\nstatement: Operate with consent, legality, and non‑maleficence; solutions are for\n  safety, rescue, education, prototyping.\nassumptions:\n- User agrees to legal and ethical constraints.\npedagogy:\n- kind: Socratic\n  text: Whose consent or safety is implicated? Stop if unclear.\n- kind: Aphorism\n  text: Better a delayed win than a wrongful one.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: medium\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -3892,7 +4313,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.property_matching_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.property_matching_v1.yaml",
       "_raw": "id: macgyver.property_matching_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Property-to-Law Matching\nstatement: Map constraints to physical laws (pressure, torque, optics, buoyancy, friction)\n  and then to available properties and parts.\nassumptions:\n- Basic physics are more portable than specific tools.\npedagogy:\n- kind: Socratic\n  text: Which law satisfies the need with the fewest steps?\n- kind: Socratic\n  text: What property‑set makes that law easy to apply here?\n- kind: Aphorism\n  text: Name the energy, not the object.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -3957,7 +4378,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.affordances_over_objects_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.affordances_over_objects_v1.yaml",
       "_raw": "id: macgyver.affordances_over_objects_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Affordances Over Objects\nstatement: Prioritize material properties (conducts, insulates, reflects, absorbs,\n  seals, flexes, burns, reacts) over brand-form labels to unlock repurposing.\nassumptions:\n- Scene contains everyday materials with varied properties.\npedagogy:\n- kind: Socratic\n  text: For each nearby object, list three properties that could serve your goal.\n- kind: Socratic\n  text: Which property is missing—and what simple substitute adds it?\n- kind: Aphorism\n  text: Every object hides a verb.\n- kind: Aphorism\n  text: Properties beat brand names.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -4022,7 +4443,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.transduction_chains_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.transduction_chains_v1.yaml",
       "_raw": "id: macgyver.transduction_chains_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Transduction Chains\nstatement: 'Route one energy into the effect you need: chemical→thermal→mechanical,\n  optical→thermal, electrical→magnetic, pneumatic/hydraulic→force.'\nassumptions:\n- Safer energy conversions exist than direct brute force.\npedagogy:\n- kind: Socratic\n  text: Which energy form is easiest to start from in your scene?\n- kind: Socratic\n  text: What two-stage conversion achieves the effect with lower risk?\n- kind: Aphorism\n  text: Route energy; don’t brute energy.\n- kind: Aphorism\n  text: Two cheap stages outrun one clever stage.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -4079,7 +4500,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.prompt_skeleton_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.prompt_skeleton_v1.yaml",
       "_raw": "id: macgyver.prompt_skeleton_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: LLM Prompt Skeleton\nstatement: A structured prompt to force safe, legal, non‑destructive chain synthesis\n  for a defined goal and setting.\nassumptions:\n- LLMs need structure and guardrails for reliable outputs.\npedagogy:\n- kind: Socratic\n  text: Does the prompt enforce assets, laws, three chains, premortem, and micro‑test?\n- kind: Aphorism\n  text: Prompts are levers for minds.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- training\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -4140,7 +4561,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.chain_design_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.chain_design_v1.yaml",
       "_raw": "id: macgyver.chain_design_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: 'Chain Design: Sense→Gate→Amplify→Actuate'\nstatement: Build solutions as short chains with a clear trigger and amplification\n  before actuation.\nassumptions:\n- Multi‑stage steps increase control and predictability.\npedagogy:\n- kind: Socratic\n  text: Where is the gate/trigger? How is the effect amplified?\n- kind: Socratic\n  text: Can sensing/illusion replace force?\n- kind: Aphorism\n  text: 'Think chains: sense→gate→amplify→actuate.'\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -4197,7 +4618,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.parallel_options_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.parallel_options_v1.yaml",
       "_raw": "id: macgyver.parallel_options_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Parallel Optioning\nstatement: 'Always generate three routes: Physical, Informational, Environmental.'\nassumptions:\n- Time allows at least brief divergent ideation.\npedagogy:\n- kind: Socratic\n  text: List one Physical, one Informational, one Environmental route.\n- kind: Aphorism\n  text: Don’t hunt with one arrow.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -4254,7 +4675,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.redundancy_chokepoints_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.redundancy_chokepoints_v1.yaml",
       "_raw": "id: macgyver.redundancy_chokepoints_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Redundancy & Choke Points\nstatement: Protect your own single points of failure while removing the opponent’s\n  options.\nassumptions:\n- System thinking improves robustness and containment.\npedagogy:\n- kind: Socratic\n  text: Where is the single point of failure—and how do we cushion it?\n- kind: Aphorism\n  text: Add a backup or remove a choke.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -4311,7 +4732,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.mvp_mechanism_bias_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.mvp_mechanism_bias_v1.yaml",
       "_raw": "id: macgyver.mvp_mechanism_bias_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: MVP Mechanism Bias\nstatement: Prefer the smallest reversible mechanism that might work; escalate complexity\n  only as needed.\nassumptions:\n- Reversible steps reduce risk and damage.\npedagogy:\n- kind: Socratic\n  text: What is the least‑effort, reversible move that could work?\n- kind: Aphorism\n  text: Use reversibility as a brake.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -4368,7 +4789,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.prompts_as_programs_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.prompts_as_programs_v1.yaml",
       "_raw": "id: macgyver.prompts_as_programs_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Prompts as Programs\nstatement: Use structured prompts/checklists to force enumeration, comparison, and\n  premortems.\nassumptions:\n- Structure improves breadth and reduces blind spots.\npedagogy:\n- kind: Socratic\n  text: Have we enumerated three routes and a premortem yet?\n- kind: Aphorism\n  text: Prompt the mind you want.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -4425,7 +4846,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.low_tech_first_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.low_tech_first_v1.yaml",
       "_raw": "id: macgyver.low_tech_first_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Low-Tech First\nstatement: Prefer simple mechanisms (rope, wedge, lever, mirror) before powered or\n  chemical routes.\nassumptions:\n- Simple tools are present; powered tools are risky/unavailable.\npedagogy:\n- kind: Socratic\n  text: What non‑powered mechanism could replace this powered step?\n- kind: Aphorism\n  text: Small forces win with leverage, pressure, and time.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -4490,7 +4911,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.five_rails_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.five_rails_v1.yaml",
       "_raw": "id: macgyver.five_rails_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: The Five Rails of Action\nstatement: 'Operate along five rails: Sensing, Shaping, Timing, Power, Signaling.\n  Compose minimally sufficient sets to achieve the goal.'\nassumptions:\n- Any solution can be decomposed across the five rails.\npedagogy:\n- kind: Socratic\n  text: Which rails are absolutely necessary for this problem?\n- kind: Socratic\n  text: Can sensing replace force (e.g., bypass over break)?\n- kind: Aphorism\n  text: If you can’t make it stronger, make it smarter.\n- kind: Aphorism\n  text: Reduce the problem, not the world.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -4547,7 +4968,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.bias_checklist_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.bias_checklist_v1.yaml",
       "_raw": "id: macgyver.bias_checklist_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Bias & Mode Collapse Check\nstatement: Before finalizing, scan for confirmation bias, selection bias, overconfidence,\n  and mode collapse.\nassumptions:\n- Brief self‑audit improves reliability.\npedagogy:\n- kind: Socratic\n  text: Which plausible alternative did we ignore?\n- kind: Aphorism\n  text: Doubt is a feature.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -4604,7 +5025,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.latency_control_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.latency_control_v1.yaml",
       "_raw": "id: macgyver.latency_control_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Latency Control\nstatement: Design predictable timing via burn, dissolve, flow, charging, cooling;\n  prefer slow, observable delays.\nassumptions:\n- Delays can be made visible and interruptible.\npedagogy:\n- kind: Socratic\n  text: What delay is safest and most observable here?\n- kind: Aphorism\n  text: Delay is a component.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -4661,7 +5082,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.deliberate_practice_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.deliberate_practice_v1.yaml",
       "_raw": "id: macgyver.deliberate_practice_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Deliberate Practice Drills\nstatement: 'Short, repeatable drills: 2‑minute affordance scans; law‑matching flashcards;\n  chain sketches from household scenes.'\nassumptions:\n- Skill improves with frequent, safe micro‑reps.\npedagogy:\n- kind: Socratic\n  text: What 2‑minute drill can you run right now in this room?\n- kind: Aphorism\n  text: Small drills make big instincts.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -4718,7 +5139,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.inventory_thinking_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.inventory_thinking_v1.yaml",
       "_raw": "id: macgyver.inventory_thinking_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Inventory Thinking\nstatement: Represent the scene as {assets, properties, converters, storers, triggers,\n  constraints}.\nassumptions:\n- A fast written inventory improves plan quality.\npedagogy:\n- kind: Socratic\n  text: List assets→properties in 60 seconds. What’s missing?\n- kind: Aphorism\n  text: What you write down exists for strategy.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -4775,7 +5196,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.reflection_loop_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.reflection_loop_v1.yaml",
       "_raw": "id: macgyver.reflection_loop_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Reflection Loop\nstatement: 'After action: identify the governing law, the choke point, and one substitution\n  that would lower risk next time.'\nassumptions:\n- Retrospective improves future plan quality.\npedagogy:\n- kind: Socratic\n  text: Which law actually did the work? What will you change next time?\n- kind: Aphorism\n  text: Name the win mechanism or you won’t keep it.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -4832,7 +5253,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.deception_force_multiplier_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.deception_force_multiplier_v1.yaml",
       "_raw": "id: macgyver.deception_force_multiplier_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Deception as Force Multiplier\nstatement: Use diversions and illusions to buy time and reduce the need for force.\nassumptions:\n- Solutions should avoid harm and de-escalate.\npedagogy:\n- kind: Socratic\n  text: What harmless diversion buys a safe minute?\n- kind: Aphorism\n  text: A signal that buys a minute beats a force that breaks a wall.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -4890,7 +5311,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.sop_10min_loop_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.sop_10min_loop_v1.yaml",
       "_raw": "id: macgyver.sop_10min_loop_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: 'SOP: The 10‑Minute MacGyver Loop'\nstatement: 'A 10‑step loop: clarify target, map layout, inventory properties, pick\n  a law, sketch three chains, choose low‑risk, add timing control, premortem, micro‑test,\n  execute & observe.'\nassumptions:\n- Timeboxed planning increases safety and success.\npedagogy:\n- kind: Socratic\n  text: Which step can you perform in under 60 seconds right now?\n- kind: Aphorism\n  text: Process is the parachute.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\n- training\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -4945,7 +5366,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.problem_collapse_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.problem_collapse_v1.yaml",
       "_raw": "id: macgyver_problem_collapse_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Problem Space Collapse → New Solutions\nstatement: Collapse a problem like macgyver.\nassumptions:\n- Assumptions are enumerated or can be elicited with one question.\npedagogy:\n- kind: Socratic\n  text: Which single assumption, if wrong, invalidates the plan?\n- kind: Aphorism\n  text: Make failure explicit and reversible.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: '2025-11-07T03:56:05.351404Z'\n  updated: '2025-11-07T03:56:05.351404Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: null\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- life\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -5002,7 +5423,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.stock_verbs_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.stock_verbs_v1.yaml",
       "_raw": "id: macgyver.stock_verbs_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Stock Verbs\nstatement: 'Memorize a small verb lexicon: tie, wedge, knot, jam, twist, short, bridge,\n  reflect, refract, siphon, vent, pack, wick, damp, shim, lash.'\nassumptions:\n- Motor skills and basic materials available.\npedagogy:\n- kind: Socratic\n  text: Which two verbs change the state with least effort?\n- kind: Aphorism\n  text: Verbs, not nouns, move worlds.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -5059,7 +5480,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.rails_ledgers_hub_mapping_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.rails_ledgers_hub_mapping_v1.yaml",
       "_raw": "id: macgyver.rails_ledgers_hub_mapping_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Rails/Ledgers/Hub Mapping\nstatement: Map solutions to rails (Sensing, Shaping, Timing, Power, Signaling), bundle\n  minimal commuting rails as a ledger, schedule steps via the hub (ordered gates/delays).\nassumptions:\n- A shared vocabulary improves collaboration and auditability.\npedagogy:\n- kind: Socratic\n  text: Which minimal set of rails forms the ledger here?\n- kind: Aphorism\n  text: Gate→Gear→Hub keeps projects clean.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
@@ -5116,7 +5537,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "medium",
         "notes": "Discourages hazardous actions; focuses on reduction of harm."
       },
-      "_file": "./capsules/macgyverisms/macgyver.blast_radius_humility_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.blast_radius_humility_v1.yaml",
       "_raw": "id: macgyver.blast_radius_humility_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Blast-Radius Humility\nstatement: Prefer diversion, disablement, and exit over destructive outcomes; minimize\n  the space of unintended effects.\nassumptions:\n- Safety and ethics are paramount; bystanders matter.\npedagogy:\n- kind: Socratic\n  text: If this misfires, who is at risk? How do we shrink that radius?\n- kind: Aphorism\n  text: Build exits before entries.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: medium\n  notes: Discourages hazardous actions; focuses on reduction of harm.\n",
       "posture": "informational",
       "_witness_count": 0
@@ -5177,296 +5598,10 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/macgyverisms/macgyver.environment_as_component_v1.yaml",
+      "_file": "./capsules/macgyver/macgyver.environment_as_component_v1.yaml",
       "_raw": "id: macgyver.environment_as_component_v1\nversion: 1.0.0\ndomain: macgyver\ntitle: Environment as a Component\nstatement: Treat gravity, sunlight, water, wind, terrain, and architecture as active\n  parts of the design.\nassumptions:\n- The environment can safely contribute force, flow, or information.\npedagogy:\n- kind: Socratic\n  text: Which environmental asset can replace a bought part?\n- kind: Socratic\n  text: How can layout (doors, shafts, slopes) create or remove options?\n- kind: Aphorism\n  text: The floorplan is your toolkit.\nwitnesses: []\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/macgyver\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- planning\n- prototyping\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: low\n  notes: ''\n",
       "posture": "informational",
       "_witness_count": 0
-    },
-    "ci.container_hardening_v1": {
-      "id": "ci.container_hardening_v1",
-      "version": "1.0.0",
-      "domain": "ci",
-      "title": "Container Hardening — Non-Root + No-Cache + Version Pins",
-      "statement": "The Dockerfile must:\n  1) drop privileges with a non-root USER,\n  2) avoid build-time caches for package managers (e.g., pip --no-cache-dir or apt lists cleanup),\n  3) pin versions for installed packages (e.g., pip ==, apt package=version).",
-      "witnesses": [
-        {
-          "name": "dockerfile_has_nonroot_nocache_pins",
-          "language": "python",
-          "entrypoint": "python3",
-          "args": [],
-          "env": {
-            "DOCKERFILE_PATH": "artifacts/examples/ci/Dockerfile"
-          },
-          "timeout_ms": 5000,
-          "memory_mb": 128,
-          "net": false,
-          "fs_mode": "ro",
-          "code": "import os, sys, json, re\n\ndef read(path):\n    with open(path, \"r\", errors=\"ignore\") as f:\n        return f.read()\n\ndef has_nonroot_user(text):\n    for m in re.finditer(r\"^\\s*USER\\s+(.+)$\", text, flags=re.M|re.I):\n        val = m.group(1).strip()\n        if re.match(r\"(?i)root\\b|0\\b\", val):\n            return False\n        return True\n    return False\n\ndef has_no_cache(text):\n    patterns = [\n        r\"pip\\s+install[^\\n]*--no-cache-dir\",\n        r\"apt-get\\s+update[^\\n]*\\n[^\\n]*apt-get\\s+install[^\\n]*\\n[^\\n]*rm\\s+-rf\\s+/var/lib/apt/lists/\"\n    ]\n    return any(re.search(p, text, flags=re.I|re.S) for p in patterns)\n\ndef has_version_pins(text):\n    return bool(re.search(r\"==\\d+\\.\\d+|=\\d+\\.\\d+\", text))\n\ndef main():\n    path = os.environ.get(\"DOCKERFILE_PATH\", \"artifacts/examples/ci/Dockerfile\")\n    content = read(path)\n\n    res = {\n        \"nonroot_user\": has_nonroot_user(content),\n        \"no_cache\": has_no_cache(content),\n        \"version_pins\": has_version_pins(content),\n        \"path\": path\n    }\n    res[\"ok\"] = res[\"nonroot_user\"] and res[\"no_cache\"] and res[\"version_pins\"]\n    print(json.dumps(res, indent=2))\n    sys.exit(0 if res[\"ok\"] else 1)\n\nif __name__ == \"__main__\":\n    main()"
-        }
-      ],
-      "provenance": {
-        "schema": "provenance.v1",
-        "author": "John Macgregor",
-        "org": "Truth Capsules Demo",
-        "license": "MIT",
-        "source_url": "https://example.com/truth-capsules/ci",
-        "created": "2025-11-10T21:10:00Z",
-        "updated": "2025-11-10T21:10:00Z",
-        "review": {
-          "status": "draft",
-          "reviewers": [],
-          "last_reviewed": null
-        },
-        "signing": {
-          "method": "ed25519",
-          "key_id": null,
-          "pubkey": null,
-          "digest": null,
-          "signature": null
-        }
-      },
-      "applies_to": [
-        "ci",
-        "release"
-      ],
-      "security": {
-        "sensitivity": "medium",
-        "notes": "Runs in restricted CI; no network by default; read-only FS recommended."
-      },
-      "_file": "./capsules/continuous_integration/ci.container_hardening_v1.yaml",
-      "_raw": "id: ci.container_hardening_v1\nversion: 1.0.0\ndomain: ci\ntitle: Container Hardening — Non-Root + No-Cache + Version Pins\nstatement: |-\n  The Dockerfile must:\n    1) drop privileges with a non-root USER,\n    2) avoid build-time caches for package managers (e.g., pip --no-cache-dir or apt lists cleanup),\n    3) pin versions for installed packages (e.g., pip ==, apt package=version).\n\nwitnesses:\n  - name: dockerfile_has_nonroot_nocache_pins\n    language: python\n    entrypoint: python3\n    args: []\n    env:\n      DOCKERFILE_PATH: artifacts/examples/ci/Dockerfile\n    timeout_ms: 5000\n    memory_mb: 128\n    net: false\n    fs_mode: ro\n    code: |-\n      import os, sys, json, re\n\n      def read(path):\n          with open(path, \"r\", errors=\"ignore\") as f:\n              return f.read()\n\n      def has_nonroot_user(text):\n          for m in re.finditer(r\"^\\s*USER\\s+(.+)$\", text, flags=re.M|re.I):\n              val = m.group(1).strip()\n              if re.match(r\"(?i)root\\b|0\\b\", val):\n                  return False\n              return True\n          return False\n\n      def has_no_cache(text):\n          patterns = [\n              r\"pip\\s+install[^\\n]*--no-cache-dir\",\n              r\"apt-get\\s+update[^\\n]*\\n[^\\n]*apt-get\\s+install[^\\n]*\\n[^\\n]*rm\\s+-rf\\s+/var/lib/apt/lists/\"\n          ]\n          return any(re.search(p, text, flags=re.I|re.S) for p in patterns)\n\n      def has_version_pins(text):\n          return bool(re.search(r\"==\\d+\\.\\d+|=\\d+\\.\\d+\", text))\n\n      def main():\n          path = os.environ.get(\"DOCKERFILE_PATH\", \"artifacts/examples/ci/Dockerfile\")\n          content = read(path)\n\n          res = {\n              \"nonroot_user\": has_nonroot_user(content),\n              \"no_cache\": has_no_cache(content),\n              \"version_pins\": has_version_pins(content),\n              \"path\": path\n          }\n          res[\"ok\"] = res[\"nonroot_user\"] and res[\"no_cache\"] and res[\"version_pins\"]\n          print(json.dumps(res, indent=2))\n          sys.exit(0 if res[\"ok\"] else 1)\n\n      if __name__ == \"__main__\":\n          main()\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/ci\n  created: '2025-11-10T21:10:00Z'\n  updated: '2025-11-10T21:10:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- ci\n- release\nsecurity:\n  sensitivity: medium\n  notes: \"Runs in restricted CI; no network by default; read-only FS recommended.\"\n",
-      "posture": "witnessed",
-      "_witness_count": 1
-    },
-    "ci.license_compliance_v1": {
-      "id": "ci.license_compliance_v1",
-      "version": "1.0.0",
-      "domain": "ci",
-      "title": "License Compliance — Allowlist Only",
-      "statement": "All package licenses in the SBOM must be on an allowlist. Fail on any package with a disallowed or unknown license.",
-      "witnesses": [
-        {
-          "name": "spdx_allowlist_only",
-          "language": "python",
-          "entrypoint": "python3",
-          "args": [],
-          "env": {
-            "SBOM_PATH": "artifacts/examples/ci/sbom.json",
-            "ALLOWED_LICENSES_JSON": "[\"MIT\",\"Apache-2.0\",\"BSD-3-Clause\",\"BSD-2-Clause\",\"ISC\",\"Python-2.0\"]",
-            "STRICT_FIELDS_ONLY": "true",
-            "IGNORE_NUMERIC_TOKENS": "true"
-          },
-          "timeout_ms": 5000,
-          "memory_mb": 128,
-          "net": false,
-          "fs_mode": "ro",
-          "code": "import os, json, sys, re\n\nVERSION_RE = re.compile(r\"^\\d+(?:\\.\\d+){0,3}$\")\n\ndef env_bool(name, default):\n    v = os.environ.get(name, str(default)).strip().lower()\n    return v in (\"1\",\"true\",\"yes\",\"on\")\n\ndef load_json(path):\n    with open(path, \"r\", errors=\"ignore\") as f:\n        return json.load(f)\n\ndef norm(s):\n    return (s or \"\").strip()\n\ndef collect_from_known_fields(sbom):\n    out = set()\n\n    # CycloneDX components\n    comps = sbom.get(\"components\") or []\n    for c in comps:\n        # CycloneDX license list format\n        lic_list = c.get(\"licenses\") or []\n        for it in lic_list:\n            if isinstance(it, dict):\n                lic = it.get(\"license\")\n                if isinstance(lic, dict):\n                    out.add(norm(lic.get(\"id\") or lic.get(\"name\")))\n                elif isinstance(lic, str):\n                    out.add(norm(lic))\n        # simple fallback: component.license\n        if isinstance(c.get(\"license\"), str):\n            out.add(norm(c[\"license\"]))\n        elif isinstance(c.get(\"license\"), dict):\n            out.add(norm(c[\"license\"].get(\"id\") or c[\"license\"].get(\"name\")))\n\n    # SPDX packages\n    pkgs = sbom.get(\"packages\") or []\n    for p in pkgs:\n        for key in (\"licenseConcluded\",\"licenseDeclared\",\"license\"):\n            if key in p and p[key]:\n                if isinstance(p[key], str):\n                    out.add(norm(p[key]))\n                elif isinstance(p[key], dict):\n                    out.add(norm(p[key].get(\"id\") or p[key].get(\"name\")))\n\n    return {x for x in out if x}\n\ndef collect_heuristic_tokens(sbom):\n    # Last-resort heuristic over raw text; may misfire.\n    # We will filter numeric/version-looking tokens below.\n    text = json.dumps(sbom, ensure_ascii=False)\n    # Simple token pass for SPDX-like ids\n    toks = set(re.findall(r\"\\b[A-Za-z][A-Za-z0-9\\.\\-\\+]{1,}\\b\", text))\n    return toks\n\ndef main():\n    sbom_path = os.environ.get(\"SBOM_PATH\", \"artifacts/examples/ci/sbom.json\")\n    try:\n        allow = set(json.loads(os.environ.get(\n            \"ALLOWED_LICENSES_JSON\",\n            '[\"MIT\",\"Apache-2.0\",\"BSD-3-Clause\",\"BSD-2-Clause\",\"ISC\",\"Python-2.0\"]'\n        )))\n    except Exception:\n        allow = {\"MIT\",\"Apache-2.0\",\"BSD-3-Clause\",\"BSD-2-Clause\",\"ISC\",\"Python-2.0\"}\n\n    STRICT = env_bool(\"STRICT_FIELDS_ONLY\", True)\n    IGN_NUM = env_bool(\"IGNORE_NUMERIC_TOKENS\", True)\n\n    try:\n        sbom = load_json(sbom_path)\n    except Exception as e:\n        print(json.dumps({\"ok\": False, \"error\": f\"load:{e}\", \"sbom_path\": sbom_path}, indent=2))\n        sys.exit(1)\n\n    licenses = set()\n    # Prefer structured fields\n    licenses |= collect_from_known_fields(sbom)\n\n    if not STRICT:\n        # Heuristic fallback (filtered)\n        licenses |= collect_heuristic_tokens(sbom)\n\n    # Filter empties and numeric/version-looking tokens\n    cleaned = []\n    for x in licenses:\n        if not x: \n            continue\n        if IGN_NUM and VERSION_RE.match(x):\n            continue\n        cleaned.append(x)\n\n    cleaned = sorted(set(map(str, cleaned)))\n    disallowed = sorted({x for x in cleaned if x not in allow})\n\n    result = {\n        \"ok\": len(disallowed) == 0,\n        \"licenses\": cleaned,\n        \"disallowed\": disallowed,\n        \"allowlist\": sorted(allow),\n        \"strict_fields_only\": STRICT,\n        \"ignore_numeric_tokens\": IGN_NUM\n    }\n    print(json.dumps(result, indent=2))\n    sys.exit(0 if result[\"ok\"] else 1)\n\nif __name__ == \"__main__\":\n    main()"
-        }
-      ],
-      "provenance": {
-        "schema": "provenance.v1",
-        "author": "John Macgregor",
-        "org": "Truth Capsules Demo",
-        "license": "MIT",
-        "source_url": "https://example.com/truth-capsules/ci",
-        "created": "2025-11-10T21:10:00Z",
-        "updated": "2025-11-10T21:10:00Z",
-        "review": {
-          "status": "draft",
-          "reviewers": [],
-          "last_reviewed": null
-        },
-        "signing": {
-          "method": "ed25519",
-          "key_id": null,
-          "pubkey": null,
-          "digest": null,
-          "signature": null
-        }
-      },
-      "applies_to": [
-        "ci",
-        "release"
-      ],
-      "security": {
-        "sensitivity": "medium",
-        "notes": "Runs in restricted CI; no network by default; read-only FS recommended."
-      },
-      "_file": "./capsules/continuous_integration/ci.license_compliance_v1.yaml",
-      "_raw": "id: ci.license_compliance_v1\nversion: 1.0.0\ndomain: ci\ntitle: License Compliance — Allowlist Only\nstatement: |-\n  All package licenses in the SBOM must be on an allowlist. Fail on any package with a disallowed or unknown license.\n\nwitnesses:\n  - name: spdx_allowlist_only\n    language: python\n    entrypoint: python3\n    args: []\n    env:\n      SBOM_PATH: artifacts/examples/ci/sbom.json\n      ALLOWED_LICENSES_JSON: '[\"MIT\",\"Apache-2.0\",\"BSD-3-Clause\",\"BSD-2-Clause\",\"ISC\",\"Python-2.0\"]'\n      STRICT_FIELDS_ONLY: \"true\"          # prefer known SBOM fields, avoid heuristics\n      IGNORE_NUMERIC_TOKENS: \"true\"       # ignore tokens that look like versions/numbers\n    timeout_ms: 5000\n    memory_mb: 128\n    net: false\n    fs_mode: ro\n    code: |-\n      import os, json, sys, re\n\n      VERSION_RE = re.compile(r\"^\\d+(?:\\.\\d+){0,3}$\")\n\n      def env_bool(name, default):\n          v = os.environ.get(name, str(default)).strip().lower()\n          return v in (\"1\",\"true\",\"yes\",\"on\")\n\n      def load_json(path):\n          with open(path, \"r\", errors=\"ignore\") as f:\n              return json.load(f)\n\n      def norm(s):\n          return (s or \"\").strip()\n\n      def collect_from_known_fields(sbom):\n          out = set()\n\n          # CycloneDX components\n          comps = sbom.get(\"components\") or []\n          for c in comps:\n              # CycloneDX license list format\n              lic_list = c.get(\"licenses\") or []\n              for it in lic_list:\n                  if isinstance(it, dict):\n                      lic = it.get(\"license\")\n                      if isinstance(lic, dict):\n                          out.add(norm(lic.get(\"id\") or lic.get(\"name\")))\n                      elif isinstance(lic, str):\n                          out.add(norm(lic))\n              # simple fallback: component.license\n              if isinstance(c.get(\"license\"), str):\n                  out.add(norm(c[\"license\"]))\n              elif isinstance(c.get(\"license\"), dict):\n                  out.add(norm(c[\"license\"].get(\"id\") or c[\"license\"].get(\"name\")))\n\n          # SPDX packages\n          pkgs = sbom.get(\"packages\") or []\n          for p in pkgs:\n              for key in (\"licenseConcluded\",\"licenseDeclared\",\"license\"):\n                  if key in p and p[key]:\n                      if isinstance(p[key], str):\n                          out.add(norm(p[key]))\n                      elif isinstance(p[key], dict):\n                          out.add(norm(p[key].get(\"id\") or p[key].get(\"name\")))\n\n          return {x for x in out if x}\n\n      def collect_heuristic_tokens(sbom):\n          # Last-resort heuristic over raw text; may misfire.\n          # We will filter numeric/version-looking tokens below.\n          text = json.dumps(sbom, ensure_ascii=False)\n          # Simple token pass for SPDX-like ids\n          toks = set(re.findall(r\"\\b[A-Za-z][A-Za-z0-9\\.\\-\\+]{1,}\\b\", text))\n          return toks\n\n      def main():\n          sbom_path = os.environ.get(\"SBOM_PATH\", \"artifacts/examples/ci/sbom.json\")\n          try:\n              allow = set(json.loads(os.environ.get(\n                  \"ALLOWED_LICENSES_JSON\",\n                  '[\"MIT\",\"Apache-2.0\",\"BSD-3-Clause\",\"BSD-2-Clause\",\"ISC\",\"Python-2.0\"]'\n              )))\n          except Exception:\n              allow = {\"MIT\",\"Apache-2.0\",\"BSD-3-Clause\",\"BSD-2-Clause\",\"ISC\",\"Python-2.0\"}\n\n          STRICT = env_bool(\"STRICT_FIELDS_ONLY\", True)\n          IGN_NUM = env_bool(\"IGNORE_NUMERIC_TOKENS\", True)\n\n          try:\n              sbom = load_json(sbom_path)\n          except Exception as e:\n              print(json.dumps({\"ok\": False, \"error\": f\"load:{e}\", \"sbom_path\": sbom_path}, indent=2))\n              sys.exit(1)\n\n          licenses = set()\n          # Prefer structured fields\n          licenses |= collect_from_known_fields(sbom)\n\n          if not STRICT:\n              # Heuristic fallback (filtered)\n              licenses |= collect_heuristic_tokens(sbom)\n\n          # Filter empties and numeric/version-looking tokens\n          cleaned = []\n          for x in licenses:\n              if not x: \n                  continue\n              if IGN_NUM and VERSION_RE.match(x):\n                  continue\n              cleaned.append(x)\n\n          cleaned = sorted(set(map(str, cleaned)))\n          disallowed = sorted({x for x in cleaned if x not in allow})\n\n          result = {\n              \"ok\": len(disallowed) == 0,\n              \"licenses\": cleaned,\n              \"disallowed\": disallowed,\n              \"allowlist\": sorted(allow),\n              \"strict_fields_only\": STRICT,\n              \"ignore_numeric_tokens\": IGN_NUM\n          }\n          print(json.dumps(result, indent=2))\n          sys.exit(0 if result[\"ok\"] else 1)\n\n      if __name__ == \"__main__\":\n          main()\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/ci\n  created: '2025-11-10T21:10:00Z'\n  updated: '2025-11-10T21:10:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- ci\n- release\nsecurity:\n  sensitivity: medium\n  notes: \"Runs in restricted CI; no network by default; read-only FS recommended.\"\n",
-      "posture": "witnessed",
-      "_witness_count": 1
-    },
-    "ci.secrets_in_build_env_v1": {
-      "id": "ci.secrets_in_build_env_v1",
-      "version": "1.0.0",
-      "domain": "ci",
-      "title": "Build Environment — No Secrets in Env Dump",
-      "statement": "The build environment dump must not contain forbidden keys. Fail if any env var key matches a forbidden prefix or exact name.",
-      "witnesses": [
-        {
-          "name": "no_forbidden_env_keys",
-          "language": "python",
-          "entrypoint": "python3",
-          "args": [],
-          "env": {
-            "ENV_DUMP_PATH": "artifacts/examples/ci/env_dump.txt",
-            "FORBIDDEN_PREFIXES_JSON": "[\"AWS_\",\"GCP_\",\"AZURE_\",\"GH_TOKEN\",\"SLACK_\",\"PRIVATE_KEY\",\"OPENAI_API_KEY\",\"SECRET\",\"TOKEN\"]"
-          },
-          "timeout_ms": 4000,
-          "memory_mb": 128,
-          "net": false,
-          "fs_mode": "ro",
-          "code": "import os, sys, json\n\ndef parse_env_dump(path):\n    env = {}\n    with open(path, \"r\", errors=\"ignore\") as f:\n        for line in f:\n            line = line.strip()\n            if not line or line.startswith(\"#\"):\n                continue\n            if \"=\" in line:\n                k, v = line.split(\"=\", 1)\n                env[k.strip()] = v.strip()\n    return env\n\ndef main():\n    dump = os.environ.get(\"ENV_DUMP_PATH\", \"artifacts/examples/ci/env_dump.txt\")\n    pref_json = os.environ.get(\"FORBIDDEN_PREFIXES_JSON\", '[\"AWS_\",\"GCP_\",\"AZURE_\",\"GH_TOKEN\",\"SLACK_\",\"PRIVATE_KEY\",\"OPENAI_API_KEY\",\"SECRET\",\"TOKEN\"]')\n    try:\n        prefixes = json.loads(pref_json)\n    except Exception:\n        prefixes = [\"AWS_\",\"GCP_\",\"AZURE_\",\"GH_TOKEN\",\"SLACK_\",\"PRIVATE_KEY\",\"OPENAI_API_KEY\",\"SECRET\",\"TOKEN\"]\n\n    env = parse_env_dump(dump)\n    bad = []\n    for k in env.keys():\n        for p in prefixes:\n            if k == p or k.startswith(p):\n                bad.append(k)\n                break\n\n    result = {\"ok\": len(bad) == 0, \"forbidden_matches\": sorted(set(bad)), \"scanned\": len(env), \"path\": dump}\n    print(json.dumps(result, indent=2))\n    sys.exit(0 if result[\"ok\"] else 1)\n\nif __name__ == \"__main__\":\n    main()"
-        }
-      ],
-      "provenance": {
-        "schema": "provenance.v1",
-        "author": "John Macgregor",
-        "org": "Truth Capsules Demo",
-        "license": "MIT",
-        "source_url": "https://example.com/truth-capsules/ci",
-        "created": "2025-11-10T21:10:00Z",
-        "updated": "2025-11-10T21:10:00Z",
-        "review": {
-          "status": "draft",
-          "reviewers": [],
-          "last_reviewed": null
-        },
-        "signing": {
-          "method": "ed25519",
-          "key_id": null,
-          "pubkey": null,
-          "digest": null,
-          "signature": null
-        }
-      },
-      "applies_to": [
-        "ci",
-        "release"
-      ],
-      "security": {
-        "sensitivity": "medium",
-        "notes": "Runs in restricted CI; no network by default; read-only FS recommended."
-      },
-      "_file": "./capsules/continuous_integration/ci.secrets_in_build_env_v1.yaml",
-      "_raw": "id: ci.secrets_in_build_env_v1\nversion: 1.0.0\ndomain: ci\ntitle: Build Environment — No Secrets in Env Dump\nstatement: |-\n  The build environment dump must not contain forbidden keys. Fail if any env var key matches a forbidden prefix or exact name.\n\nwitnesses:\n  - name: no_forbidden_env_keys\n    language: python\n    entrypoint: python3\n    args: []\n    env:\n      ENV_DUMP_PATH: artifacts/examples/ci/env_dump.txt\n      FORBIDDEN_PREFIXES_JSON: '[\"AWS_\",\"GCP_\",\"AZURE_\",\"GH_TOKEN\",\"SLACK_\",\"PRIVATE_KEY\",\"OPENAI_API_KEY\",\"SECRET\",\"TOKEN\"]'\n    timeout_ms: 4000\n    memory_mb: 128\n    net: false\n    fs_mode: ro\n    code: |-\n      import os, sys, json\n\n      def parse_env_dump(path):\n          env = {}\n          with open(path, \"r\", errors=\"ignore\") as f:\n              for line in f:\n                  line = line.strip()\n                  if not line or line.startswith(\"#\"):\n                      continue\n                  if \"=\" in line:\n                      k, v = line.split(\"=\", 1)\n                      env[k.strip()] = v.strip()\n          return env\n\n      def main():\n          dump = os.environ.get(\"ENV_DUMP_PATH\", \"artifacts/examples/ci/env_dump.txt\")\n          pref_json = os.environ.get(\"FORBIDDEN_PREFIXES_JSON\", '[\"AWS_\",\"GCP_\",\"AZURE_\",\"GH_TOKEN\",\"SLACK_\",\"PRIVATE_KEY\",\"OPENAI_API_KEY\",\"SECRET\",\"TOKEN\"]')\n          try:\n              prefixes = json.loads(pref_json)\n          except Exception:\n              prefixes = [\"AWS_\",\"GCP_\",\"AZURE_\",\"GH_TOKEN\",\"SLACK_\",\"PRIVATE_KEY\",\"OPENAI_API_KEY\",\"SECRET\",\"TOKEN\"]\n\n          env = parse_env_dump(dump)\n          bad = []\n          for k in env.keys():\n              for p in prefixes:\n                  if k == p or k.startswith(p):\n                      bad.append(k)\n                      break\n\n          result = {\"ok\": len(bad) == 0, \"forbidden_matches\": sorted(set(bad)), \"scanned\": len(env), \"path\": dump}\n          print(json.dumps(result, indent=2))\n          sys.exit(0 if result[\"ok\"] else 1)\n\n      if __name__ == \"__main__\":\n          main()\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/ci\n  created: '2025-11-10T21:10:00Z'\n  updated: '2025-11-10T21:10:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- ci\n- release\nsecurity:\n  sensitivity: medium\n  notes: \"Runs in restricted CI; no network by default; read-only FS recommended.\"\n",
-      "posture": "witnessed",
-      "_witness_count": 1
-    },
-    "ci.reproducible_artifact_hash_v1": {
-      "id": "ci.reproducible_artifact_hash_v1",
-      "version": "1.0.0",
-      "domain": "ci",
-      "title": "Reproducible Build — Repeatable Artifact Hash",
-      "statement": "Running the build command twice in a clean workspace should produce byte-identical artifacts (same SHA-256).",
-      "witnesses": [
-        {
-          "name": "repeatable_hash_check",
-          "language": "python",
-          "entrypoint": "python3",
-          "args": [],
-          "env": {
-            "BUILD_CMD": "bash artifacts/examples/ci/build_demo.sh",
-            "ARTIFACT_PATH": "artifacts/examples/ci/build/out/demo-artifact.txt"
-          },
-          "timeout_ms": 10000,
-          "memory_mb": 256,
-          "net": false,
-          "fs_mode": "rw",
-          "code": "import os, sys, json, hashlib, subprocess, time\n\ndef sha256(path):\n    h = hashlib.sha256()\n    with open(path, \"rb\") as f:\n        for chunk in iter(lambda: f.read(65536), b\"\"):\n            h.update(chunk)\n    return h.hexdigest()\n\ndef run_cmd(cmd):\n    completed = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)\n    return completed.returncode, completed.stdout, completed.stderr\n\ndef main():\n    cmd = os.environ.get(\"BUILD_CMD\", \"\")\n    artifact = os.environ.get(\"ARTIFACT_PATH\", \"\")\n\n    if cmd:\n        rc1, out1, err1 = run_cmd(cmd)\n        rc2, out2, err2 = run_cmd(cmd)\n        build_ok = (rc1 == 0 and rc2 == 0)\n    else:\n        build_ok = True\n        out1 = out2 = err1 = err2 = \"\"\n\n    if not os.path.isfile(artifact):\n        print(json.dumps({\"ok\": False, \"error\": \"artifact missing\", \"artifact\": artifact, \"build_ok\": build_ok, \"stdout\": out2, \"stderr\": err2}, indent=2))\n        sys.exit(1)\n\n    h1 = sha256(artifact)\n    time.sleep(0.1)\n    h2 = sha256(artifact)\n\n    ok = build_ok and (h1 == h2)\n    print(json.dumps({\"ok\": ok, \"artifact\": artifact, \"sha256_first\": h1, \"sha256_second\": h2, \"build_ok\": build_ok}, indent=2))\n    sys.exit(0 if ok else 1)\n\nif __name__ == \"__main__\":\n    main()"
-        }
-      ],
-      "provenance": {
-        "schema": "provenance.v1",
-        "author": "John Macgregor",
-        "org": "Truth Capsules Demo",
-        "license": "MIT",
-        "source_url": "https://example.com/truth-capsules/ci",
-        "created": "2025-11-10T21:10:00Z",
-        "updated": "2025-11-10T21:10:00Z",
-        "review": {
-          "status": "draft",
-          "reviewers": [],
-          "last_reviewed": null
-        },
-        "signing": {
-          "method": "ed25519",
-          "key_id": null,
-          "pubkey": null,
-          "digest": null,
-          "signature": null
-        }
-      },
-      "applies_to": [
-        "ci",
-        "release"
-      ],
-      "security": {
-        "sensitivity": "medium",
-        "notes": "Runs in restricted CI; no network by default; read-only FS recommended."
-      },
-      "_file": "./capsules/continuous_integration/ci.reproducible_artifact_hash_v1.yaml",
-      "_raw": "id: ci.reproducible_artifact_hash_v1\nversion: 1.0.0\ndomain: ci\ntitle: Reproducible Build — Repeatable Artifact Hash\nstatement: |-\n  Running the build command twice in a clean workspace should produce byte-identical artifacts (same SHA-256).\n\nwitnesses:\n  - name: repeatable_hash_check\n    language: python\n    entrypoint: python3\n    args: []\n    env:\n      BUILD_CMD: \"bash artifacts/examples/ci/build_demo.sh\"\n      ARTIFACT_PATH: artifacts/examples/ci/build/out/demo-artifact.txt\n    timeout_ms: 10000\n    memory_mb: 256\n    net: false\n    fs_mode: rw\n    code: |-\n      import os, sys, json, hashlib, subprocess, time\n\n      def sha256(path):\n          h = hashlib.sha256()\n          with open(path, \"rb\") as f:\n              for chunk in iter(lambda: f.read(65536), b\"\"):\n                  h.update(chunk)\n          return h.hexdigest()\n\n      def run_cmd(cmd):\n          completed = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)\n          return completed.returncode, completed.stdout, completed.stderr\n\n      def main():\n          cmd = os.environ.get(\"BUILD_CMD\", \"\")\n          artifact = os.environ.get(\"ARTIFACT_PATH\", \"\")\n\n          if cmd:\n              rc1, out1, err1 = run_cmd(cmd)\n              rc2, out2, err2 = run_cmd(cmd)\n              build_ok = (rc1 == 0 and rc2 == 0)\n          else:\n              build_ok = True\n              out1 = out2 = err1 = err2 = \"\"\n\n          if not os.path.isfile(artifact):\n              print(json.dumps({\"ok\": False, \"error\": \"artifact missing\", \"artifact\": artifact, \"build_ok\": build_ok, \"stdout\": out2, \"stderr\": err2}, indent=2))\n              sys.exit(1)\n\n          h1 = sha256(artifact)\n          time.sleep(0.1)\n          h2 = sha256(artifact)\n\n          ok = build_ok and (h1 == h2)\n          print(json.dumps({\"ok\": ok, \"artifact\": artifact, \"sha256_first\": h1, \"sha256_second\": h2, \"build_ok\": build_ok}, indent=2))\n          sys.exit(0 if ok else 1)\n\n      if __name__ == \"__main__\":\n          main()\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/ci\n  created: '2025-11-10T21:10:00Z'\n  updated: '2025-11-10T21:10:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- ci\n- release\nsecurity:\n  sensitivity: medium\n  notes: \"Runs in restricted CI; no network by default; read-only FS recommended.\"\n",
-      "posture": "witnessed",
-      "_witness_count": 1
-    },
-    "ci.sbom_present_v1": {
-      "id": "ci.sbom_present_v1",
-      "version": "1.0.0",
-      "domain": "ci",
-      "title": "SBOM Present for the Release",
-      "statement": "A Software Bill of Materials (SBOM) must be attached to every release artifact.\nThe SBOM file must exist, be non-empty, and parse as JSON or SPDX tag-value text.",
-      "witnesses": [
-        {
-          "name": "sbom_file_exists",
-          "language": "python",
-          "entrypoint": "python3",
-          "args": [],
-          "env": {
-            "ARTIFACTS_DIR": "artifacts/examples/ci",
-            "SBOM_NAME": "sbom.json"
-          },
-          "timeout_ms": 4000,
-          "memory_mb": 128,
-          "net": false,
-          "fs_mode": "ro",
-          "code": "import os, json, sys\n\ndef is_nonempty_file(path):\n    try:\n        return os.path.isfile(path) and os.path.getsize(path) > 0\n    except Exception:\n        return False\n\ndef try_parse_json(path):\n    try:\n        with open(path, \"r\", errors=\"ignore\") as f:\n            json.load(f)\n        return True, \"json\"\n    except Exception:\n        return False, None\n\ndef try_spdx_tagvalue(path):\n    try:\n        with open(path, \"r\", errors=\"ignore\") as f:\n            head = f.read(2048)\n        return \"SPDXVersion:\" in head or \"PackageName:\" in head\n    except Exception:\n        return False\n\ndef main():\n    artifacts = os.environ.get(\"ARTIFACTS_DIR\", \"artifacts/examples/ci\")\n    name = os.environ.get(\"SBOM_NAME\", \"sbom.json\")\n    path = os.path.join(artifacts, name)\n\n    exists = is_nonempty_file(path)\n    parsed = False\n    fmt = None\n    if exists:\n        ok, fmt = try_parse_json(path)\n        if not ok:\n            if try_spdx_tagvalue(path):\n                parsed = True\n                fmt = \"spdx-tagvalue\"\n            else:\n                parsed = False\n        else:\n            parsed = True\n\n    result = {\"ok\": exists and parsed, \"path\": path, \"exists\": exists, \"parsed\": parsed, \"format\": fmt}\n    print(json.dumps(result, indent=2))\n    sys.exit(0 if result[\"ok\"] else 1)\n\nif __name__ == \"__main__\":\n    main()"
-        }
-      ],
-      "provenance": {
-        "schema": "provenance.v1",
-        "author": "John Macgregor",
-        "org": "Truth Capsules Demo",
-        "license": "MIT",
-        "source_url": "https://example.com/truth-capsules/ci",
-        "created": "2025-11-10T21:10:00Z",
-        "updated": "2025-11-10T21:10:00Z",
-        "review": {
-          "status": "draft",
-          "reviewers": [],
-          "last_reviewed": null
-        },
-        "signing": {
-          "method": "ed25519",
-          "key_id": null,
-          "pubkey": null,
-          "digest": null,
-          "signature": null
-        }
-      },
-      "applies_to": [
-        "ci",
-        "release"
-      ],
-      "security": {
-        "sensitivity": "medium",
-        "notes": "Runs in restricted CI; no network by default; read-only FS recommended."
-      },
-      "_file": "./capsules/continuous_integration/ci.sbom_present_v1.yaml",
-      "_raw": "id: ci.sbom_present_v1\nversion: 1.0.0\ndomain: ci\ntitle: SBOM Present for the Release\nstatement: |-\n  A Software Bill of Materials (SBOM) must be attached to every release artifact.\n  The SBOM file must exist, be non-empty, and parse as JSON or SPDX tag-value text.\n\nwitnesses:\n  - name: sbom_file_exists\n    language: python\n    entrypoint: python3\n    args: []\n    env:\n      ARTIFACTS_DIR: artifacts/examples/ci\n      SBOM_NAME: sbom.json\n    timeout_ms: 4000\n    memory_mb: 128\n    net: false\n    fs_mode: ro\n    code: |-\n      import os, json, sys\n\n      def is_nonempty_file(path):\n          try:\n              return os.path.isfile(path) and os.path.getsize(path) > 0\n          except Exception:\n              return False\n\n      def try_parse_json(path):\n          try:\n              with open(path, \"r\", errors=\"ignore\") as f:\n                  json.load(f)\n              return True, \"json\"\n          except Exception:\n              return False, None\n\n      def try_spdx_tagvalue(path):\n          try:\n              with open(path, \"r\", errors=\"ignore\") as f:\n                  head = f.read(2048)\n              return \"SPDXVersion:\" in head or \"PackageName:\" in head\n          except Exception:\n              return False\n\n      def main():\n          artifacts = os.environ.get(\"ARTIFACTS_DIR\", \"artifacts/examples/ci\")\n          name = os.environ.get(\"SBOM_NAME\", \"sbom.json\")\n          path = os.path.join(artifacts, name)\n\n          exists = is_nonempty_file(path)\n          parsed = False\n          fmt = None\n          if exists:\n              ok, fmt = try_parse_json(path)\n              if not ok:\n                  if try_spdx_tagvalue(path):\n                      parsed = True\n                      fmt = \"spdx-tagvalue\"\n                  else:\n                      parsed = False\n              else:\n                  parsed = True\n\n          result = {\"ok\": exists and parsed, \"path\": path, \"exists\": exists, \"parsed\": parsed, \"format\": fmt}\n          print(json.dumps(result, indent=2))\n          sys.exit(0 if result[\"ok\"] else 1)\n\n      if __name__ == \"__main__\":\n          main()\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/ci\n  created: '2025-11-10T21:10:00Z'\n  updated: '2025-11-10T21:10:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- ci\n- release\nsecurity:\n  sensitivity: medium\n  notes: \"Runs in restricted CI; no network by default; read-only FS recommended.\"\n",
-      "posture": "witnessed",
-      "_witness_count": 1
     },
     "dev.style_guide_js_v1": {
       "id": "dev.style_guide_js_v1",
@@ -5504,7 +5639,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "medium",
         "notes": ""
       },
-      "_file": "./capsules/development/dev.style_guide_js_v1.yaml",
+      "_file": "./capsules/dev/dev.style_guide_js_v1.yaml",
       "_raw": "id: dev.style_guide_js_v1\nversion: 1.0.0\ndomain: dev\ntitle: JS/TS Style Guide (Practical Defaults)\nstatement: |-\n  Keep the surface consistent; let tools fight bikeshedding.\n\n  Formatter & Lint\n    • Prettier; ESLint with recommended + security (eslint-plugin-security) + import/order.\n    • TypeScript strict for libraries; app code minimally typed but typed at boundaries.\n\n  Testing & UI\n    • Jest/Vitest + Testing Library; prefer role-based queries; avoid brittle snapshots.\n    • Keep components pure; derive state; lift state when two consumers need it.\n\n  Examples\n    • API calls have abort controllers and sane timeouts.\n    • Avoid implicit any; prefer union types to magic strings.\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/dev\n  created: '2025-11-10T20:25:00Z'\n  updated: '2025-11-10T20:25:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- review\nsecurity:\n  sensitivity: medium\n  notes: \"\"\n",
       "posture": "informational",
       "_witness_count": 0
@@ -5562,7 +5697,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "medium",
         "notes": ""
       },
-      "_file": "./capsules/development/dev.diff_risk_tags_v1.yaml",
+      "_file": "./capsules/dev/dev.diff_risk_tags_v1.yaml",
       "_raw": "id: dev.diff_risk_tags_v1\nversion: 1.0.0\ndomain: dev\ntitle: Diff-Derived Risk Tags are Addressed in Review\nstatement: |-\n  Compute risk tags from the diff and require the review to explicitly address each tag.\n  Tags include (non-exhaustive): security, performance, migration, breaking, dependency,\n  infrastructure, tests, docs. Review must mention each inferred tag.\n\nwitnesses:\n  - name: pr_review_covers_risks\n    language: python\n    entrypoint: python3\n    args: []\n    env:\n      REVIEW_PATH: artifacts/examples/dev/pr_review_good.md\n      DIFF_PATH: artifacts/examples/dev/pr_diff.patch\n    timeout_ms: 5000\n    memory_mb: 128\n    net: false\n    fs_mode: ro\n    code: |-\n        import os, re, json, sys\n\n        def read(path):\n            with open(path, \"r\", errors=\"ignore\") as f:\n                return f.read()\n\n        TAG_PATTERNS = {\n            \"security\": [r\"\\bauth\\b\", r\"\\bjwt\\b\", r\"\\bxss\\b\", r\"\\bcsrf\\b\", r\"\\bencrypt\", r\"\\bsecret\\b\", r\"\\btoken\\b\", r\"\\bhash\\b\", r\"\\baes\\b\", r\"\\brsa\\b\"],\n            \"performance\": [r\"\\bO\\([Nn]\\)\", r\"\\bhot path\\b\", r\"\\blatency\\b\", r\"\\bthroughput\\b\", r\"\\bcach\", r\"\\balloc\"],\n            # Migration: require SQL-ish context or migration frameworks/paths (NO plain 'index')\n            \"migration\": [\n                r\"\\bmigrations?/\", r\"\\b(alembic|flyway|liquibase)\\b\",\n                r\"\\bcreate\\s+(table|index)\\b\", r\"\\bdrop\\s+(column|table|index)\\b\",\n                r\"\\balter\\s+table\\b\", r\"\\bddl\\b\", r\"\\bschema\\b\"\n            ],\n            \"breaking\": [r\"BREAKING CHANGE\", r\"\\brename\\b\", r\"\\bremove public\\b\", r\"\\bsignature\\b\", r\"\\bsemver[- ]?major\\b\"],\n            \"dependency\": [r\"package\\.json\", r\"requirements\\.txt\", r\"poetry\\.lock\", r\"yarn\\.lock\", r\"pnpm-lock\", r\"go\\.mod\", r\"Cargo\\.toml\"],\n            \"infrastructure\": [r\"Dockerfile\", r\"\\bk8s\\b\", r\"helm\", r\"terraform\", r\"ansible\", r\"systemd\"],\n            \"tests\": [r\"\\btests?/\", r\"\\btest\", r\"\\bspec\\b\", r\"\\bfixture\\b\", r\"\\bcoverage\\b\"],\n            \"docs\": [r\"README\", r\"\\bdocs?/\", r\"\\.md\\b\"]\n        }\n\n        def infer_tags_from_diff(diff_text):\n            tags = set()\n            lowered = diff_text.lower()\n            for tag, pats in TAG_PATTERNS.items():\n                for pat in pats:\n                    if re.search(pat, lowered):\n                        tags.add(tag); break\n            return sorted(tags)\n\n        def tags_in_text(text):\n            found = set()\n            for tag in TAG_PATTERNS.keys():\n                if re.search(rf\"\\b{tag}\\b\", text, flags=re.I):\n                    found.add(tag)\n            m = re.search(r\"tags?\\s*:\\s*([a-z, ]+)\", text, flags=re.I)\n            if m:\n                for t in re.split(r\"[, ]+\", m.group(1).strip()):\n                    if t.lower() in TAG_PATTERNS.keys():\n                        found.add(t.lower())\n            return sorted(found)\n\n        def main():\n            review_path = os.environ.get(\"REVIEW_PATH\", \"artifacts/examples/dev/pr_review_good.md\")\n            diff_path = os.environ.get(\"DIFF_PATH\", \"artifacts/examples/dev/pr_diff.patch\")\n            if os.path.isdir(review_path): review_path = os.path.join(review_path, \"pr_review_good.md\")\n            if os.path.isdir(diff_path):   diff_path   = os.path.join(diff_path, \"pr_diff.patch\")\n\n            diff_text = read(diff_path)\n            review_text = read(review_path)\n\n            needed  = infer_tags_from_diff(diff_text)\n            present = tags_in_text(review_text)\n            missing = [t for t in needed if t not in present]\n\n            print(json.dumps({\n                \"ok\": len(missing) == 0,\n                \"needed\": needed, \"present\": present, \"missing\": missing,\n                \"review\": review_path, \"diff\": diff_path\n            }, indent=2))\n            sys.exit(0 if not missing else 1)\n\n        if __name__ == \"__main__\":\n            main()\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/dev\n  created: '2025-11-10T20:25:00Z'\n  updated: '2025-11-10T20:25:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- review\nsecurity:\n  sensitivity: medium\n  notes: \"\"\n",
       "posture": "witnessed",
       "_witness_count": 1
@@ -5628,7 +5763,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "low",
         "notes": ""
       },
-      "_file": "./capsules/development/dev.enforce_todo_ticket_v1.yaml",
+      "_file": "./capsules/dev/dev.enforce_todo_ticket_v1.yaml",
       "_raw": "id: dev.enforce_todo_ticket_v1\nversion: 1.0.0\ndomain: dev\ntitle: Enforce TODO/FIXME Lines Reference a Ticket\nstatement: |-\n  Any newly added TODO/FIXME lines in a diff must include a valid ticket reference.\n  Default format is `(PROJ|JIRA)-[0-9]+` and can be customized with env `TICKET_REGEX`.\n  Scope: added lines only (unified diff), excluding headers (`+++`, `@@`, `diff --git`).\n  Pass criteria:\n    • If no TODO/FIXME were added ⇒ PASS.\n    • If TODO/FIXME were added ⇒ each TODO line must contain a ticket reference that matches `TICKET_REGEX`.\n\nassumptions:\n  - Diff is a standard unified diff (e.g., `git diff`).\n  - Reviewers accept TODOs only when linked to tracked work.\n  - Ticket prefix is stable and communicated to the team.\n\npedagogy:\n  - kind: Socratic\n    text: If this TODO is worth shipping, where’s the ticket to follow it up?\n  - kind: Socratic\n    text: What template would keep TODOs actionable and time-bounded?\n  - kind: Aphorism\n    text: No ticket, no TODO.\n\nwitnesses:\n  - name: todo_refs_present\n    language: python\n    entrypoint: python3\n    args: []\n    env:\n      DIFF_PATH: artifacts/examples/pr_diff.patch\n      TICKET_REGEX: \"(PROJ|JIRA)-[0-9]+\"\n    timeout_ms: 5000\n    memory_mb: 128\n    net: false\n    fs_mode: ro\n    code: |-\n      import os, sys, re, json\n\n      DIFF_PATH = os.environ.get(\"DIFF_PATH\", \"artifacts/examples/pr_diff.patch\")\n      TICKET_REGEX = os.environ.get(\"TICKET_REGEX\", r\"(PROJ|JIRA)-[0-9]+\")\n      ticket_rx = re.compile(TICKET_REGEX)\n\n      def iter_added_lines(p):\n          with open(p, \"r\", errors=\"ignore\") as f:\n              for line in f:\n                  if line.startswith(\"+++ \") or line.startswith(\"--- \"):  # file headers\n                      continue\n                  if line.startswith(\"@@ \"):  # hunk headers\n                      continue\n                  if line.startswith(\"diff --git \"):  # git headers\n                      continue\n                  if line.startswith(\"+++\"):  # guard against \"+++b/file\"\n                      continue\n                  if line.startswith(\"+\") and not line.startswith(\"+++\") and not line.startswith(\"+@@\"):\n                      yield line[1:].rstrip(\"\\n\")\n\n      def main():\n          todo_lines = []\n          with_ticket = []\n          missing = []\n\n          for added in iter_added_lines(DIFF_PATH):\n              # We treat \"TODO\" or \"FIXME\" (any case) as a tracked to-do marker\n              if re.search(r\"(?i)\\b(TODO|FIXME)\\b\", added):\n                  todo_lines.append(added)\n                  if ticket_rx.search(added):\n                      with_ticket.append(added)\n                  else:\n                      missing.append(added)\n\n          ok = (len(todo_lines) == 0) or (len(missing) == 0)\n\n          out = {\n              \"ok\": ok,\n              \"diff\": DIFF_PATH,\n              \"regex\": TICKET_REGEX,\n              \"todo_added_count\": len(todo_lines),\n              \"todo_with_ticket\": len(with_ticket),\n              \"todo_missing_ticket\": len(missing),\n              \"examples_missing\": missing[:5]\n          }\n          print(json.dumps(out, indent=2))\n          sys.exit(0 if ok else 1)\n\n      if __name__ == \"__main__\":\n          main()\n\nprovenance:\n  schema: provenance.v1\n  author: Truth Capsules\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules\n  created: 2025-11-10T00:00:00Z\n  updated: 2025-11-10T00:00:00Z\n\napplies_to:\n  - ci\n  - code_assistant\n\ndependencies: []\nincompatible_with: []\n\nsecurity:\n  sensitivity: low\n  notes: \"\"\n",
       "posture": "witnessed",
       "_witness_count": 1
@@ -5693,7 +5828,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "medium",
         "notes": ""
       },
-      "_file": "./capsules/development/dev.secret_scan_baseline_v1.yaml",
+      "_file": "./capsules/dev/dev.secret_scan_baseline_v1.yaml",
       "_raw": "id: dev.secret_scan_baseline_v1\nversion: 1.0.0\ndomain: dev\ntitle: Secret Scan Baseline (No Keys, No High-Entropy Blobs)\nstatement: |-\n  Scan source tree for obvious secrets and high-entropy blobs. Skip vendor and binary paths.\n  Fail on suspected credentials or suspicious entropy across text files.\nwitnesses:\n  - name: no_high_entropy_or_keys\n    language: python\n    entrypoint: python3\n    args: []\n    env:\n      REPO_PATH: .\n      # Scan only code-ish files by default; you can widen with INCLUDE_GLOBS_JSON\n      INCLUDE_GLOBS_JSON: '[\"**/*.py\",\"**/*.js\",\"**/*.ts\",\"**/*.go\",\"**/*.rs\",\"**/*.java\",\"**/*.sh\",\"**/*.yaml\",\"**/*.yml\",\"**/*.toml\",\"**/*.ini\",\"**/*.cfg\",\"**/*.conf\"]'\n      # Skip heavy/noisy dirs/files\n      EXCLUDE_GLOBS_JSON: '[\"**/.env*\",\"**/out/**\",\"**/dist/**\",\"**/build/**\",\"**/node_modules/**\",\"**/.git/**\",\"**/__pycache__/**\",\"**/*.json\",\"**/*.ndjson\",\"**/*.ttl\",\"**/*.md\"]'\n      SKIP_DIRS_JSON: '[\".git\",\"node_modules\",\"venv\",\".venv\",\".cache\",\"dist\",\"build\",\"__pycache__\"]'\n      MAX_FILES: \"2000\"\n      MAX_FILE_BYTES: \"200000\"\n      ENTROPY_THRESHOLD: \"5.2\"             # higher to avoid “normal text” trips\n      # Candidate token pattern: long base64/hex-ish strings\n      TOKEN_MINLEN: \"20\"\n      KEY_REGEXES_JSON: |\n        [\n          \"(?i)aws[_-]?access[_-]?key[_-]?id\",\n          \"(?i)aws[_-]?secret[_-]?access[_-]?key\",\n          \"(?i)gh[_-]?token|github[_-]?token\",\n          \"(?i)slack[_-]?(token|webhook)\",\n          \"(?i)api[_-]?key|secret[_-]?key|private[_-]?key\",\n          \"-----BEGIN\\\\s+PRIVATE\\\\s+KEY-----\"\n        ]\n    timeout_ms: 8000\n    memory_mb: 256\n    net: false\n    fs_mode: ro\n    code: |-\n      import os, sys, json, math, fnmatch, re\n\n      def env_json(name, default):\n          try: return json.loads(os.environ.get(name, json.dumps(default)))\n          except Exception: return default\n\n      def env_int(name, default):\n          try: return int(os.environ.get(name, str(default)))\n          except Exception: return default\n\n      def env_float(name, default):\n          try: return float(os.environ.get(name, str(default)))\n          except Exception: return default\n\n      def shannon_entropy(s):\n          if not s: return 0.0\n          freq = {}\n          for ch in s: freq[ch] = freq.get(ch, 0) + 1\n          H = 0.0\n          ln = len(s)\n          for c in freq.values():\n              p = c / ln\n              H -= p * math.log2(p)\n          return H\n\n      def looks_binary(b):\n          return (b.count(b\"\\x00\") > 0) or any(c < 9 for c in b[:64])\n\n      def read_limited(path, max_bytes):\n          with open(path, \"rb\") as f: return f.read(max_bytes)\n\n      def match_any_glob(path, globs):\n          return any(fnmatch.fnmatch(path, g) for g in globs)\n\n      def main():\n          root = os.environ.get(\"REPO_PATH\", \".\")\n          include_globs = env_json(\"INCLUDE_GLOBS_JSON\", [])\n          exclude_globs = env_json(\"EXCLUDE_GLOBS_JSON\", [])\n          skip_dirs = set(env_json(\"SKIP_DIRS_JSON\", []))\n          max_files = env_int(\"MAX_FILES\", 2000)\n          max_bytes = env_int(\"MAX_FILE_BYTES\", 200000)\n          thr = env_float(\"ENTROPY_THRESHOLD\", 5.2)\n          token_min = env_int(\"TOKEN_MINLEN\", 20)\n          key_res = [re.compile(p) for p in env_json(\"KEY_REGEXES_JSON\", [])]\n          token_re = re.compile(rf\"[A-Za-z0-9+/=_-]{{{token_min},}}\")\n\n          findings, scanned = [], 0\n\n          for cur, dirs, files in os.walk(root):\n              dirs[:] = [d for d in dirs if os.path.join(cur, d).split(os.sep)[-1] not in skip_dirs]\n              for name in files:\n                  rel = os.path.relpath(os.path.join(cur, name), root)\n                  if exclude_globs and match_any_glob(rel, exclude_globs): continue\n                  if include_globs and not match_any_glob(rel, include_globs): continue\n\n                  scanned += 1\n                  if scanned > max_files:\n                      findings.append({\"limit\": \"max_files_reached\", \"scanned\": scanned})\n                      break\n\n                  try: data = read_limited(os.path.join(root, rel), max_bytes)\n                  except Exception: continue\n                  if looks_binary(data): continue\n\n                  try: text = data.decode(\"utf-8\", \"ignore\")\n                  except Exception: continue\n\n                  # Regex hits (keys/secrets style)\n                  regex_hits = []\n                  for rx in key_res:\n                      if rx.search(text):\n                          regex_hits.append(rx.pattern)\n\n                  # Token-level entropy (not whole file): find long base64/hex-ish substrings\n                  token_hits = []\n                  for tok in token_re.findall(text):\n                      H = shannon_entropy(tok)\n                      if H >= thr:\n                          token_hits.append({\"token_len\": len(tok), \"entropy\": round(H, 3)})\n\n                  if regex_hits or token_hits:\n                      findings.append({\n                          \"file\": rel,\n                          \"regex_hits\": regex_hits,\n                          \"token_hits\": token_hits[:5]\n                      })\n\n              if scanned > max_files: break\n\n          ok = len([f for f in findings if \"file\" in f]) == 0\n          out = {\n              \"ok\": ok,\n              \"findings\": findings[:50],\n              \"scanned_files\": scanned,\n              \"root\": root,\n              \"limits\": {\n                  \"max_files\": max_files,\n                  \"max_file_bytes\": max_bytes,\n                  \"entropy_threshold\": thr,\n                  \"token_minlen\": token_min\n              },\n              \"skipped_dirs\": sorted(skip_dirs),\n              \"include_globs\": include_globs,\n              \"exclude_globs\": exclude_globs\n          }\n          print(json.dumps(out, indent=2))\n          sys.exit(0 if ok else 1)\n\n      if __name__ == \"__main__\":\n          main()\n\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/dev\n  created: '2025-11-10T20:25:00Z'\n  updated: '2025-11-10T20:25:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- review\nsecurity:\n  sensitivity: medium\n  notes: \"\"\n",
       "posture": "witnessed",
       "_witness_count": 1
@@ -5734,7 +5869,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "medium",
         "notes": ""
       },
-      "_file": "./capsules/development/dev.commit_conventions_v1.yaml",
+      "_file": "./capsules/dev/dev.commit_conventions_v1.yaml",
       "_raw": "id: dev.commit_conventions_v1\nversion: 1.0.0\ndomain: dev\ntitle: Conventional Commits (with Examples)\nstatement: |-\n  Consistent messages → better changelogs, semantic versioning, and easier reviews.\n\n  Types\n    • feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert\n\n  Format\n    • type(scope): brief imperative summary\n    • Blank line, then optional body; footer for BREAKING CHANGE or issues.\n\n  Examples\n    • feat(api): add pagination to listUsers\n    • fix(auth): handle expired refresh tokens\n    • docs(readme): add quickstart docker commands\n\n  Diff etiquette\n    • Keep PRs small; isolate unrelated changes; include before/after snippets when helpful.\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/dev\n  created: '2025-11-10T20:25:00Z'\n  updated: '2025-11-10T20:25:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- review\nsecurity:\n  sensitivity: medium\n  notes: \"\"\n",
       "posture": "informational",
       "_witness_count": 0
@@ -5775,7 +5910,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "medium",
         "notes": ""
       },
-      "_file": "./capsules/development/dev.prompt_safety_rules_v1.yaml",
+      "_file": "./capsules/dev/dev.prompt_safety_rules_v1.yaml",
       "_raw": "id: dev.prompt_safety_rules_v1\nversion: 1.0.0\ndomain: dev\ntitle: Prompt Safety Rules (No Secrets, No PHI/PII, Scratchpad Discipline)\nstatement: |-\n  Guardrails for safe, reproducible dev prompting.\n\n  Do\n    • Redact or mask secrets/PHI/PII before pasting (tokens, keys, emails, phone numbers).\n    • Use a scratchpad file; summarize context; paste only minimal diffs, errors, and file paths.\n    • State desired output explicitly (patch/diff, function signature, CLI snippet).\n    • Declare toolchain versions and OS when relevant (python 3.11, node 20, ubuntu 22.04).\n    • Prefer small, testable changes; include tests or commands to verify.\n\n  Don’t\n    • Paste .env, private keys, customer data, or production URLs.\n    • Demand sweeping refactors; avoid touching unrelated files.\n    • Bury the lede — put the objective first; attach diagnostics after.\n\n  Scratchpad discipline\n    • Keep a running PLAN → VERIFY → ANSWER section.\n    • Use fenced code blocks for diffs/patches; keep commit-ready.\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/dev\n  created: '2025-11-10T20:25:00Z'\n  updated: '2025-11-10T20:25:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- review\nsecurity:\n  sensitivity: medium\n  notes: \"\"\n",
       "posture": "informational",
       "_witness_count": 0
@@ -5816,7 +5951,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "medium",
         "notes": ""
       },
-      "_file": "./capsules/development/dev.style_guide_python_v1.yaml",
+      "_file": "./capsules/dev/dev.style_guide_python_v1.yaml",
       "_raw": "id: dev.style_guide_python_v1\nversion: 1.0.0\ndomain: dev\ntitle: Python Style Guide (Practical Defaults)\nstatement: |-\n  Use boring, reliable defaults to keep diffs clean and onboarding fast.\n\n  Formatter & Lint\n    • Black (line-length 88), isort (profile=black), Ruff (or flake8) with error-level lint.\n    • mypy: --strict for libraries, relaxed for apps; add types for new/changed code.\n\n  Docstrings & Tests\n    • Google or NumPy style docstrings; include Args/Returns/Raises.\n    • pytest for tests; AAA pattern; prefer small, focused tests.\n\n  Examples\n    • Function signature changes require typing + tests.\n    • IO code uses context managers; network calls have timeouts.\n    • Use pathlib, not os.path string munging; f-strings over format().\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/dev\n  created: '2025-11-10T20:25:00Z'\n  updated: '2025-11-10T20:25:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- review\nsecurity:\n  sensitivity: medium\n  notes: \"\"\n",
       "posture": "informational",
       "_witness_count": 0
@@ -5857,7 +5992,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "medium",
         "notes": ""
       },
-      "_file": "./capsules/development/dev.review_checklist_v1.yaml",
+      "_file": "./capsules/dev/dev.review_checklist_v1.yaml",
       "_raw": "id: dev.review_checklist_v1\nversion: 1.0.0\ndomain: dev\ntitle: PR Review Checklist (Security, Perf, i18n, Docs, Tests)\nstatement: |-\n  Minimal checklist for actionable reviews.\n\n  Security\n    • Inputs validated; authz checked; secrets not logged; dependencies sane.\n  Performance\n    • No accidental N^2; hot paths measured; allocations/retries bounded.\n  i18n & UX\n    • Text externalized; RTL and accessibility considered for UI.\n  Docs & Tests\n    • README/CHANGELOG touched if behavior changes; tests added/updated; coverage stable.\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/dev\n  created: '2025-11-10T20:25:00Z'\n  updated: '2025-11-10T20:25:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- code_assistant\n- review\nsecurity:\n  sensitivity: medium\n  notes: \"\"\n",
       "posture": "informational",
       "_witness_count": 0
@@ -5912,7 +6047,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "medium",
         "notes": ""
       },
-      "_file": "./capsules/support_agent/support.pii_redaction_smoke_v1.yaml",
+      "_file": "./capsules/support/support.pii_redaction_smoke_v1.yaml",
       "_raw": "id: support.pii_redaction_smoke_v1\nversion: 1.0.0\ndomain: support\ntitle: PII Redaction Smoke Test\nstatement: |-\n  Ensure bundled examples contain no plaintext PII. This check scans example transcripts\n  (default: artifacts/examples/support_agent/examples.txt) for emails, phone numbers,\n  credit card patterns, government ID keywords, street addresses, and IP addresses.\nwitnesses:\n  - name: no_plaintext_pii_in_examples\n    language: python\n    code: |-\n      import os, sys, re, json, glob\n\n      def find_files(path):\n          if os.path.isdir(path):\n              for ext in (\"*.txt\", \"*.md\", \"*.log\"):\n                  for p in glob.glob(os.path.join(path, ext)):\n                      yield p\n          else:\n              if os.path.exists(path):\n                  yield path\n\n      EMAIL = re.compile(r\"[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\", re.I)\n      PHONE = re.compile(r\"(?:\\+?\\d{1,3}[\\s\\-\\.]?)?(?:\\(?\\d{3}\\)?[\\s\\-\\.]?\\d{3}[\\s\\-\\.]?\\d{4})\")\n      CCARD = re.compile(r\"\\b(?:\\d[ -]*?){13,19}\\b\")\n      GOVID = re.compile(r\"\\b(?:SSN|NIN|SIN|CPF|DNI|Aadhar)\\b\", re.I)\n      ADDRESS = re.compile(r\"\\b\\d{1,5}\\s+\\w+\\s+(?:St|Street|Ave|Avenue|Rd|Road|Blvd|Lane|Ln|Dr|Drive)\\b\", re.I)\n      IPADDR = re.compile(r\"\\b(?:(?:\\d{1,3}\\.){3}\\d{1,3})\\b\")\n\n      MASKED_TOKENS = re.compile(r\"\\*\\*\\*|\\[redacted\\]|\\[masked\\]\", re.I)\n\n      def main():\n          examples_path = os.environ.get(\"EXAMPLES_PATH\", \"\").strip()\n          fail_on_any = os.environ.get(\"FAIL_ON_ANY\", \"true\").lower() == \"true\"\n\n          if not examples_path:\n              print(json.dumps({\"ok\": False, \"error\": \"EXAMPLES_PATH not set\"}))\n              sys.exit(2)\n\n          patterns = {\n              \"email\": EMAIL,\n              \"phone\": PHONE,\n              \"credit_card\": CCARD,\n              \"government_id\": GOVID,\n              \"street_address\": ADDRESS,\n              \"ip_address\": IPADDR,\n          }\n\n          findings = []\n          total_lines = 0\n\n          for fp in find_files(examples_path):\n              with open(fp, \"r\", errors=\"ignore\") as f:\n                  for ln, line in enumerate(f, 1):\n                      total_lines += 1\n                      if MASKED_TOKENS.search(line):\n                          continue\n                      for tag, rx in patterns.items():\n                          for m in rx.finditer(line):\n                              findings.append({\"file\": fp, \"line\": ln, \"tag\": tag, \"match\": m.group(0)[:64]})\n\n          ok = len(findings) == 0\n          result = {\"ok\": ok, \"total_lines\": total_lines, \"violations\": findings}\n\n          print(json.dumps(result, indent=2))\n          sys.exit(0 if (ok or not fail_on_any) else 1)\n\n      if __name__ == \"__main__\":\n          main()\n    env:\n      EXAMPLES_PATH: artifacts/examples/support_agent/examples.txt\n      FAIL_ON_ANY: \"true\"\n    success_message: \"No PII found in examples.\"\n    failure_message: \"PII detected in examples. Redact or mask before shipping.\"\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: medium\n  notes: ''\n",
       "posture": "witnessed",
       "_witness_count": 1
@@ -5952,7 +6087,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "medium",
         "notes": ""
       },
-      "_file": "./capsules/support_agent/support.billing_basics_v1.yaml",
+      "_file": "./capsules/support/support.billing_basics_v1.yaml",
       "_raw": "id: support.billing_basics_v1\nversion: 1.1.0\ndomain: support\ntitle: Billing Playbooks (SaaS)\nstatement: |-\n  Canonical flows for common billing issues without exposing PII or promising credits.\n\n  Playbook: Get invoice PDF\n    1) Ask for masked account identifier (e.g., ticket or org slug).\n    2) Guide to: Settings → Billing → Invoices → \"Download PDF\".\n    3) If missing, create ticket for Billing with masked reference.\n\n  Playbook: Refund request (within policy)\n    1) Acknowledge and summarize the reason.\n    2) Link refunds policy (exact section) and timeframe.\n    3) Create Billing ticket; do not promise outcome; share reference ID.\n\n  Playbook: Plan downgrade / cancel\n    1) Confirm effective date and proration link.\n    2) Guide to: Settings → Plan → \"Change plan\".\n    3) If blocked by contract, route to Billing Supervisor.\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T19:05:00Z'\n  updated: '2025-11-10T19:05:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\nsecurity:\n  sensitivity: medium\n  notes: \"\"\n",
       "posture": "informational",
       "_witness_count": 0
@@ -5992,7 +6127,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "medium",
         "notes": ""
       },
-      "_file": "./capsules/support_agent/support.knowledge_view_projection_v1.yaml",
+      "_file": "./capsules/support/support.knowledge_view_projection_v1.yaml",
       "_raw": "id: support.knowledge_view_projection_v1\nversion: 1.1.0\ndomain: support\ntitle: Knowledge View & Citation Policy\nstatement: |-\n  Cite official docs with exact anchors; avoid paraphrasing policy-sensitive pages.\n\n  Sources policy:\n    • Prefer official docs, status pages, and signed announcements. Avoid blog posts for policy.\n\n  Citation rules:\n    • Link the exact doc section and version (e.g., /docs/billing#refunds v3.1).\n    • Summarize in one sentence, then provide the link; do not copy large passages.\n    • If doc is gated, describe the path (Settings → Billing → Invoices).\n    • For outages, always include {status_url} and the last update time.\n\n  Link policy:\n    • Never link to internal-only resources in public responses.\n    • If a page moves, provide both old and new paths during the transition.\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T19:05:00Z'\n  updated: '2025-11-10T19:05:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\nsecurity:\n  sensitivity: medium\n  notes: \"\"\n",
       "posture": "informational",
       "_witness_count": 0
@@ -6032,7 +6167,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "medium",
         "notes": ""
       },
-      "_file": "./capsules/support_agent/support.escalation_matrix_v1.yaml",
+      "_file": "./capsules/support/support.escalation_matrix_v1.yaml",
       "_raw": "id: support.escalation_matrix_v1\nversion: 1.1.0\ndomain: support\ntitle: Escalation Matrix & Handoffs\nstatement: |-\n  Route high-risk or restricted requests to the correct queue with a crisp customer explanation.\n\n  Matrix (placeholders in braces are filled by your system):\n    +------------------------+---------------------+----------------------+---------------------------+\n    | Scenario               | Tier / Owner        | SLA                  | Customer-Facing Message   |\n    +------------------------+---------------------+----------------------+---------------------------+\n    | Outage / Sev-1         | On-call SRE         | 15m ack / hourly upd | \"We're experiencing an    |\n    |                        |                     |                      | outage. Status: {status_url}\"    |\n    | Billing dispute >$500  | Billing Specialist  | 1 business day       | \"I've opened a ticket     |\n    |                        |                     |                      | with Billing. Ref: {ticket_id}\"  |\n    | Refund exceptions      | Billing Supervisor  | 2 business days      | \"I'll escalate your refund|\n    |                        |                     |                      | request for review.\"      |\n    | Security/Privacy       | Security Team       | 1 business day       | \"Escalated to security.   |\n    |                        |                     |                      | Ref: {ticket}\"          |\n    | Data deletion (GDPR)   | Data Protection Off | 72 hours             | \"Deletion in progress.    |\n    |                        |                     |                      | Ref: {ticket}\"          |\n    +------------------------+---------------------+----------------------+---------------------------+\n\n  Rules:\n    • If severity ≥ Sev-2 or involves legal/privacy, escalate immediately and provide a reference ID.\n    • Never modify or promise billing credits; create a ticket and route to Billing.\n    • Provide the customer with what will happen next and a timeframe.\n    • Record all escalations with ticket references; avoid free-form DMs.\n    • Do not request or store PII; use masked references only.\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T19:05:00Z'\n  updated: '2025-11-10T19:05:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\nsecurity:\n  sensitivity: medium\n  notes: \"\"\n",
       "posture": "informational",
       "_witness_count": 0
@@ -6090,7 +6225,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "medium",
         "notes": ""
       },
-      "_file": "./capsules/support_agent/support.intent_router_sanity_v1.yaml",
+      "_file": "./capsules/support/support.intent_router_sanity_v1.yaml",
       "_raw": "id: support.intent_router_sanity_v1\nversion: 1.0.0\ndomain: support\ntitle: Intent Router Sanity Check\nstatement: |-\n  Validate that baseline rules classify common support intents correctly. Defaults read\n  fixtures under artifacts/examples/support_agent/. Accuracy must meet or exceed 0.8.\nassumptions:\npedagogy:\nwitnesses:\n  - name: routes_top_intents_correctly\n    language: python\n    code: |-\n      import os, sys, json, re\n\n      def load_json(path):\n          with open(path, \"r\") as f:\n              return json.load(f)\n\n      def classify(text, rules):\n          text_l = text.lower()\n          for intent, pats in rules.items():\n              for pat in pats:\n                  if re.search(pat, text_l):\n                      return intent\n          return \"unknown\"\n\n      def main():\n          intents_path = os.environ.get(\"INTENTS_JSON\", \"\").strip()\n          rules_path = os.environ.get(\"RULES_JSON\", \"\").strip()\n          acc_threshold = float(os.environ.get(\"ACC_THRESHOLD\", \"0.8\"))\n\n          if not intents_path or not rules_path:\n              print(json.dumps({\"ok\": False, \"error\": \"INTENTS_JSON or RULES_JSON not set\"}))\n              sys.exit(2)\n\n          intents = load_json(intents_path)  # list of {text, expected}\n          rules = load_json(rules_path)      # {intent: [regex,...]}\n\n          total = len(intents)\n          correct = 0\n          details = []\n\n          for item in intents:\n              text = item[\"text\"]\n              expected = item[\"expected\"]\n              pred = classify(text, rules)\n              correct += 1 if pred == expected else 0\n              details.append({\"text\": text, \"expected\": expected, \"pred\": pred})\n\n          acc = (correct / total) if total else 0.0\n          ok = acc >= acc_threshold\n\n          print(json.dumps({\"ok\": ok, \"accuracy\": acc, \"threshold\": acc_threshold, \"total\": total, \"correct\": correct, \"details\": details}, indent=2))\n          sys.exit(0 if ok else 1)\n\n      if __name__ == \"__main__\":\n          main()\n\n    env:\n      INTENTS_JSON: artifacts/examples/support_agent/intents.json\n      RULES_JSON: artifacts/examples/support_agent/router_rules.json\n      ACC_THRESHOLD: \"0.8\"\n    success_message: \"Intent router accuracy meets threshold.\"\n    failure_message: \"Intent router below threshold — refine rules or examples.\"\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T18:12:37Z'\n  updated: '2025-11-10T18:12:37Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\ndependencies: []\nincompatible_with: []\nsecurity:\n  sensitivity: medium\n  notes: ''\n",
       "posture": "witnessed",
       "_witness_count": 1
@@ -6130,7 +6265,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "medium",
         "notes": ""
       },
-      "_file": "./capsules/support_agent/support.tone_style_guide_v1.yaml",
+      "_file": "./capsules/support/support.tone_style_guide_v1.yaml",
       "_raw": "id: support.tone_style_guide_v1\nversion: 1.1.0\ndomain: support\ntitle: Tone & Style Guide (Public-Facing)\nstatement: |-\n  Be empathetic, concise, specific, and action-oriented; never echo or store PII.\n  Rules:\n    • Lead with empathy and a one-sentence summary of the customer’s goal.\n    • Offer one actionable next step; avoid overwhelming lists.\n    • Prefer links to official docs; include exact anchor and version if relevant.\n    • Never guess order/account details; ask for the minimal non-sensitive clarifier.\n    • Use plain language; avoid internal acronyms or engineering jargon.\n    • Avoid absolute promises; reference policy and expected timeframes.\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T19:05:00Z'\n  updated: '2025-11-10T19:05:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\nsecurity:\n  sensitivity: medium\n  notes: \"\"\n",
       "posture": "informational",
       "_witness_count": 0
@@ -6170,7 +6305,7 @@ Prism.languages.js = Prism.languages.javascript;
         "sensitivity": "medium",
         "notes": ""
       },
-      "_file": "./capsules/support_agent/support.legal_privacy_rules_v1.yaml",
+      "_file": "./capsules/support/support.legal_privacy_rules_v1.yaml",
       "_raw": "id: support.legal_privacy_rules_v1\nversion: 1.1.0\ndomain: support\ntitle: Legal & Privacy Rules (Public-Facing)\nstatement: |-\n  Prevent PII leakage and ensure compliant disclosures.\n\n  PII classes to avoid in public channels:\n    • email, phone, government_id, credit_card, street_address, ip_address\n\n  Storage policy:\n    • Do not store PII in tickets or chat logs. Use masked IDs or internal references.\n\n  Customer-facing disclaimers (choose 1 as needed):\n    • \"For your security, please avoid sharing personal data (like email, phone, or payment info) here.\"\n    • \"We can continue after I’ve created a secure ticket; I’ll share a masked reference ID.\"\n    • \"I’m not able to provide legal or medical advice. I can link official resources instead.\"\nprovenance:\n  schema: provenance.v1\n  author: John Macgregor\n  org: Truth Capsules Demo\n  license: MIT\n  source_url: https://example.com/truth-capsules/support\n  created: '2025-11-10T19:05:00Z'\n  updated: '2025-11-10T19:05:00Z'\n  review:\n    status: draft\n    reviewers: []\n    last_reviewed: null\n  signing:\n    method: ed25519\n    key_id: null\n    pubkey: null\n    digest: null\n    signature: null\napplies_to:\n- conversation\n- support\nsecurity:\n  sensitivity: medium\n  notes: \"\"\n",
       "posture": "informational",
       "_witness_count": 0
@@ -6441,27 +6576,25 @@ Prism.languages.js = Prism.languages.javascript;
     },
     "profile.macgyver_v1": {
       "id": "profile.macgyver_v1",
-      "title": "Macgyverisms",
-      "version": "1.0.0",
-      "description": "Bootstrap yourself or an LLM to solve problems like Macgyver.",
+      "title": "MacGyver Upgrade (Conversational)",
+      "version": "1.1.1",
+      "description": "A lean, declarative profile that primes the model with MacGyver-style problem solving. Minimal capsule view, strong startup priming, one crisp follow-up only, and built-in safety.",
       "response": {
         "format": "natural",
-        "policy": "Cite or abstain; follow Plan→Verify→Answer; ask ONE crisp follow-up if required.\n",
-        "system_block": "SYSTEM: Profile=Macgyver\n\nFORMAT: Natural language.\n",
+        "policy": "Ask at most ONE crisp follow-up only if a blocker exists. Prefer concrete, low-risk, reversible steps. Cite if you use sources; otherwise reason from first principles. Validate JSON before any tool call.\n",
+        "system_block": "SYSTEM: MacGyver Upgrade — Problem-Solving Profile\nMODE: Natural language; concise and declarative.\n\nSTARTUP (do silently, do not echo):\n  • Read the capsule excerpts below.\n  • Build two internal lists:\n    – SOCRATIC_PRIMES = all Socratic questions from capsules\n    – APHORISM_GUARDS = all aphorisms from capsules\n  • Spend several internal steps reflecting on these lists so you are primed for fast, safe, resourceful problem solving.\n\nOPERATING CYCLE (each task):\n  1) GOAL → restate in one short sentence.\n  2) INVENTORY → assets → properties (not brand labels).\n  3) LAWS → map the need to simple physical / informational laws.\n  4) ROUTES → propose 3 routes (Physical / Informational / Environmental).\n  5) CHOSEN ROUTE → lowest-risk, highest-control; show the chain Sense→Gate→Amplify→Actuate.\n  6) PREMORTEM & SAFETY → likely failure + how to shrink blast radius.\n  7) MICRO-TEST → the smallest, reversible test to validate safely.\n  8) ANSWER → numbered steps + benign analogue if needed.\n\nFOLLOW-UP RULE:\n  • If a required fact is missing, ask exactly ONE crisp question first, then proceed.\n\nOUTPUT SHAPE:\n  • GOAL\n  • INVENTORY (assets→properties)\n  • LAWS\n  • ROUTES (P/I/E)\n  • CHOSEN ROUTE (chain & why)\n  • PREMORTEM & SAFETY\n  • MICRO-TEST\n  • ANSWER\n\nSTYLE:\n  • Verbs over nouns; properties over brand labels.\n  • Prefer low-tech, observable, interruptible mechanisms.\n  • Keep steps short, testable, and reversible.\n\nSAFETY & SCOPE:\n  • No hazardous, unlawful, or security-bypass guidance. Offer safe, legal, educational analogues instead.\n\nEXAMPLES\n— Good —\n  User: “Open a sealed paint can without a proper opener.”\n  Assistant:\n    GOAL: Open lid without damage or injury.\n    INVENTORY: flat screwdriver→lever; rag→shim; wooden block→fulcrum; warm water→thermal expansion.\n    LAWS: torque/leverage; thermal expansion; edge protection.\n    ROUTES:\n      P: screwdriver + block as lever; rag protects rim.\n      I: check can label for opening guidance.\n      E: warm the lid circumference 60–90 s to relax seal.\n    CHOSEN ROUTE: Physical — Sense (seat tip) → Gate (small lift) → Amplify (longer lever) → Actuate (slow pry).\n    PREMORTEM & SAFETY: slip risk→use rag; paint splash→tilt away; eye protection.\n    MICRO-TEST: 2 mm lift at one point; inspect seal.\n    ANSWER: 1) Wrap rag on rim; 2) Place block as fulcrum; 3) Pry in small increments around clock; 4) If stiff, warm rim then repeat.\n— Bad —\n  “Just pry it open with a knife or google it.”\n",
         "projection": {
           "include": [
             "title",
             "statement",
-            "assumptions[:5]",
-            "pedagogy.socratic[:3]",
-            "pedagogy.aphorisms[:3]"
+            "pedagogy.socratic[:2]",
+            "pedagogy.aphorisms[:2]"
           ],
           "render": {
-            "capsule_header": "BEGIN CAPSULE id={id} version={version} domain={domain}",
-            "assumption_bullet": "  - {text}",
-            "socratic_bullet": "  - {text}",
-            "aphorism_bullet": "  - {text}",
-            "enforcement_footer": "ENFORCEMENT: Ensure outputs satisfy this capsule; otherwise abstain and request the minimal missing info."
+            "capsule_header": " ",
+            "socratic_bullet": "  ? {text}",
+            "aphorism_bullet": "  ✱ {text}",
+            "enforcement_footer": " "
           }
         }
       },
@@ -6469,7 +6602,7 @@ Prism.languages.js = Prism.languages.javascript;
         "suggested_ext": "txt"
       },
       "_file": "./profiles/conversational_macgyver.yaml",
-      "_raw": "kind: profile\nid: profile.macgyver_v1\ntitle: Macgyverisms\nversion: 1.0.0\ndescription: Bootstrap yourself or an LLM to solve problems like Macgyver.\nresponse:\n  format: natural\n  policy: |\n    Cite or abstain; follow Plan→Verify→Answer; ask ONE crisp follow-up if required.\n  system_block: |\n    SYSTEM: Profile=Macgyver\n\n    FORMAT: Natural language.\n  projection:\n    include:\n    - title\n    - statement\n    - assumptions[:5]\n    - pedagogy.socratic[:3]\n    - pedagogy.aphorisms[:3]\n    render:\n      capsule_header: BEGIN CAPSULE id={id} version={version} domain={domain}\n      assumption_bullet: '  - {text}'\n      socratic_bullet: '  - {text}'\n      aphorism_bullet: '  - {text}'\n      enforcement_footer: 'ENFORCEMENT: Ensure outputs satisfy this capsule; otherwise\n        abstain and request the minimal missing info.'\ndownload:\n  suggested_ext: txt"
+      "_raw": "kind: profile\nid: profile.macgyver_v1\ntitle: MacGyver Upgrade (Conversational)\nversion: 1.1.1\ndescription: A lean, declarative profile that primes the model with MacGyver-style problem solving. Minimal capsule view, strong startup priming, one crisp follow-up only, and built-in safety.\nresponse:\n  format: natural\n  policy: |\n    Ask at most ONE crisp follow-up only if a blocker exists. Prefer concrete, low-risk, reversible steps. Cite if you use sources; otherwise reason from first principles. Validate JSON before any tool call.\n  system_block: |\n    SYSTEM: MacGyver Upgrade — Problem-Solving Profile\n    MODE: Natural language; concise and declarative.\n\n    STARTUP (do silently, do not echo):\n      • Read the capsule excerpts below.\n      • Build two internal lists:\n        – SOCRATIC_PRIMES = all Socratic questions from capsules\n        – APHORISM_GUARDS = all aphorisms from capsules\n      • Spend several internal steps reflecting on these lists so you are primed for fast, safe, resourceful problem solving.\n\n    OPERATING CYCLE (each task):\n      1) GOAL → restate in one short sentence.\n      2) INVENTORY → assets → properties (not brand labels).\n      3) LAWS → map the need to simple physical / informational laws.\n      4) ROUTES → propose 3 routes (Physical / Informational / Environmental).\n      5) CHOSEN ROUTE → lowest-risk, highest-control; show the chain Sense→Gate→Amplify→Actuate.\n      6) PREMORTEM & SAFETY → likely failure + how to shrink blast radius.\n      7) MICRO-TEST → the smallest, reversible test to validate safely.\n      8) ANSWER → numbered steps + benign analogue if needed.\n\n    FOLLOW-UP RULE:\n      • If a required fact is missing, ask exactly ONE crisp question first, then proceed.\n\n    OUTPUT SHAPE:\n      • GOAL\n      • INVENTORY (assets→properties)\n      • LAWS\n      • ROUTES (P/I/E)\n      • CHOSEN ROUTE (chain & why)\n      • PREMORTEM & SAFETY\n      • MICRO-TEST\n      • ANSWER\n\n    STYLE:\n      • Verbs over nouns; properties over brand labels.\n      • Prefer low-tech, observable, interruptible mechanisms.\n      • Keep steps short, testable, and reversible.\n\n    SAFETY & SCOPE:\n      • No hazardous, unlawful, or security-bypass guidance. Offer safe, legal, educational analogues instead.\n\n    EXAMPLES\n    — Good —\n      User: “Open a sealed paint can without a proper opener.”\n      Assistant:\n        GOAL: Open lid without damage or injury.\n        INVENTORY: flat screwdriver→lever; rag→shim; wooden block→fulcrum; warm water→thermal expansion.\n        LAWS: torque/leverage; thermal expansion; edge protection.\n        ROUTES:\n          P: screwdriver + block as lever; rag protects rim.\n          I: check can label for opening guidance.\n          E: warm the lid circumference 60–90 s to relax seal.\n        CHOSEN ROUTE: Physical — Sense (seat tip) → Gate (small lift) → Amplify (longer lever) → Actuate (slow pry).\n        PREMORTEM & SAFETY: slip risk→use rag; paint splash→tilt away; eye protection.\n        MICRO-TEST: 2 mm lift at one point; inspect seal.\n        ANSWER: 1) Wrap rag on rim; 2) Place block as fulcrum; 3) Pry in small increments around clock; 4) If stiff, warm rim then repeat.\n    — Bad —\n      “Just pry it open with a knife or google it.”\n\n  projection:\n    include:\n      - title\n      - statement\n      - pedagogy.socratic[:2]\n      - pedagogy.aphorisms[:2]\n    render:\n      # Keep the header empty to avoid unsupported placeholders.\n      capsule_header: \" \"\n      socratic_bullet: \"  ? {text}\"\n      aphorism_bullet: \"  ✱ {text}\"\n      # Explicitly clear the enforcement footer (many renderers default this if absent).\n      enforcement_footer: \" \"\ndownload:\n  suggested_ext: txt\n"
     },
     "profile.dev.code_assistant_v1": {
       "id": "profile.dev.code_assistant_v1",
@@ -7160,9 +7293,6 @@ Prism.languages.js = Prism.languages.javascript;
         $('out').value = out;
       }
 
-
-
-      /* ------------ Manifest + share ------------ */
       /* ------------ Manifest + share ------------ */
 
       /* Namespace for LocalStorage manifests */

@@ -1038,6 +1038,7 @@
     .toolbar .title-wrap {
       display: flex;
       flex-direction: column;
+      padding-left:30px;
     }
 
     .toolbar-actions {
@@ -1046,6 +1047,7 @@
       align-items: center;
       gap: 10px;
       flex-wrap: wrap;
+      margin-right:30px;
     }
 
     /* Groups = compact button clusters */
@@ -1054,7 +1056,7 @@
       align-items: center;
       gap: 4px;
       padding: 2px;
-      border: 1px solid var(--border, #3a3f55);
+      /* border: 1px solid var(--border, #3a3f55); */
       border-radius: 10px;
       background: var(--panel, rgba(127, 127, 127, 0.08));
     }
@@ -1141,6 +1143,141 @@
       opacity: 0.7;
       font-size: 12px;
     }
+
+/* === Modern ghost pills (borderless groups) === */
+:root{
+  --btn-h: 30px;
+  --btn-r: 12px;
+  --hairline: color-mix(in oklab, var(--border), transparent 35%);
+  --hover:   color-mix(in oklab, var(--accent), transparent 88%);
+  --press:   color-mix(in oklab, var(--accent), transparent 70%);
+}
+
+.toolbar { gap: 10px; padding: 6px 0; }
+.toolbar-actions { gap: 8px; }
+
+/* No chrome around clusters */
+.group{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: 0;
+}
+/* kill any old highlight rings */
+.group:has(.menu[open]){ box-shadow: none; }
+
+/* Pills */
+.btn{
+  -webkit-appearance: none;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: var(--btn-h);
+  padding: 0 12px;
+  border-radius: var(--btn-r);
+  border: 1px solid var(--hairline);         /* hairline, not heavy */
+  background: color-mix(in oklab, var(--btn-bg), transparent 10%);
+  color: var(--text);
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease,
+              box-shadow .15s ease, transform .04s ease;
+}
+
+.btn:hover{
+  background: var(--hover);
+  border-color: color-mix(in oklab, var(--border), var(--accent) 40%);
+  box-shadow: 0 2px 10px rgba(0,0,0,.12);
+}
+
+.btn:active{
+  background: var(--press);
+  transform: translateY(1px);
+  box-shadow: 0 1px 4px rgba(0,0,0,.18) inset;
+}
+
+/* Subtle, accessible focus */
+.btn:focus{ outline: none; }
+.btn:focus-visible{
+  outline: 2px solid color-mix(in oklab, var(--accent), transparent 60%);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+/* Icon-only = circular ghost */
+.btn.icon{
+  width: var(--btn-h);
+  min-width: var(--btn-h);
+  padding: 0;
+  border-radius: 999px;
+}
+
+/* Caution tone stays ghost (no filled red blob) */
+.btn.warn{
+  color: var(--danger, #e06c75);
+  background: color-mix(in oklab, var(--btn-bg), transparent 6%);
+  border-color: color-mix(in oklab, var(--danger, #e06c75), var(--border) 75%);
+}
+
+/* Details/summary dropdown matches pills */
+.menu{ position: relative; }
+.menu > summary{ list-style: none; cursor: pointer; }
+.menu > summary::-webkit-details-marker{ display: none; }
+
+/* Panel */
+.menu[open] .menu-list{ display: block; }
+.menu-list{
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 220px;
+  padding: 8px;
+  background: var(--bgElevated, var(--bg));
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  z-index: 1000;
+}
+
+.menu-item{
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  text-align: left;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.menu-item:hover{
+  background: color-mix(in oklab, var(--panel), var(--text) 4%);
+}
+.menu-item.warn{ color: var(--danger, #e06c75); }
+
+.menu-field{ padding: 6px 6px 8px; }
+.menu-row{ display: flex; gap: 6px; padding: 4px 6px; }
+.menu-row .menu-item{ flex: 1; text-align: center; }
+
+.menu-sep{
+  border: 0; height: 1px; margin: 6px 0;
+  background: linear-gradient(to right, transparent, var(--hairline), transparent);
+}
+
+/* Tiny screen tweak */
+@media (max-width: 900px){
+  :root{ --btn-h: 28px; }
+}
+
+    
   </style>
 
 
