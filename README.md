@@ -1,227 +1,156 @@
-```
-Assumption: You want a drop-in replacement for README.md that reflects the directory tree you pasted (accurate counts, updated examples, and current capsule/profile/bundle lists).
+# Truth Capsules — A Knowledge Architecture Example
 
-🧭 Mode=Basic | 🧠 Depth=3 | 🧪 Rigor=Medium | 📄 Scope=1-page | 🕒 Recency=optional | ⏸ Stop-at=— | 📡 Adapter=Chat
-(quick change ⇒ “Mode: Deep · Depth: 5 · Rigor: High · Scope: YAML skeleton · Recency: required · Stop at S2 · Adapter: PR”)
-```
+**Demonstrator project for structured, versioned, testable LLM knowledge**
 
-Here’s an updated `README.md` you can paste over the current one. I’ve refreshed all counts and examples to match the tree you provided (as of **2025-11-12**).
+This is a reference implementation showing how I approach organizing
+domain-specific knowledge for LLMs. It includes:
 
----
+* **Versioned knowledge units (capsules)**
+* **Pedagogy** (Socratic prompts, aphorisms)
+* **Executable tests** (witnesses)
+* **Composition system** (bundles, profiles)
+* **Cryptographic provenance** (signing & verification)
 
-# Truth Capsules v0.1 — informational & witnessed knowledge packs
-
-**Curation-first, executable prompt library for LLMs — with optional signed receipts.**
-
-A **Truth Capsule** is a tiny, versioned **YAML** object that encodes **rules, methods, assumptions, and pedagogy** (Socratic prompts + aphorisms). You can use capsules in **two lanes**:
-
-* **Informational capsules** → compose great **system prompts** from curated bundles/profiles (for prompting, pedagogy, process).
-* **Witnessed capsules** → run **executable checks** and emit **cryptographically-signed receipts** (for CI, policy, audits).
-
-**Project status:** v0.1.0 (PoC) — feedback welcome
+**Status:** Demonstrator / portfolio project
+**Use Case:** Example of knowledge architecture methodology
+**Author:** *Your Name* — Prompt Engineer & Knowledge Architect ·
+**Hire me:** [Get help organizing LLM knowledge »](#hire-me)
 
 ---
 
-## Repo quick stats (from the current tree)
+## What’s inside (snapshot)
 
-* **50 capsules** across 5 groups — CI (5), Dev (8), **MacGyver** (29), Support (7), Meta (1)
-* **4 bundles** (`bundles/`), **4 profiles** (`profiles/`)
-* **24 example inputs** (`artifacts/examples/…`)
-* **CLI/tools:** 18 Python scripts + 5 shell helpers (`scripts/`)
-* **Graph tooling:** 11 Cypher + 3 SPARQL queries (`extras/cypher_queries/`)
-* **Schemas:** 7 JSON schemas (`schemas/`)
-* **LLM templates:** 3 ready-to-use provider configs (`llm_templates/`)
-* **Ontology & shapes:** 1 JSON-LD context, 1 RDFS/Turtle ontology, 1 SHACL shape
+* **50 capsules** across groups — CI (5), Dev (8), **MacGyver (29)**,
+  Support (7), Meta (1)
+* **4 bundles** (`bundles/`) — curated compositions
+* **4 profiles** (`profiles/`) — context-specific prompt postures
+* **SPA composer** — single-file UI (`capsule_composer.html`)
+* **Executable witnesses** — GREEN/RED checks + optional signatures
+* **Graph tooling** — JSON-LD context, RDFS/Turtle ontology, SHACL,
+  SPARQL & Neo4j helpers
+* **Docs** — quickstarts, schema guides, security, CI, witnesses
 
----
-
-## Pick your lane
-
-| Lane              | What you get                                                   | Typical uses                                          | Try it in 60s                           |
-| ----------------- | -------------------------------------------------------------- | ----------------------------------------------------- | --------------------------------------- |
-| **Informational** | Curated, deterministic **system prompts** + manifest lockfiles | Prompt profiles, pedagogy packs, process checklists   | Generate SPA and compose a prompt       |
-| **Witnessed**     | **GREEN/RED** results + **detached Ed25519 signature** per run | “Cite or abstain”, JSON-contract, safety/policy gates | `make witness-sandbox` (examples below) |
-
-> Services available: Day-rate contracting · Pilot installs · Sponsorship. (See repo discussions or contact.)
+> This repo is intentionally simple and self-contained to make the
+> method easy to review and adapt.
 
 ---
 
-## One-minute demo
+## Why this matters
 
-### A) Informational lane (compose a prompt)
+Most orgs keep prompts, policies, and “tribal knowledge” scattered in
+docs and chats. **Truth Capsules** demonstrates a way to:
+
+1. **Structure** knowledge as small, versioned units
+2. **Compose** them deterministically (bundles/profiles)
+3. **Test** them with executable witnesses (GREEN/RED)
+4. **Prove** what ran with signed receipts
+
+Think of it as “**knowledge you can lint, test, and ship**.”
+
+---
+
+## Quick tour (60 seconds)
 
 ```bash
-# 1) Deps
+# deps
 pip install -r requirements.txt
 
-# 2) Generate the SPA snapshot (local composer)
-python scripts/spa/generate_spa.py --root . --output capsule_composer.html
-# Open capsule_composer.html → pick a profile + bundles → copy the prompt
-```
-
-Or via CLI:
-
-```bash
-python scripts/compose_capsules_cli.py \
+# generate the single-file SPA composer (also powers GitHub Pages)
+python scripts/spa/generate_spa.py \
   --root . \
-  --profile conversational_macgyver \
-  --bundle macgyverisms_v1 \
-  --out prompt.txt \
-  --manifest prompt.manifest.json
+  --output capsule_composer.html \
+  --embed-cdn \
+  --vendor-dir scripts/spa/vendor
 ```
 
-### B) Witnessed lane (GREEN/RED + signed receipts)
+Open `capsule_composer.html`, pick a **profile** + **bundles**, and copy
+the composed prompt (manifest included).
 
-**1) Keys (one-time)**
-
-```bash
-make keygen
-# writes keys/dev_ed25519_sk.pem (private) & keys/dev_ed25519_pk.pem (public)
-```
-
-**2) Example: diff risk tags (Dev)**
+**Witness example (GREEN/RED):**
 
 ```bash
-# Likely GREEN: “no-risk” patch
+make keygen  # one-time: writes keys/dev_ed25519_{sk,pk}.pem
+
+# Dev: diff risk tags (no-risk vs risky patch)
 make witness-sandbox CAPSULE=dev.diff_risk_tags_v1 WITNESS=diff_has_expected_risk_tags JSON=1 \
   ENV_VARS="-e DIFF_PATH=artifacts/examples/pr_diff_norisk.patch" \
   SIGN=1 SIGNING_KEY=keys/dev_ed25519_sk.pem KEY_ID=<you@org>
 
-# Likely RED: risky patch
 make witness-sandbox CAPSULE=dev.diff_risk_tags_v1 WITNESS=diff_has_expected_risk_tags JSON=1 \
   ENV_VARS="-e DIFF_PATH=artifacts/examples/pr_diff.patch" \
   SIGN=1 SIGNING_KEY=keys/dev_ed25519_sk.pem KEY_ID=<you@org> ALLOW_RED=1
 ```
 
-**3) Example: PII redaction smoke (Support)**
-
-```bash
-make witness-sandbox CAPSULE=support.pii_redaction_smoke_v1 WITNESS=pii_is_redacted JSON=1 \
-  ENV_VARS="-e INPUT_PATH=artifacts/examples/pii_ok.json"
-```
-
-**4) Example: SBOM present (CI)**
-
-```bash
-make witness-sandbox CAPSULE=ci.sbom_present_v1 WITNESS=sbom_file_exists JSON=1 \
-  ENV_VARS="-e SBOM_PATH=artifacts/examples/ci/sbom.json"
-```
-
-**Verify a signed receipt**
-
-```bash
-python scripts/verify_witness.py \
-  --pub keys/dev_ed25519_pk.pem \
-  artifacts/out/witness_YYYYMMDDTHHMMSSZ.signed.json
-```
-
-Outputs land under `artifacts/out/`:
-
-* `witness_*.json` — raw results
-* `witness_*.signed.json` — result + detached-signature envelope
-* `witness_*.sig` — detached base64 signature
-
-More: **docs/witnesses/WITNESS_SANDBOX.md**, **docs/witnesses/SIGNED_WITNESSES.md**
+Artifacts land in `artifacts/out/` (raw + signed receipts).
 
 ---
 
-## Why Truth Capsules (in 3 bullets)
+## Case study (mini)
 
-* **Receipts, not vibes** — Reproducible prompts and **signed** witness results.
-* **Low ceremony** — Plain YAML + CLI + one-file SPA; copy-paste in minutes.
-* **Composable** — The same capsule feeds prompts *and* CI/policy without divergence.
+**Organizing 50+ MacGyver problem-solving principles**
 
----
-
-## Key features
-
-* ✅ **50 capsules** (CI 5 · Dev 8 · MacGyver 29 · Support 7 · Meta 1)
-* ✅ **Profiles (4)** — `conversational_macgyver`, `dev.code_assistant`, `support_public_agent`, `ci.gates`
-* ✅ **Bundles (4)** — `macgyverisms_v1`, `bundle.dev_code_assistant_v1`, `bundle.ci_quality_gates_v1`, `support_agent_v1_bundle`
-* ✅ **Deterministic composition** — Manifests/lockfiles for reproducibility
-* ✅ **Executable witnesses** — Automated **GREEN/RED** checks
-* ✅ **Provenance & signing** — Ed25519 receipts for audit trails
-* ✅ **CLI tools** — Linter, composer, witness runner, **sign/verify**, **KG export**
-* ✅ **Knowledge-graph ready** — JSON-LD context, RDFS/Turtle ontology, SHACL, SPARQL, Neo4j helpers
+* **Problem:** principles scattered across notes/files; hard to inject
+  into LLMs with consistency, testing, and provenance.
+* **Solution:** encode each as a **capsule** (YAML + pedagogy), compose
+  bundles for different contexts, and add **witnesses** to check
+  application.
+* **Results:** faster iteration, **reduced hallucinations** (pre-flight
+  checks), and repeatable prompt builds with manifests.
 
 ---
 
-## Snapshot SPA (compose visually)
+## How it works (high level)
 
-```bash
-python scripts/spa/generate_spa.py --root . --output docs/index.html
-# Then enable GitHub Pages → /docs
-```
-
-The SPA validates capsule digests, exports manifests/share-links, and emits ready-to-run commands.
-
----
-
-## Knowledge-graph readiness
-
-```bash
-python scripts/export_kg.py
-# artifacts/out/capsules.ttl
-# artifacts/out/capsules.ndjson
-```
-
-See **docs/graph/KG_README.md** and **extras/cypher_queries/** (11 Cypher, 3 SPARQL).
+* **Capsules:** small YAML units with metadata + pedagogy (+ optional
+  witnesses)
+* **Bundles/Profiles:** deterministic composition into prompts
+* **Witnesses:** executable checks (GREEN/RED) with optional signing
+* **Provenance:** Ed25519 signing + verification
+* **Graph:** export to RDF/Turtle & NDJSON-LD; query with SPARQL/Cypher
 
 ---
 
 ## Project structure (abridged)
 
 ```
-truth-capsules/
-├── artifacts/
-│   ├── examples/                 # 24 input fixtures (CI/Dev/Support…)
-│   └── out/                      # Generated outputs (KG, receipts)
-├── bundles/                      # 4 curated bundles
-├── capsules/                     # 50 capsules (CI 5, Dev 8, MacGyver 29, Support 7, Meta 1)
-├── profiles/                     # 4 profiles
-├── scripts/                      # 18 Python CLIs + 5 shell helpers (+ SPA generator)
-├── llm_templates/                # 3 provider templates
-├── extras/cypher_queries/        # 11 Cypher + 3 SPARQL
-├── contexts/, ontology/, shacl/  # JSON-LD, RDFS/Turtle, SHACL
-└── docs/                         # Guides, quickstarts, security, CI, witnesses
+truth_capsules/
+├─ capsules/             # 50 total (CI 5, Dev 8, MacGyver 29, Support 7, Meta 1)
+├─ bundles/              # 4 curated sets
+├─ profiles/             # 4 context profiles
+├─ artifacts/examples/   # input fixtures (GREEN/RED)
+├─ artifacts/out/        # generated outputs (KG, receipts)
+├─ scripts/              # CLIs (compose, run, sign, verify, export KG)
+├─ capsule_composer.html # single-file SPA (also served via GitHub Pages)
+└─ docs/                 # guides & references
 ```
 
 ---
 
-## Available capsules (by group)
+## Not a product — a pattern you can adopt
 
-**CI (5):**
-`ci.container_hardening_v1`, `ci.license_compliance_v1`, `ci.reproducible_artifact_hash_v1`, `ci.sbom_present_v1`, `ci.secrets_in_build_env_v1`
-
-**Dev (8):**
-`dev.commit_conventions_v1`, `dev.diff_risk_tags_v1`, `dev.enforce_todo_ticket_v1`, `dev.prompt_safety_rules_v1`, `dev.review_checklist_v1`, `dev.secret_scan_baseline_v1`, `dev.style_guide_js_v1`, `dev.style_guide_python_v1`
-
-**MacGyver (29):**
-`macgyver.affordance_matrix_template_v1`, `macgyver.affordances_over_objects_v1`, `macgyver.bias_checklist_v1`, `macgyver.blast_radius_humility_v1`, `macgyver.chain_design_v1`, `macgyver.deception_force_multiplier_v1`, `macgyver.deliberate_practice_v1`, `macgyver.environment_as_component_v1`, `macgyver.fail_safe_defaults_v1`, `macgyver.five_rails_v1`, `macgyver.functional_fixedness_avoidance_v1`, `macgyver.inventory_thinking_v1`, `macgyver.latency_control_v1`, `macgyver.legal_ethical_guardrails_v1`, `macgyver.low_tech_first_v1`, `macgyver.mvp_mechanism_bias_v1`, `macgyver.parallel_options_v1`, `macgyver.problem_collapse_v1`, `macgyver.prompts_as_programs_v1`, `macgyver.prompt_skeleton_v1`, `macgyver.property_matching_v1`, `macgyver.rails_ledgers_hub_mapping_v1`, `macgyver.reality_check_v1`, `macgyver.redundancy_chokepoints_v1`, `macgyver.reflection_loop_v1`, `macgyver.sop_10min_loop_v1`, `macgyver.stock_verbs_v1`, `macgyver.transduction_chains_v1`, `macgyver.world_as_typed_graph_v1`
-
-**Support (7):**
-`support.billing_basics_v1`, `support.escalation_matrix_v1`, `support.intent_router_sanity_v1`, `support.knowledge_view_projection_v1`, `support.legal_privacy_rules_v1`, `support.pii_redaction_smoke_v1`, `support.tone_style_guide_v1`
-
-**Meta (1):**
-`meta.truth_capsules_v1`
+This repo is a **demonstrator of method**: structure → compose →
+test → prove. Copy the pattern; keep or replace any part you wish.
 
 ---
 
-## Docs you’ll want first
+## Hire me
 
-* **Quickstart:** `docs/QUICKSTART.md`, `docs/misc/QUICKSTART_SHIP_NEW_CAPSULE.md`
-* **Profiles:** `docs/misc/PROFILES_REFERENCE.md`
-* **Witnesses:** `docs/witnesses/WITNESSES_GUIDE.md`, `docs/witnesses/WITNESS_SANDBOX.md`
-* **Security:** `docs/SECURITY.md`
-* **CI:** `docs/ci/CI_GUIDE.md`
-* **KG:** `docs/graph/KG_README.md`
+If you need to **turn scattered prompts/policies into structured,
+versioned, testable knowledge** with provenance, I can help.
+
+* **Prompt/Knowledge/Intelligence Architecture sprints** (1–2 weeks)
+* **Capsule curation + witness design**
+* **CI/Dev workflow integration** (lint/test/sign/verify)
+
+**Contact:** *mrlecko@gmail.com* · *[linkedin](https://www.linkedin.com/in/semanticalchemist/)* ·
+Calendar: *[Book a 30 minute call](https://calendly.com/mrlecko/30min)*
 
 ---
 
 ## License
 
-MIT — see **LICENSE**.
+MIT. Commercial use encouraged; attribution welcomed.
 
 ---
 
-*Last updated:* **2025-11-12**
+*Last updated:* 2025-11-12
