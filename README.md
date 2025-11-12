@@ -1,4 +1,4 @@
-# Truth Capsules — A Knowledge Architecture Example
+# Truth Capsules  -  A Knowledge Architecture Example
 
 **Demonstrator project for structured, versioned, testable LLM knowledge**
 
@@ -12,24 +12,26 @@ domain-specific knowledge for LLMs. It includes:
 * **Cryptographic provenance** (signing & verification)
 
 **Status:** Demonstrator / portfolio project
-**Composer Demo:** [here] (https://mrlecko.github.io/truth_capsules/)
+**Composer Demo:** [here](https://mrlecko.github.io/truth_capsules/)
+
 **Use Case:** Example of knowledge architecture methodology
-**Author:** *mrlecko@gmail.com* — Intelligence Engineer & Knowledge Architect ·
+
+**Author:** *mrlecko@gmail.com*  -  Intelligence Engineer & Knowledge Architect ·
 **Hire me:** [Get help organizing LLM knowledge »](#hire-me)
 
 ---
 
 ## What’s inside (snapshot)
 
-* **50 capsules** across groups — CI (5), Dev (8), **MacGyver (29)**,
+* **50 capsules** across groups  -  CI (5), Dev (8), **MacGyver (29)**,
   Support (7), Meta (1)
-* **4 bundles** (`bundles/`) — curated compositions
-* **4 profiles** (`profiles/`) — context-specific prompt postures
-* **SPA composer** — single-file UI (`capsule_composer.html`)
-* **Executable witnesses** — GREEN/RED checks + optional signatures
-* **Graph tooling** — JSON-LD context, RDFS/Turtle ontology, SHACL,
+* **4 bundles** (`bundles/`)  -  curated compositions
+* **4 profiles** (`profiles/`)  -  context-specific prompt postures
+* **SPA composer**  -  single-file UI (`capsule_composer.html`)
+* **Executable witnesses**  -  GREEN/RED checks + optional signatures
+* **Graph tooling**  -  JSON-LD context, RDFS/Turtle ontology, SHACL,
   SPARQL & Neo4j helpers
-* **Docs** — quickstarts, schema guides, security, CI, witnesses
+* **Docs**  -  quickstarts, schema guides, security, CI, witnesses
 
 > This repo is intentionally simple and self-contained to make the
 > method easy to review and adapt.
@@ -127,7 +129,7 @@ truth_capsules/
 
 ---
 
-## Not a product — a pattern you can adopt
+## Not a product  -  a pattern you can adopt
 
 This repo is a **demonstrator of method**: structure → compose →
 test → prove. Copy the pattern; keep or replace any part you wish.
