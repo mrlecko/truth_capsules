@@ -24,28 +24,35 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install deps (best-effort)
+      - name: Install deps (same as Makefile env)
         run: |
           python -m pip install --upgrade pip
-          pip install -r scripts/spa/requirements.txt || true
+          # minimal deps for the SPA generator
+          pip install -r scripts/spa/requirements.txt
+          # if the generator reads capsules using project libs, keep this best-effort:
           pip install -r requirements.txt || true
 
-      - name: Build (or copy) SPA
+      - name: Build embedded SPA (vendor inlined)
         run: |
           set -e
           mkdir -p dist
-          # Try generator path first
-          if python scripts/spa/generate_spa.py \
-              --root . \
-              --template scripts/spa/template.html \
-              --output dist/index.html ; then
-            echo "Generated dist/index.html"
-          else
-            echo "Generator failed or not needed; publishing existing capsule_composer.html"
-            cp capsule_composer.html dist/index.html
+          python scripts/spa/generate_spa.py \
+            --root . \
+            --output dist/index.html \
+            --embed-cdn \
+            --vendor-dir scripts/spa/vendor
+
+          # also publish under the original filename for convenience
+          cp dist/index.html dist/capsule_composer.html
+
+          # SPA-friendly 404 to catch client-side routes (optional)
+          cp dist/index.html dist/404.html
+
+          # Sanity: fail if external CDNs remain (relax if you embed fonts elsewhere)
+          if grep -Eo 'https?://(cdn|jsdelivr|unpkg|cdnjs)' dist/index.html; then
+            echo "External CDN refs detected; expected vendor to be embedded."
+            exit 1
           fi
-          # SPA-friendly 404 for client-side routing (optional but nice)
-          cp dist/index.html dist/404.html || true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
