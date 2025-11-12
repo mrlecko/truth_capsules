@@ -12,8 +12,9 @@ domain-specific knowledge for LLMs. It includes:
 * **Cryptographic provenance** (signing & verification)
 
 **Status:** Demonstrator / portfolio project
+**Composer Demo:** [here] (https://mrlecko.github.io/truth_capsules/)
 **Use Case:** Example of knowledge architecture methodology
-**Author:** *Your Name* — Prompt Engineer & Knowledge Architect ·
+**Author:** *mrlecko@gmail.com* — Intelligence Engineer & Knowledge Architect ·
 **Hire me:** [Get help organizing LLM knowledge »](#hire-me)
 
 ---
