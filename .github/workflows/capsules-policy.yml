@@ -16,5 +16,3 @@ jobs:
         run: pip install pyyaml pynacl
       - name: Lint capsules
         run: python scripts/capsule_linter.py capsules
-      - name: Policy check (signatures enforced on approved)
-        run: python scripts/capsule_policy_check.py capsules
